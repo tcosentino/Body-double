@@ -1,0 +1,27 @@
+{
+  "name": "body-double",
+  "version": "0.1.0",
+  "description": "AI-powered body doubling companion for focus and productivity",
+  "type": "module",
+  "scripts": {
+    "test:prompts": "tsx src/test-harness.ts",
+    "test:prompts:watch": "tsx watch src/test-harness.ts",
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts"
+  },
+  "keywords": [
+    "adhd",
+    "productivity",
+    "body-doubling",
+    "ai-companion"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
