@@ -6,3 +6,6 @@ dist/
 
 # Generated test outputs (remove this line to track example conversations)
 test-outputs/
+
+# SQLite database
+data/

@@ -1,0 +1,120 @@
+/**
+ * Database Schema
+ *
+ * SQLite schema for local development.
+ * Can be migrated to PostgreSQL for production.
+ */
+
+export const schema = `
+-- Users table
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+
+  -- User context for AI companion
+  work_context TEXT,
+  interests TEXT,  -- JSON array
+
+  -- Preferences
+  preferences TEXT DEFAULT '{}'  -- JSON object
+);
+
+-- Sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  started_at TEXT DEFAULT (datetime('now')),
+  ended_at TEXT,
+
+  -- Session details
+  declared_task TEXT,
+  outcome TEXT,  -- Post-session reflection
+  duration_planned INTEGER,  -- in minutes
+  duration_actual INTEGER,   -- in minutes
+  check_in_frequency INTEGER DEFAULT 15,  -- in minutes
+
+  -- Status: 'active', 'completed', 'abandoned'
+  status TEXT DEFAULT 'active'
+);
+
+-- Messages table
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL REFERENCES sessions(id),
+  role TEXT NOT NULL,  -- 'user' or 'assistant'
+  content TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- User context items - things worth remembering
+CREATE TABLE IF NOT EXISTS user_context_items (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  category TEXT NOT NULL,  -- 'project', 'interest', 'challenge', 'insight'
+  content TEXT NOT NULL,
+  last_referenced TEXT DEFAULT (datetime('now')),
+  importance INTEGER DEFAULT 1,  -- 1-5 scale
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
+CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
+CREATE INDEX IF NOT EXISTS idx_context_items_user_id ON user_context_items(user_id);
+CREATE INDEX IF NOT EXISTS idx_context_items_category ON user_context_items(category);
+`;
+
+// TypeScript types matching the schema
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  created_at: string;
+  work_context: string | null;
+  interests: string | null;  // JSON string
+  preferences: string;       // JSON string
+}
+
+export interface Session {
+  id: string;
+  user_id: string;
+  started_at: string;
+  ended_at: string | null;
+  declared_task: string | null;
+  outcome: string | null;
+  duration_planned: number | null;
+  duration_actual: number | null;
+  check_in_frequency: number;
+  status: 'active' | 'completed' | 'abandoned';
+}
+
+export interface Message {
+  id: string;
+  session_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  created_at: string;
+}
+
+export interface UserContextItem {
+  id: string;
+  user_id: string;
+  category: 'project' | 'interest' | 'challenge' | 'insight';
+  content: string;
+  last_referenced: string;
+  importance: number;
+  created_at: string;
+}
+
+// Parsed types with JSON fields expanded
+export interface UserWithParsedFields extends Omit<User, 'interests' | 'preferences'> {
+  interests: string[];
+  preferences: {
+    defaultSessionDuration?: number;
+    defaultCheckInFrequency?: number;
+    theme?: 'light' | 'dark';
+  };
+}

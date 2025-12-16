@@ -9,7 +9,9 @@
     "test:batch": "tsx src/batch-test.ts",
     "test:batch:dry": "tsx src/batch-test.ts --dry-run",
     "build": "tsc",
-    "dev": "tsx watch src/index.ts"
+    "dev": "tsx watch src/server/index.ts",
+    "dev:server": "tsx watch src/server/index.ts",
+    "db:setup": "tsx src/server/db/setup.ts"
   },
   "keywords": [
     "adhd",
@@ -19,10 +21,20 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
+    "@anthropic-ai/sdk": "^0.39.0",
+    "better-sqlite3": "^11.7.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "uuid": "^11.0.3",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.13",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
