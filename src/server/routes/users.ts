@@ -1,102 +1,83 @@
 /**
  * User Routes
  *
- * Endpoints for user management and context.
+ * Endpoints for user profile and context management.
+ * All routes require authentication.
  */
 
 import { Router } from "express";
 import { getDb } from "../db/index.js";
 import { buildUserContext } from "../services/context.js";
+import { requireAuth } from "../middleware/auth.js";
 import type { User } from "../db/schema.js";
 
 const router = Router();
 
-/**
- * POST /api/users
- * Create a new user (simple registration)
- */
-router.post("/", (req, res) => {
-  const { email, name } = req.body;
-
-  if (!email || !name) {
-    res.status(400).json({ error: "Email and name are required" });
-    return;
-  }
-
-  const db = getDb();
-  const id = crypto.randomUUID();
-
-  try {
-    db.prepare(`
-      INSERT INTO users (id, email, name)
-      VALUES (?, ?, ?)
-    `).run(id, email, name);
-
-    const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(id) as User;
-    res.status(201).json(user);
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message.includes("UNIQUE constraint")) {
-      res.status(409).json({ error: "Email already exists" });
-    } else {
-      throw error;
-    }
-  }
-});
+// All routes require authentication
+router.use(requireAuth);
 
 /**
- * GET /api/users/:id
- * Get a user by ID
+ * GET /api/users/me
+ * Get current user profile
  */
-router.get("/:id", (req, res) => {
-  const db = getDb();
-  const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.params.id) as User | undefined;
+router.get("/me", (req, res) => {
+  const user = req.user!;
 
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
-  }
-
-  // Parse JSON fields
   res.json({
-    ...user,
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    created_at: user.created_at,
+    work_context: user.work_context,
     interests: user.interests ? JSON.parse(user.interests) : [],
     preferences: JSON.parse(user.preferences),
   });
 });
 
 /**
- * GET /api/users/email/:email
- * Get a user by email (for simple auth)
+ * PUT /api/users/me
+ * Update current user profile
  */
-router.get("/email/:email", (req, res) => {
+router.put("/me", (req, res) => {
+  const { name } = req.body;
   const db = getDb();
-  const user = db.prepare(`SELECT * FROM users WHERE email = ?`).get(req.params.email) as User | undefined;
+  const user = req.user!;
 
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
+  if (name) {
+    db.prepare(`UPDATE users SET name = ? WHERE id = ?`).run(name, user.id);
   }
 
+  const updatedUser = db.prepare(`SELECT * FROM users WHERE id = ?`).get(user.id) as User;
+
   res.json({
-    ...user,
-    interests: user.interests ? JSON.parse(user.interests) : [],
-    preferences: JSON.parse(user.preferences),
+    id: updatedUser.id,
+    email: updatedUser.email,
+    name: updatedUser.name,
+    created_at: updatedUser.created_at,
+    work_context: updatedUser.work_context,
+    interests: updatedUser.interests ? JSON.parse(updatedUser.interests) : [],
+    preferences: JSON.parse(updatedUser.preferences),
   });
 });
 
 /**
- * PUT /api/users/:id/context
- * Update user context (work situation, interests, etc.)
+ * GET /api/users/me/context
+ * Get current user's full context for AI companion
  */
-router.put("/:id/context", (req, res) => {
+router.get("/me/context", (req, res) => {
+  const user = req.user!;
+  const context = buildUserContext(user.id);
+  res.json(context);
+});
+
+/**
+ * PUT /api/users/me/context
+ * Update current user's context (work situation, interests, etc.)
+ */
+router.put("/me/context", (req, res) => {
   const { workContext, interests } = req.body;
   const db = getDb();
-
-  const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.params.id);
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
-  }
+  const user = req.user!;
 
   const updates: string[] = [];
   const values: unknown[] = [];
@@ -116,53 +97,35 @@ router.put("/:id/context", (req, res) => {
     return;
   }
 
-  values.push(req.params.id);
+  values.push(user.id);
   db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`).run(...values);
 
-  const updatedUser = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.params.id) as User;
+  const updatedUser = db.prepare(`SELECT * FROM users WHERE id = ?`).get(user.id) as User;
+
   res.json({
-    ...updatedUser,
+    id: updatedUser.id,
+    email: updatedUser.email,
+    name: updatedUser.name,
+    work_context: updatedUser.work_context,
     interests: updatedUser.interests ? JSON.parse(updatedUser.interests) : [],
     preferences: JSON.parse(updatedUser.preferences),
   });
 });
 
 /**
- * GET /api/users/:id/context
- * Get full user context for AI companion
+ * PUT /api/users/me/preferences
+ * Update current user's preferences
  */
-router.get("/:id/context", (req, res) => {
-  try {
-    const context = buildUserContext(req.params.id);
-    res.json(context);
-  } catch (error: unknown) {
-    if (error instanceof Error && error.message.includes("User not found")) {
-      res.status(404).json({ error: "User not found" });
-    } else {
-      throw error;
-    }
-  }
-});
-
-/**
- * PUT /api/users/:id/preferences
- * Update user preferences
- */
-router.put("/:id/preferences", (req, res) => {
+router.put("/me/preferences", (req, res) => {
   const db = getDb();
-
-  const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(req.params.id) as User | undefined;
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
-  }
+  const user = req.user!;
 
   const currentPrefs = JSON.parse(user.preferences);
   const newPrefs = { ...currentPrefs, ...req.body };
 
   db.prepare(`UPDATE users SET preferences = ? WHERE id = ?`).run(
     JSON.stringify(newPrefs),
-    req.params.id
+    user.id
   );
 
   res.json(newPrefs);

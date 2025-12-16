@@ -21,7 +21,28 @@ CREATE TABLE IF NOT EXISTS users (
   preferences TEXT DEFAULT '{}'  -- JSON object
 );
 
--- Sessions table
+-- Magic links for passwordless auth
+CREATE TABLE IF NOT EXISTS magic_links (
+  id TEXT PRIMARY KEY,
+  user_id TEXT REFERENCES users(id),
+  email TEXT NOT NULL,
+  token TEXT UNIQUE NOT NULL,
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Auth sessions (login sessions, not focus sessions)
+CREATE TABLE IF NOT EXISTS auth_sessions (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  token TEXT UNIQUE NOT NULL,
+  expires_at TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+  last_active_at TEXT DEFAULT (datetime('now'))
+);
+
+-- Focus sessions table (renamed from sessions for clarity)
 CREATE TABLE IF NOT EXISTS sessions (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id),
@@ -65,6 +86,10 @@ CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
 CREATE INDEX IF NOT EXISTS idx_messages_session_id ON messages(session_id);
 CREATE INDEX IF NOT EXISTS idx_context_items_user_id ON user_context_items(user_id);
 CREATE INDEX IF NOT EXISTS idx_context_items_category ON user_context_items(category);
+CREATE INDEX IF NOT EXISTS idx_magic_links_token ON magic_links(token);
+CREATE INDEX IF NOT EXISTS idx_magic_links_email ON magic_links(email);
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_token ON auth_sessions(token);
+CREATE INDEX IF NOT EXISTS idx_auth_sessions_user_id ON auth_sessions(user_id);
 `;
 
 // TypeScript types matching the schema
@@ -117,4 +142,24 @@ export interface UserWithParsedFields extends Omit<User, 'interests' | 'preferen
     defaultCheckInFrequency?: number;
     theme?: 'light' | 'dark';
   };
+}
+
+// Auth types
+export interface MagicLink {
+  id: string;
+  user_id: string | null;
+  email: string;
+  token: string;
+  expires_at: string;
+  used_at: string | null;
+  created_at: string;
+}
+
+export interface AuthSession {
+  id: string;
+  user_id: string;
+  token: string;
+  expires_at: string;
+  created_at: string;
+  last_active_at: string;
 }

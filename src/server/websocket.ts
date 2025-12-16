@@ -2,25 +2,28 @@
  * WebSocket Handler
  *
  * Real-time chat using WebSockets with streaming AI responses.
+ * Requires authentication via token query parameter.
  */
 
 import { WebSocketServer, WebSocket } from "ws";
-import type { Server } from "http";
+import type { Server, IncomingMessage } from "http";
 import { getDb } from "./db/index.js";
 import { generateStreamingResponse, saveMessage } from "./services/companion.js";
-import type { Session } from "./db/schema.js";
+import { validateSession } from "./services/auth.js";
+import type { Session, User } from "./db/schema.js";
 
 interface ChatMessage {
-  type: "message" | "join" | "leave" | "error" | "stream_start" | "stream_chunk" | "stream_end";
+  type: "message" | "join" | "leave" | "error" | "stream_start" | "stream_chunk" | "stream_end" | "authenticated";
   sessionId?: string;
   content?: string;
   role?: "user" | "assistant";
   error?: string;
+  user?: { id: string; name: string; email: string };
 }
 
 interface ClientState {
+  user: User | null;
   sessionId: string | null;
-  userId: string | null;
 }
 
 const clients = new Map<WebSocket, ClientState>();
@@ -28,8 +31,24 @@ const clients = new Map<WebSocket, ClientState>();
 export function setupWebSocket(server: Server): WebSocketServer {
   const wss = new WebSocketServer({ server, path: "/ws" });
 
-  wss.on("connection", (ws) => {
-    clients.set(ws, { sessionId: null, userId: null });
+  wss.on("connection", (ws, req) => {
+    // Authenticate via token query parameter
+    const user = authenticateConnection(req);
+
+    if (!user) {
+      ws.send(JSON.stringify({ type: "error", error: "Authentication required. Connect with ?token=xxx" }));
+      ws.close(4001, "Authentication required");
+      return;
+    }
+
+    clients.set(ws, { user, sessionId: null });
+
+    // Send authentication confirmation
+    send(ws, {
+      type: "authenticated",
+      user: { id: user.id, name: user.name, email: user.email },
+      content: "Connected and authenticated",
+    });
 
     ws.on("message", async (data) => {
       try {
@@ -53,9 +72,23 @@ export function setupWebSocket(server: Server): WebSocketServer {
   return wss;
 }
 
+/**
+ * Authenticate WebSocket connection via token query parameter
+ */
+function authenticateConnection(req: IncomingMessage): User | null {
+  const url = new URL(req.url || "", `http://${req.headers.host}`);
+  const token = url.searchParams.get("token");
+
+  if (!token) {
+    return null;
+  }
+
+  return validateSession(token);
+}
+
 async function handleMessage(ws: WebSocket, message: ChatMessage): Promise<void> {
   const state = clients.get(ws);
-  if (!state) return;
+  if (!state || !state.user) return;
 
   switch (message.type) {
     case "join":
@@ -81,6 +114,7 @@ async function handleJoin(
   message: ChatMessage
 ): Promise<void> {
   const { sessionId } = message;
+  const user = state.user!;
 
   if (!sessionId) {
     sendError(ws, "sessionId is required to join");
@@ -88,7 +122,11 @@ async function handleJoin(
   }
 
   const db = getDb();
-  const session = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(sessionId) as Session | undefined;
+
+  // Verify session exists and belongs to this user
+  const session = db.prepare(`
+    SELECT * FROM sessions WHERE id = ? AND user_id = ?
+  `).get(sessionId, user.id) as Session | undefined;
 
   if (!session) {
     sendError(ws, "Session not found");
@@ -101,7 +139,6 @@ async function handleJoin(
   }
 
   state.sessionId = sessionId;
-  state.userId = session.user_id;
 
   send(ws, {
     type: "join",
@@ -115,7 +152,9 @@ async function handleChatMessage(
   state: ClientState,
   message: ChatMessage
 ): Promise<void> {
-  if (!state.sessionId || !state.userId) {
+  const user = state.user!;
+
+  if (!state.sessionId) {
     sendError(ws, "Not connected to a session. Send a join message first.");
     return;
   }
@@ -126,9 +165,11 @@ async function handleChatMessage(
     return;
   }
 
-  // Verify session is still active
+  // Verify session is still active and belongs to user
   const db = getDb();
-  const session = db.prepare(`SELECT status FROM sessions WHERE id = ?`).get(state.sessionId) as { status: string } | undefined;
+  const session = db.prepare(`
+    SELECT status FROM sessions WHERE id = ? AND user_id = ?
+  `).get(state.sessionId, user.id) as { status: string } | undefined;
 
   if (!session || session.status !== "active") {
     sendError(ws, "Session is no longer active");
@@ -151,7 +192,7 @@ async function handleChatMessage(
   // Stream AI response
   let fullResponse = "";
   try {
-    const stream = generateStreamingResponse(state.userId, state.sessionId, content);
+    const stream = generateStreamingResponse(user.id, state.sessionId, content);
 
     for await (const chunk of stream) {
       fullResponse += chunk;
@@ -178,7 +219,6 @@ async function handleChatMessage(
 function handleLeave(ws: WebSocket, state: ClientState): void {
   const sessionId = state.sessionId;
   state.sessionId = null;
-  state.userId = null;
 
   send(ws, {
     type: "leave",

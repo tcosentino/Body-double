@@ -2,15 +2,20 @@
  * Chat Routes
  *
  * Endpoints for sending messages during sessions.
+ * All routes require authentication.
  * For real-time chat, use WebSocket connections instead.
  */
 
 import { Router } from "express";
 import { getDb } from "../db/index.js";
 import { generateResponse, saveMessage } from "../services/companion.js";
+import { requireAuth } from "../middleware/auth.js";
 import type { Session, Message } from "../db/schema.js";
 
 const router = Router();
+
+// All routes require authentication
+router.use(requireAuth);
 
 /**
  * POST /api/chat
@@ -18,6 +23,7 @@ const router = Router();
  */
 router.post("/", async (req, res) => {
   const { sessionId, message } = req.body;
+  const user = req.user!;
 
   if (!sessionId || !message) {
     res.status(400).json({ error: "sessionId and message are required" });
@@ -26,8 +32,10 @@ router.post("/", async (req, res) => {
 
   const db = getDb();
 
-  // Get session and verify it's active
-  const session = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(sessionId) as Session | undefined;
+  // Get session and verify it belongs to user and is active
+  const session = db.prepare(`
+    SELECT * FROM sessions WHERE id = ? AND user_id = ?
+  `).get(sessionId, user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
@@ -44,7 +52,7 @@ router.post("/", async (req, res) => {
 
   try {
     // Generate response
-    const response = await generateResponse(session.user_id, sessionId, message);
+    const response = await generateResponse(user.id, sessionId, message);
 
     // Save assistant message
     const assistantMsg = saveMessage(sessionId, "assistant", response);
@@ -64,10 +72,21 @@ router.post("/", async (req, res) => {
 
 /**
  * GET /api/chat/:sessionId/history
- * Get chat history for a session (alias for /sessions/:id/messages)
+ * Get chat history for a session (must belong to current user)
  */
 router.get("/:sessionId/history", (req, res) => {
+  const user = req.user!;
   const db = getDb();
+
+  // Verify session belongs to user
+  const session = db.prepare(`
+    SELECT id FROM sessions WHERE id = ? AND user_id = ?
+  `).get(req.params.sessionId, user.id);
+
+  if (!session) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
 
   const messages = db.prepare(`
     SELECT * FROM messages

@@ -9,9 +9,11 @@ import cors from "cors";
 import { createServer } from "http";
 import { initializeDb, closeDb } from "./db/index.js";
 import { setupWebSocket } from "./websocket.js";
+import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
+import { cleanupExpiredAuth } from "./services/auth.js";
 
 const PORT = process.env.PORT || 3001;
 
@@ -34,6 +36,7 @@ app.get("/health", (_req, res) => {
 });
 
 // API Routes
+app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
@@ -58,6 +61,14 @@ const wss = setupWebSocket(server);
 // Initialize database
 initializeDb();
 
+// Periodic cleanup of expired auth tokens (every hour)
+setInterval(() => {
+  const cleaned = cleanupExpiredAuth();
+  if (cleaned.magicLinks > 0 || cleaned.sessions > 0) {
+    console.log(`Auth cleanup: removed ${cleaned.magicLinks} magic links, ${cleaned.sessions} sessions`);
+  }
+}, 60 * 60 * 1000);
+
 // Start server
 server.listen(PORT, () => {
   console.log(`
@@ -69,24 +80,29 @@ server.listen(PORT, () => {
 ║  Health:    http://localhost:${PORT}/health                   ║
 ╚════════════════════════════════════════════════════════════╝
 
-API Endpoints:
-  POST   /api/users              Create user
-  GET    /api/users/:id          Get user
-  GET    /api/users/:id/context  Get user context for AI
-  PUT    /api/users/:id/context  Update user context
+Auth Endpoints:
+  POST   /api/auth/request       Request magic link (email)
+  POST   /api/auth/verify        Verify magic link token
+  GET    /api/auth/me            Get current user (auth required)
+  POST   /api/auth/logout        Logout (auth required)
+
+API Endpoints (auth required):
+  GET    /api/users/me           Get current user profile
+  PUT    /api/users/me/context   Update user context
+  GET    /api/users/me/context   Get user context for AI
 
   POST   /api/sessions/start     Start focus session
   POST   /api/sessions/:id/end   End session with reflection
   GET    /api/sessions/:id       Get session
-  GET    /api/sessions/user/:userId/history  Session history
+  GET    /api/sessions/history   Session history
 
   POST   /api/chat               Send message (non-streaming)
 
 WebSocket:
-  Connect to /ws and send:
-    { "type": "join", "sessionId": "..." }
-    { "type": "message", "content": "..." }
-    { "type": "leave" }
+  Connect to /ws with token query param: /ws?token=xxx
+  Send: { "type": "join", "sessionId": "..." }
+        { "type": "message", "content": "..." }
+        { "type": "leave" }
   `);
 });
 
