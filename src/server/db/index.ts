@@ -13,8 +13,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, "../../../data/body-double.db");
 
 let db: Database.Database | null = null;
+let testDb: Database.Database | null = null;
 
 export function getDb(): Database.Database {
+  // If test database is set, use it
+  if (testDb) {
+    return testDb;
+  }
+
   if (!db) {
     // Ensure data directory exists
     const dataDir = path.dirname(DB_PATH);
@@ -42,6 +48,13 @@ export function closeDb(): void {
     db.close();
     db = null;
   }
+}
+
+/**
+ * Set a test database instance (for testing purposes only)
+ */
+export function setTestDb(database: Database.Database | null): void {
+  testDb = database;
 }
 
 export { DB_PATH };
