@@ -17,6 +17,7 @@ import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
 import memoryRouter from "./routes/memory.js";
 import notionRouter from "./routes/notion.js";
+import chatsRouter from "./routes/chats.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -53,6 +54,7 @@ app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/memory", memoryRouter);
 app.use("/api/notion", notionRouter);
+app.use("/api/chats", chatsRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -147,6 +149,22 @@ Notion Endpoints:
   DELETE /api/notion/disconnect  Disconnect Notion
   GET    /api/notion/databases   List available databases
   PUT    /api/notion/configure   Configure database mappings
+
+Chat Endpoints (auth required):
+  GET    /api/chats/main              Get main chat messages
+  POST   /api/chats/main/messages     Add message to main chat
+  DELETE /api/chats/main              Clear main chat history
+  GET    /api/chats/side              List side chats
+  POST   /api/chats/side              Create side chat
+  POST   /api/chats/side/spawn        Spawn side chat from main
+  GET    /api/chats/side/:id          Get side chat
+  PATCH  /api/chats/side/:id          Update side chat
+  DELETE /api/chats/side/:id          Delete side chat
+  POST   /api/chats/side/:id/archive  Archive side chat
+  POST   /api/chats/side/:id/pin      Toggle pin status
+  GET    /api/chats/side/:id/messages Get side chat messages
+  POST   /api/chats/side/:id/messages Add message to side chat
+  GET    /api/chats/activity          Get recent chat activity
 
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx

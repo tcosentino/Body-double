@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat - Body Double</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--gray-50);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      flex-shrink: 0;
+    }
+
+    .app-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      text-decoration: none;
+    }
+
+    .app-header .logo-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      background: transparent;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .nav-link:hover {
+      background: var(--gray-100);
+      color: var(--gray-900);
+    }
+
+    .nav-link.active {
+      background: var(--gray-100);
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--gray-100);
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      color: var(--gray-700);
+    }
+
+    .btn-settings {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .btn-settings:hover {
+      color: var(--gray-700);
+      background: var(--gray-200);
+    }
+
+    .app-body {
+      flex: 1;
+      display: flex;
+      min-height: 0;
+    }
+
+    /* Side Chats Panel */
+    .side-panel {
+      width: 280px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .side-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .side-panel-title {
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .btn-new-chat {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--gray-100);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      color: var(--gray-600);
+      transition: all 0.15s;
+    }
+
+    .btn-new-chat:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .side-chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .side-chat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid transparent;
+    }
+
+    .side-chat-item:hover {
+      background: var(--gray-50);
+    }
+
+    .side-chat-item.selected {
+      background: var(--gray-100);
+      border-color: var(--primary);
+    }
+
+    .side-chat-item.pinned {
+      background: #fef3c7;
+    }
+
+    .side-chat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      background: var(--gradient-primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .side-chat-item.pinned .side-chat-icon {
+      background: #f59e0b;
+    }
+
+    .side-chat-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .side-chat-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .side-chat-topic {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .side-chat-actions {
+      display: none;
+      gap: 0.25rem;
+    }
+
+    .side-chat-item:hover .side-chat-actions {
+      display: flex;
+    }
+
+    .side-chat-action-btn {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--gray-400);
+      transition: all 0.15s;
+    }
+
+    .side-chat-action-btn:hover {
+      background: var(--gray-200);
+      color: var(--gray-700);
+    }
+
+    .empty-side-chats {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 0.875rem;
+    }
+
+    /* Main Chat Area */
+    .main-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .chat-header-info h2 {
+      font-size: 1.125rem;
+      margin: 0 0 0.25rem 0;
+      color: var(--gray-900);
+    }
+
+    .chat-header-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .chat-header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-clear {
+      padding: 0.5rem 1rem;
+      background: var(--gray-100);
+      color: var(--gray-600);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-clear:hover {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    .btn-spawn {
+      padding: 0.5rem 1rem;
+      background: #fef3c7;
+      color: #92400e;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-spawn:hover {
+      background: #fde68a;
+    }
+
+    .btn-spawn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      line-height: 1.5;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+      background: var(--white);
+      color: var(--gray-800);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .message.system {
+      align-self: center;
+      background: #fef3c7;
+      color: var(--gray-700);
+      font-size: 0.875rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s;
+      border: 2px solid transparent;
+    }
+
+    .message.system:hover {
+      background: #fde68a;
+      border-color: #f59e0b;
+    }
+
+    .message.system .side-chat-icon {
+      width: 24px;
+      height: 24px;
+      background: #f59e0b;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message.system .side-chat-icon svg {
+      color: white;
+    }
+
+    .message.system .side-chat-link {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .message.system .side-chat-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      padding: 1rem;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .typing-indicator.show {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: var(--gray-400);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    .chat-input-container {
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      resize: none;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .btn-send {
+      padding: 0.875rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      padding: 0.5rem;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gray-300);
+    }
+
+    .status-dot.connected {
+      background: var(--secondary);
+    }
+
+    /* Modal for new side chat */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .modal h3 {
+      margin: 0 0 1rem 0;
+      color: var(--gray-900);
+    }
+
+    .modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .modal-form input {
+      padding: 0.75rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      font-size: 1rem;
+    }
+
+    .modal-form input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 0.5rem;
+    }
+
+    .btn-cancel {
+      padding: 0.5rem 1rem;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .btn-create {
+      padding: 0.5rem 1rem;
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .side-panel {
+        width: 240px;
+      }
+      .message {
+        max-width: 85%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-body {
+        flex-direction: column;
+      }
+      .side-panel {
+        width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .side-chat-list {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding: 0.5rem;
+      }
+      .side-chat-item {
+        flex-shrink: 0;
+        min-width: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <header class="app-header">
+      <a href="/app" class="logo">
+        <span class="logo-icon">&#9680;</span>
+        <span>Body Double</span>
+      </a>
+      <nav class="header-nav">
+        <a href="/app" class="nav-link">Focus Sessions</a>
+        <a href="/app/chat" class="nav-link active">Chat</a>
+      </nav>
+      <div class="header-actions">
+        <a href="/app/settings" class="btn-settings" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </a>
+        <div class="user-menu">
+          <span id="userName">Loading...</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <!-- Side Chats Panel -->
+      <aside class="side-panel">
+        <div class="side-panel-header">
+          <span class="side-panel-title">Side Chats</span>
+          <button class="btn-new-chat" id="newSideChatBtn" title="New side chat">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="side-chat-list" id="sideChatList">
+          <div class="empty-side-chats">No side chats yet</div>
+        </div>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main class="main-chat">
+        <div class="chat-header" id="chatHeader">
+          <div class="chat-header-info">
+            <h2 id="chatTitle">Main Chat</h2>
+            <div class="chat-header-meta" id="chatMeta">Talk to your assistant about anything</div>
+          </div>
+          <div class="chat-header-actions">
+            <button class="btn-spawn" id="spawnChatBtn" style="display: none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <line x1="12" y1="8" x2="12" y2="14"></line>
+                <line x1="9" y1="11" x2="15" y2="11"></line>
+              </svg>
+              Start Side Chat
+            </button>
+            <button class="btn-clear" id="clearChatBtn">Clear History</button>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="message assistant">Hello! I'm your personal assistant. How can I help you today?</div>
+        </div>
+
+        <div class="typing-indicator" id="typingIndicator">
+          <span></span><span></span><span></span>
+        </div>
+
+        <div class="connection-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Connecting...</span>
+        </div>
+
+        <div class="chat-input-container">
+          <form class="chat-input-form" id="chatForm">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off">
+            <button type="submit" class="btn-send" id="sendBtn">Send</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- New Side Chat Modal -->
+  <div class="modal-overlay" id="newChatModal">
+    <div class="modal">
+      <h3>New Side Chat</h3>
+      <form class="modal-form" id="newChatForm">
+        <input type="text" id="chatTitleInput" placeholder="Chat title" required>
+        <input type="text" id="chatTopicInput" placeholder="Topic (optional)">
+        <div class="modal-actions">
+          <button type="button" class="btn-cancel" id="cancelNewChat">Cancel</button>
+          <button type="submit" class="btn-create">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    if (!token || !user) {
+      window.location.href = '/auth/login';
+    }
+
+    // DOM elements
+    const userName = document.getElementById('userName');
+    const sideChatList = document.getElementById('sideChatList');
+    const chatTitle = document.getElementById('chatTitle');
+    const chatMeta = document.getElementById('chatMeta');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const clearChatBtn = document.getElementById('clearChatBtn');
+    const newSideChatBtn = document.getElementById('newSideChatBtn');
+    const newChatModal = document.getElementById('newChatModal');
+    const newChatForm = document.getElementById('newChatForm');
+    const chatTitleInput = document.getElementById('chatTitleInput');
+    const chatTopicInput = document.getElementById('chatTopicInput');
+    const cancelNewChat = document.getElementById('cancelNewChat');
+    const spawnChatBtn = document.getElementById('spawnChatBtn');
+
+    // State
+    let ws = null;
+    let sideChats = [];
+    let currentChatId = null; // null = main chat
+    let isMainChat = true;
+
+    // Initialize
+    userName.textContent = user?.name || user?.email || 'User';
+
+    // Load initial data
+    loadSideChats();
+    loadMainChatMessages();
+    connectWebSocket();
+
+    // ============================================
+    // Side Chats
+    // ============================================
+
+    async function loadSideChats() {
+      try {
+        const response = await fetch('/api/chats/side', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to load');
+        const data = await response.json();
+        sideChats = data.chats || [];
+        renderSideChats();
+      } catch (err) {
+        console.error('Failed to load side chats:', err);
+      }
+    }
+
+    function renderSideChats() {
+      if (sideChats.length === 0) {
+        sideChatList.innerHTML = '<div class="empty-side-chats">No side chats yet</div>';
+        return;
+      }
+
+      sideChatList.innerHTML = sideChats.map(chat => {
+        const isSelected = currentChatId === chat.id;
+        const isPinned = chat.pinned === 1;
+        const initials = chat.title.substring(0, 2).toUpperCase();
+
+        return `
+          <div class="side-chat-item ${isSelected ? 'selected' : ''} ${isPinned ? 'pinned' : ''}"
+               data-id="${chat.id}">
+            <div class="side-chat-icon">${initials}</div>
+            <div class="side-chat-content">
+              <div class="side-chat-title">${escapeHtml(chat.title)}</div>
+              ${chat.topic ? `<div class="side-chat-topic">${escapeHtml(chat.topic)}</div>` : ''}
+            </div>
+            <div class="side-chat-actions">
+              <button class="side-chat-action-btn pin-btn" data-id="${chat.id}" title="${isPinned ? 'Unpin' : 'Pin'}">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
+                  <path d="M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4.76Z"/>
+                </svg>
+              </button>
+              <button class="side-chat-action-btn archive-btn" data-id="${chat.id}" title="Archive">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add click handlers
+      sideChatList.querySelectorAll('.side-chat-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.side-chat-action-btn')) return;
+          selectSideChat(item.dataset.id);
+        });
+      });
+
+      sideChatList.querySelectorAll('.pin-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          togglePin(btn.dataset.id);
+        });
+      });
+
+      sideChatList.querySelectorAll('.archive-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          archiveChat(btn.dataset.id);
+        });
+      });
+    }
+
+    async function selectSideChat(chatId) {
+      currentChatId = chatId;
+      isMainChat = false;
+
+      const chat = sideChats.find(c => c.id === chatId);
+      if (!chat) return;
+
+      chatTitle.textContent = chat.title;
+      chatMeta.textContent = chat.topic || 'Side conversation';
+      clearChatBtn.textContent = 'Archive';
+      spawnChatBtn.style.display = 'none';
+
+      renderSideChats();
+      await loadSideChatMessages(chatId);
+    }
+
+    async function loadSideChatMessages(chatId) {
+      chatMessages.innerHTML = '<div class="message assistant">Loading messages...</div>';
+
+      try {
+        const response = await fetch(`/api/chats/side/${chatId}/messages`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+        chatMessages.innerHTML = '';
+
+        if (data.messages.length === 0) {
+          chatMessages.innerHTML = '<div class="message assistant">This conversation is empty. Start chatting!</div>';
+        } else {
+          data.messages.forEach(m => addMessage(m.content, m.role));
+        }
+      } catch (err) {
+        chatMessages.innerHTML = '<div class="message system">Failed to load messages</div>';
+      }
+    }
+
+    async function togglePin(chatId) {
+      try {
+        await fetch(`/api/chats/side/${chatId}/pin`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        await loadSideChats();
+      } catch (err) {
+        console.error('Failed to toggle pin:', err);
+      }
+    }
+
+    async function archiveChat(chatId) {
+      if (!confirm('Archive this side chat?')) return;
+
+      try {
+        await fetch(`/api/chats/side/${chatId}/archive`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        // If we're viewing this chat, switch to main
+        if (currentChatId === chatId) {
+          switchToMainChat();
+        }
+
+        await loadSideChats();
+      } catch (err) {
+        console.error('Failed to archive chat:', err);
+      }
+    }
+
+    // ============================================
+    // Main Chat
+    // ============================================
+
+    function switchToMainChat() {
+      currentChatId = null;
+      isMainChat = true;
+
+      chatTitle.textContent = 'Main Chat';
+      chatMeta.textContent = 'Talk to your assistant about anything';
+      clearChatBtn.textContent = 'Clear History';
+      spawnChatBtn.style.display = 'flex';
+
+      renderSideChats();
+      loadMainChatMessages();
+    }
+
+    async function loadMainChatMessages() {
+      chatMessages.innerHTML = '<div class="message assistant">Loading messages...</div>';
+      spawnChatBtn.style.display = 'flex'; // Show spawn button for main chat
+
+      try {
+        const response = await fetch('/api/chats/main?limit=100', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+        chatMessages.innerHTML = '';
+
+        if (data.messages.length === 0) {
+          chatMessages.innerHTML = '<div class="message assistant">Hello! I\'m your personal assistant. How can I help you today?</div>';
+        } else {
+          data.messages.forEach(m => {
+            if (m.spawned_side_chat_id) {
+              // Parse metadata from JSON string
+              const metadata = m.metadata ? JSON.parse(m.metadata) : null;
+              addSystemMessage(m.content, m.spawned_side_chat_id, metadata);
+            } else {
+              addMessage(m.content, m.role);
+            }
+          });
+        }
+      } catch (err) {
+        chatMessages.innerHTML = '<div class="message assistant">Hello! I\'m your personal assistant. How can I help you today?</div>';
+      }
+    }
+
+    // ============================================
+    // Chat Messages
+    // ============================================
+
+    function addMessage(content, role) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${role}`;
+      msgDiv.textContent = content;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addSystemMessage(content, sideChatId, metadata) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message system';
+
+      // Parse side chat title from content
+      const titleMatch = content.match(/Started side chat: "(.+)"/);
+      const chatName = titleMatch ? titleMatch[1] : 'Side Chat';
+      const copiedCount = metadata?.copiedMessageCount || 0;
+
+      msgDiv.innerHTML = `
+        <div class="side-chat-icon">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <span class="side-chat-link">${escapeHtml(chatName)}</span>
+          ${copiedCount > 0 ? `<div class="side-chat-meta">Grabbed ${copiedCount} messages for context</div>` : ''}
+        </div>
+      `;
+
+      msgDiv.addEventListener('click', () => {
+        if (sideChatId) {
+          selectSideChat(sideChatId);
+        }
+      });
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // ============================================
+    // WebSocket
+    // ============================================
+
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+
+      ws.onopen = () => {
+        statusDot.classList.add('connected');
+        statusText.textContent = 'Connected';
+      };
+
+      ws.onclose = () => {
+        statusDot.classList.remove('connected');
+        statusText.textContent = 'Disconnected - Reconnecting...';
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = () => {
+        statusText.textContent = 'Connection error';
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'message' || data.type === 'greeting') {
+          typingIndicator.classList.remove('show');
+          addMessage(data.content, 'assistant');
+          // Save to appropriate chat
+          saveAssistantMessage(data.content);
+        } else if (data.type === 'stream_start') {
+          typingIndicator.classList.add('show');
+        } else if (data.type === 'stream_end') {
+          typingIndicator.classList.remove('show');
+          addMessage(data.content, 'assistant');
+          saveAssistantMessage(data.content);
+        } else if (data.type === 'error') {
+          typingIndicator.classList.remove('show');
+          addMessage('Error: ' + data.message, 'system');
+        }
+      };
+    }
+
+    async function saveAssistantMessage(content) {
+      const endpoint = isMainChat
+        ? '/api/chats/main/messages'
+        : `/api/chats/side/${currentChatId}/messages`;
+
+      try {
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ role: 'assistant', content })
+        });
+      } catch (err) {
+        console.error('Failed to save assistant message:', err);
+      }
+    }
+
+    // ============================================
+    // Event Handlers
+    // ============================================
+
+    // Click on chat header to go back to main
+    chatTitle.addEventListener('click', () => {
+      if (!isMainChat) {
+        switchToMainChat();
+      }
+    });
+    chatTitle.style.cursor = 'pointer';
+
+    // Send message
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const content = chatInput.value.trim();
+      if (!content) return;
+
+      addMessage(content, 'user');
+      chatInput.value = '';
+      typingIndicator.classList.add('show');
+
+      // Save user message
+      const endpoint = isMainChat
+        ? '/api/chats/main/messages'
+        : `/api/chats/side/${currentChatId}/messages`;
+
+      try {
+        await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ role: 'user', content })
+        });
+      } catch (err) {
+        console.error('Failed to save user message:', err);
+      }
+
+      // Send via WebSocket for AI response
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'chat_message', content, chatType: isMainChat ? 'main' : 'side', chatId: currentChatId }));
+      }
+    });
+
+    // Clear/Archive button
+    clearChatBtn.addEventListener('click', async () => {
+      if (isMainChat) {
+        if (!confirm('Clear all main chat history?')) return;
+        try {
+          await fetch('/api/chats/main', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          await loadMainChatMessages();
+        } catch (err) {
+          console.error('Failed to clear chat:', err);
+        }
+      } else if (currentChatId) {
+        await archiveChat(currentChatId);
+      }
+    });
+
+    // Spawn side chat from main conversation
+    spawnChatBtn.addEventListener('click', () => {
+      if (!isMainChat) return;
+
+      // Open modal with spawn mode
+      newChatModal.classList.add('show');
+      chatTitleInput.focus();
+      chatTitleInput.placeholder = 'Side chat title';
+      chatTopicInput.placeholder = 'What topic to discuss?';
+
+      // Change modal title and submit handler temporarily
+      const modalTitle = newChatModal.querySelector('h3');
+      modalTitle.textContent = 'Start Side Chat';
+
+      // Store original handler
+      const originalSubmit = newChatForm.onsubmit;
+
+      newChatForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const title = chatTitleInput.value.trim();
+        const topic = chatTopicInput.value.trim();
+
+        if (!title || !topic) {
+          alert('Please enter both a title and topic');
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/chats/side/spawn', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              title,
+              topic,
+              includeRecentMessages: 5 // Grab last 5 messages
+            })
+          });
+
+          if (!response.ok) throw new Error('Failed to spawn');
+
+          const result = await response.json();
+
+          newChatModal.classList.remove('show');
+          chatTitleInput.value = '';
+          chatTopicInput.value = '';
+          chatTitleInput.placeholder = 'Chat title';
+          chatTopicInput.placeholder = 'Topic (optional)';
+          modalTitle.textContent = 'New Side Chat';
+          newChatForm.onsubmit = null; // Reset
+
+          // Add the spawn indicator to main chat
+          addSystemMessage(`Started side chat: "${title}"`, result.sideChat.id, { copiedMessageCount: result.copiedMessages });
+
+          await loadSideChats();
+          selectSideChat(result.sideChat.id);
+        } catch (err) {
+          console.error('Failed to spawn side chat:', err);
+          alert('Failed to start side chat');
+        }
+      };
+    });
+
+    // New side chat modal
+    newSideChatBtn.addEventListener('click', () => {
+      newChatModal.classList.add('show');
+      chatTitleInput.focus();
+    });
+
+    cancelNewChat.addEventListener('click', () => {
+      newChatModal.classList.remove('show');
+      chatTitleInput.value = '';
+      chatTopicInput.value = '';
+    });
+
+    newChatModal.addEventListener('click', (e) => {
+      if (e.target === newChatModal) {
+        newChatModal.classList.remove('show');
+      }
+    });
+
+    newChatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = chatTitleInput.value.trim();
+      const topic = chatTopicInput.value.trim();
+
+      if (!title) return;
+
+      try {
+        const response = await fetch('/api/chats/side', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ title, topic: topic || null })
+        });
+
+        if (!response.ok) throw new Error('Failed to create');
+
+        const chat = await response.json();
+
+        newChatModal.classList.remove('show');
+        chatTitleInput.value = '';
+        chatTopicInput.value = '';
+
+        await loadSideChats();
+        selectSideChat(chat.id);
+      } catch (err) {
+        console.error('Failed to create side chat:', err);
+        alert('Failed to create side chat');
+      }
+    });
+
+    // Utility
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

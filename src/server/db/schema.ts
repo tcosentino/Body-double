@@ -129,6 +129,49 @@ CREATE TABLE IF NOT EXISTS notion_api_logs (
   notion_object_type TEXT         -- "page", "database", "block", etc.
 );
 
+-- Side chats for organized topic-based conversations
+CREATE TABLE IF NOT EXISTS side_chats (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  title TEXT NOT NULL,
+  topic TEXT,                           -- Brief topic description
+  created_at TEXT DEFAULT (datetime('now')),
+  last_message_at TEXT DEFAULT (datetime('now')),
+  status TEXT DEFAULT 'active',         -- 'active', 'archived'
+  pinned INTEGER DEFAULT 0,             -- Boolean: 1 = pinned
+  notion_page_id TEXT,                  -- Optional link to Notion page
+
+  -- Context for the conversation
+  context TEXT                          -- JSON: any context data for this chat
+);
+
+-- Messages in side chats (separate from session messages)
+CREATE TABLE IF NOT EXISTS side_chat_messages (
+  id TEXT PRIMARY KEY,
+  side_chat_id TEXT NOT NULL REFERENCES side_chats(id),
+  role TEXT NOT NULL,                   -- 'user', 'assistant', 'system'
+  content TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+
+  -- Optional metadata
+  metadata TEXT                         -- JSON: tool calls, suggestions, etc.
+);
+
+-- Main chat messages (persistent chat not tied to sessions)
+CREATE TABLE IF NOT EXISTS main_chat_messages (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  role TEXT NOT NULL,                   -- 'user', 'assistant', 'system'
+  content TEXT NOT NULL,
+  created_at TEXT DEFAULT (datetime('now')),
+
+  -- Link to side chat if message spawned one
+  spawned_side_chat_id TEXT REFERENCES side_chats(id),
+
+  -- Optional metadata
+  metadata TEXT                         -- JSON: tool calls, context, etc.
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
@@ -143,6 +186,10 @@ CREATE INDEX IF NOT EXISTS idx_notion_connections_user_id ON notion_connections(
 CREATE INDEX IF NOT EXISTS idx_notion_api_logs_user_id ON notion_api_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_notion_api_logs_timestamp ON notion_api_logs(timestamp);
 CREATE INDEX IF NOT EXISTS idx_notion_api_logs_operation ON notion_api_logs(operation);
+CREATE INDEX IF NOT EXISTS idx_side_chats_user_id ON side_chats(user_id);
+CREATE INDEX IF NOT EXISTS idx_side_chats_status ON side_chats(status);
+CREATE INDEX IF NOT EXISTS idx_side_chat_messages_chat_id ON side_chat_messages(side_chat_id);
+CREATE INDEX IF NOT EXISTS idx_main_chat_messages_user_id ON main_chat_messages(user_id);
 `;
 
 // TypeScript types matching the schema
@@ -301,4 +348,58 @@ export interface NotionApiLogInput {
   error_message?: string;
   notion_object_id?: string;
   notion_object_type?: "page" | "database" | "block" | "user";
+}
+
+// Side chats for topic-based conversations
+export interface SideChat {
+  id: string;
+  user_id: string;
+  title: string;
+  topic: string | null;
+  created_at: string;
+  last_message_at: string;
+  status: "active" | "archived";
+  pinned: number; // 0 or 1
+  notion_page_id: string | null;
+  context: string | null; // JSON string
+}
+
+export interface SideChatMessage {
+  id: string;
+  side_chat_id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  created_at: string;
+  metadata: string | null; // JSON string
+}
+
+export interface MainChatMessage {
+  id: string;
+  user_id: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  created_at: string;
+  spawned_side_chat_id: string | null;
+  metadata: string | null; // JSON string
+}
+
+// Input types for creating new entries
+export interface SideChatInput {
+  title: string;
+  topic?: string;
+  context?: object;
+  notion_page_id?: string;
+}
+
+export interface SideChatMessageInput {
+  role: "user" | "assistant" | "system";
+  content: string;
+  metadata?: object;
+}
+
+export interface MainChatMessageInput {
+  role: "user" | "assistant" | "system";
+  content: string;
+  spawned_side_chat_id?: string;
+  metadata?: object;
 }
