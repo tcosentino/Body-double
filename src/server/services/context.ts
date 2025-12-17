@@ -5,6 +5,7 @@
  * This is the key to making the companion feel genuinely knowledgeable about the user.
  */
 
+import crypto from "node:crypto";
 import { getDb } from "../db/index.js";
 import type { User, Session } from "../db/schema.js";
 import { getMemorySummary, getRelevantMemories } from "./memory.js";
