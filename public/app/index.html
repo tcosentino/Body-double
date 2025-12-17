@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus Session - Body Double</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: var(--gray-50);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .app-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .app-header .logo-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--gray-100);
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      color: var(--gray-700);
+    }
+
+    .btn-logout {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: var(--gray-500);
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-logout:hover {
+      color: var(--gray-700);
+    }
+
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+      overflow: hidden;
+    }
+
+    .session-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-radius: var(--radius-lg);
+      margin-bottom: 1rem;
+    }
+
+    .session-banner.active {
+      display: flex;
+    }
+
+    .session-info h3 {
+      color: var(--white);
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .session-timer {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    .btn-end-session {
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.2);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .btn-end-session:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .start-session-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 1rem;
+    }
+
+    .start-session-card.hidden {
+      display: none;
+    }
+
+    .start-session-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .start-session-card p {
+      color: var(--gray-500);
+      margin-bottom: 1.5rem;
+    }
+
+    .session-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .session-form input, .session-form select {
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+    }
+
+    .session-form input:focus, .session-form select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .chat-container.hidden {
+      display: none;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem;
+      border-radius: var(--radius-lg);
+      line-height: 1.5;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.system {
+      align-self: center;
+      background: transparent;
+      color: var(--gray-400);
+      font-size: 0.875rem;
+      padding: 0.5rem;
+    }
+
+    .chat-input-container {
+      padding: 1rem;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      resize: none;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .btn-send {
+      padding: 0.875rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-self: flex-start;
+      padding: 1rem;
+      background: var(--gray-100);
+      border-radius: var(--radius-lg);
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-indicator.show {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-indicator span {
+      width: 8px;
+      height: 8px;
+      background: var(--gray-400);
+      border-radius: 50%;
+      animation: typing 1.4s infinite;
+    }
+
+    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      padding: 0.5rem 1rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gray-300);
+    }
+
+    .status-dot.connected {
+      background: var(--secondary);
+    }
+
+    @media (max-width: 640px) {
+      .app-main { padding: 1rem; }
+      .message { max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <header class="app-header">
+      <a href="/" class="logo">
+        <span class="logo-icon">&#9680;</span>
+        <span>Body Double</span>
+      </a>
+      <div class="header-actions">
+        <div class="user-menu">
+          <span id="userName">Loading...</span>
+        </div>
+        <button class="btn-logout" id="logoutBtn">Log out</button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="session-banner" id="sessionBanner">
+        <div class="session-info">
+          <h3 id="sessionTask">Focus Session</h3>
+          <div class="session-timer" id="sessionTimer">0:00 elapsed</div>
+        </div>
+        <button class="btn-end-session" id="endSessionBtn">End Session</button>
+      </div>
+
+      <div class="start-session-card" id="startSessionCard">
+        <h2>Ready to focus?</h2>
+        <p>Start a session and I'll be here to help you stay on track.</p>
+        <form class="session-form" id="sessionForm">
+          <input type="text" id="taskInput" placeholder="What are you working on?" required>
+          <select id="durationSelect">
+            <option value="25">25 minutes (Pomodoro)</option>
+            <option value="50">50 minutes</option>
+            <option value="90">90 minutes (Deep work)</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Start Focus Session</button>
+        </form>
+      </div>
+
+      <div class="chat-container hidden" id="chatContainer">
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages will be added here -->
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="connection-status">
+          <span class="status-dot" id="statusDot"></span>
+          <span id="statusText">Connecting...</span>
+        </div>
+        <div class="chat-input-container">
+          <form class="chat-input-form" id="chatForm">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off">
+            <button type="submit" class="btn-send" id="sendBtn">Send</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+
+    if (!token || !user) {
+      window.location.href = '/auth/login';
+    }
+
+    // DOM elements
+    const userName = document.getElementById('userName');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const sessionBanner = document.getElementById('sessionBanner');
+    const sessionTask = document.getElementById('sessionTask');
+    const sessionTimer = document.getElementById('sessionTimer');
+    const endSessionBtn = document.getElementById('endSessionBtn');
+    const startSessionCard = document.getElementById('startSessionCard');
+    const sessionForm = document.getElementById('sessionForm');
+    const taskInput = document.getElementById('taskInput');
+    const durationSelect = document.getElementById('durationSelect');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const typingIndicator = document.getElementById('typingIndicator');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+
+    // State
+    let ws = null;
+    let currentSession = null;
+    let sessionStartTime = null;
+    let timerInterval = null;
+
+    // Initialize
+    userName.textContent = user?.name || user?.email || 'User';
+
+    // WebSocket connection
+    function connectWebSocket() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${window.location.host}/ws?token=${token}`);
+
+      ws.onopen = () => {
+        statusDot.classList.add('connected');
+        statusText.textContent = 'Connected';
+        if (currentSession) {
+          ws.send(JSON.stringify({ type: 'join', sessionId: currentSession.id }));
+        }
+      };
+
+      ws.onclose = () => {
+        statusDot.classList.remove('connected');
+        statusText.textContent = 'Disconnected - Reconnecting...';
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = () => {
+        statusText.textContent = 'Connection error';
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === 'message' || data.type === 'greeting') {
+          typingIndicator.classList.remove('show');
+          addMessage(data.content, 'assistant');
+        } else if (data.type === 'check_in') {
+          typingIndicator.classList.remove('show');
+          addMessage(data.content, 'assistant');
+        } else if (data.type === 'stream_start') {
+          typingIndicator.classList.add('show');
+        } else if (data.type === 'error') {
+          addMessage('Error: ' + data.message, 'system');
+        }
+      };
+    }
+
+    // Add message to chat
+    function addMessage(content, type) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${type}`;
+      msgDiv.textContent = content;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Start session
+    sessionForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const task = taskInput.value;
+      const duration = parseInt(durationSelect.value);
+
+      try {
+        const response = await fetch('/api/sessions/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            task_description: task,
+            planned_duration: duration,
+            check_in_interval: Math.min(15, Math.floor(duration / 2))
+          })
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          alert(err.error || 'Failed to start session');
+          return;
+        }
+
+        const data = await response.json();
+        currentSession = data.session;
+        sessionStartTime = new Date();
+
+        // Update UI
+        startSessionCard.classList.add('hidden');
+        chatContainer.classList.remove('hidden');
+        sessionBanner.classList.add('active');
+        sessionTask.textContent = task;
+
+        // Start timer
+        timerInterval = setInterval(updateTimer, 1000);
+
+        // Join session via WebSocket
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'join', sessionId: currentSession.id }));
+        }
+
+        // Show greeting
+        if (data.greeting) {
+          addMessage(data.greeting, 'assistant');
+        }
+
+      } catch (err) {
+        alert('Network error. Please try again.');
+      }
+    });
+
+    // Update timer
+    function updateTimer() {
+      if (!sessionStartTime) return;
+      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      sessionTimer.textContent = `${mins}:${secs.toString().padStart(2, '0')} elapsed`;
+    }
+
+    // Send message
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const content = chatInput.value.trim();
+      if (!content || !ws || ws.readyState !== WebSocket.OPEN) return;
+
+      addMessage(content, 'user');
+      ws.send(JSON.stringify({ type: 'message', content }));
+      chatInput.value = '';
+      typingIndicator.classList.add('show');
+    });
+
+    // End session
+    endSessionBtn.addEventListener('click', async () => {
+      if (!currentSession) return;
+
+      const reflection = prompt('Quick reflection: How did this session go?') || '';
+
+      try {
+        await fetch(`/api/sessions/${currentSession.id}/end`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ reflection })
+        });
+
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'leave' }));
+        }
+
+        // Reset UI
+        clearInterval(timerInterval);
+        currentSession = null;
+        sessionStartTime = null;
+        chatMessages.innerHTML = '';
+        startSessionCard.classList.remove('hidden');
+        chatContainer.classList.add('hidden');
+        sessionBanner.classList.remove('active');
+        taskInput.value = '';
+
+      } catch (err) {
+        alert('Failed to end session');
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (e) {
+        // Ignore errors
+      }
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    });
+
+    // Start WebSocket connection
+    connectWebSocket();
+  </script>
+</body>
+</html>
