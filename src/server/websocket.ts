@@ -193,12 +193,9 @@ async function handleChatMessage(
   // Save user message
   saveMessage(state.sessionId, "user", content);
 
-  // Echo back user message
-  send(ws, {
-    type: "message",
-    role: "user",
-    content,
-  });
+  // Note: We do NOT echo back user messages to the client.
+  // The client already displays the message optimistically when sent.
+  // Echoing would cause duplicate display.
 
   // Signal streaming start
   send(ws, { type: "stream_start" });
