@@ -233,7 +233,7 @@ export function cleanupExpiredAuth(): { magicLinks: number; sessions: number } {
  * Generate the magic link URL
  */
 export function getMagicLinkUrl(token: string, baseUrl?: string): string {
-  const base = baseUrl || process.env.APP_URL || "http://localhost:3000";
+  const base = baseUrl || process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000";
   return `${base}/auth/verify?token=${token}`;
 }
 
@@ -244,13 +244,9 @@ export function sendMagicLink(email: string, token: string): void {
   const url = getMagicLinkUrl(token);
 
   // In production, this would send an actual email
-  // For now, log to console
-  console.log(`
-╔════════════════════════════════════════════════════════════╗
-║                    MAGIC LINK                              ║
-╠════════════════════════════════════════════════════════════╣
-║  Email: ${email.padEnd(49)}║
-║  Link:  ${url.slice(0, 49).padEnd(49)}║
-${url.length > 49 ? `║        ${url.slice(49).padEnd(49)}║\n` : ""}╚════════════════════════════════════════════════════════════╝
-  `);
+  // For now, log to console with clear formatting
+  console.log("\n========== MAGIC LINK ==========");
+  console.log(`Email: ${email}`);
+  console.log(`Link:  ${url}`);
+  console.log("================================\n");
 }
