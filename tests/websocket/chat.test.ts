@@ -162,7 +162,8 @@ describe("WebSocket Chat", () => {
     it("should NOT echo back user messages (prevents duplicate display)", async () => {
       // Mock the AI response generator to avoid API calls
       vi.mock("../../src/server/services/companion.js", async (importOriginal) => {
-        const original = await importOriginal<typeof import("../../src/server/services/companion.js")>();
+        const original =
+          await importOriginal<typeof import("../../src/server/services/companion.js")>();
         return {
           ...original,
           generateStreamingResponse: async function* () {
