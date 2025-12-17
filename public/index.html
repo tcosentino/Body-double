@@ -22,6 +22,7 @@
       <div class="nav-links">
         <a href="#features">Features</a>
         <a href="#how-it-works">How It Works</a>
+        <a href="#examples">Examples</a>
         <a href="#science">The Science</a>
         <a href="/research.html">Research</a>
         <a href="/auth/login" class="btn btn-secondary">Log In</a>
@@ -197,6 +198,73 @@
           <div class="step-content">
             <h3>Reflect & Repeat</h3>
             <p>End your session with a quick reflection. Build the habit of focused work, one session at a time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Conversations Section -->
+  <section class="examples-section" id="examples">
+    <div class="container">
+      <div class="section-header">
+        <h2>See It In Action</h2>
+        <p>Real conversations showing how Body Double helps different people find their focus</p>
+      </div>
+
+      <div class="examples-container">
+        <!-- Persona Tabs -->
+        <div class="persona-tabs" role="tablist">
+          <button class="persona-tab active" data-persona="alex" role="tab" aria-selected="true">
+            <div class="persona-avatar">A</div>
+            <div class="persona-info">
+              <span class="persona-name">Alex</span>
+              <span class="persona-role">Software Engineer</span>
+            </div>
+          </button>
+          <button class="persona-tab" data-persona="maya" role="tab" aria-selected="false">
+            <div class="persona-avatar">M</div>
+            <div class="persona-info">
+              <span class="persona-name">Maya</span>
+              <span class="persona-role">Freelance Writer</span>
+            </div>
+          </button>
+          <button class="persona-tab" data-persona="jordan" role="tab" aria-selected="false">
+            <div class="persona-avatar">J</div>
+            <div class="persona-info">
+              <span class="persona-name">Jordan</span>
+              <span class="persona-role">PhD Student</span>
+            </div>
+          </button>
+          <button class="persona-tab" data-persona="sam" role="tab" aria-selected="false">
+            <div class="persona-avatar">S</div>
+            <div class="persona-info">
+              <span class="persona-name">Sam</span>
+              <span class="persona-role">New User</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Conversation Display -->
+        <div class="example-conversation">
+          <div class="conversation-header">
+            <div class="conversation-task">
+              <span class="task-label">Today's task:</span>
+              <span class="task-text" id="task-text">Finally start the auth system refactor</span>
+            </div>
+            <div class="conversation-duration">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              <span id="session-duration">45 minutes</span>
+            </div>
+          </div>
+          <div class="conversation-messages" id="conversation-messages">
+            <!-- Messages will be populated by JavaScript -->
+          </div>
+          <div class="conversation-footer">
+            <p class="conversation-description" id="persona-description">Senior engineer who struggles with task initiation but hyperfocuses once started</p>
           </div>
         </div>
       </div>
@@ -386,6 +454,63 @@
         navbar?.classList.remove('scrolled');
       }
     });
+
+    // Example Conversations
+    let exampleConversations = null;
+
+    async function loadExampleConversations() {
+      try {
+        const response = await fetch('/data/example-conversations.json');
+        exampleConversations = await response.json();
+        displayConversation('alex');
+      } catch (error) {
+        console.error('Failed to load example conversations:', error);
+      }
+    }
+
+    function displayConversation(personaId) {
+      if (!exampleConversations) return;
+
+      const persona = exampleConversations.personas.find(p => p.id === personaId);
+      if (!persona) return;
+
+      // Update task and duration
+      document.getElementById('task-text').textContent = persona.task;
+      document.getElementById('session-duration').textContent = persona.sessionDuration;
+      document.getElementById('persona-description').textContent = persona.description;
+
+      // Clear and populate messages
+      const messagesContainer = document.getElementById('conversation-messages');
+      messagesContainer.innerHTML = '';
+
+      persona.conversation.forEach((msg, index) => {
+        const messageEl = document.createElement('div');
+        messageEl.className = `example-message ${msg.role}`;
+        messageEl.innerHTML = `<p>${msg.content}</p>`;
+        messageEl.style.animationDelay = `${index * 0.1}s`;
+        messagesContainer.appendChild(messageEl);
+      });
+    }
+
+    // Tab click handlers
+    document.querySelectorAll('.persona-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active states
+        document.querySelectorAll('.persona-tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        // Display the conversation
+        const personaId = tab.getAttribute('data-persona');
+        displayConversation(personaId);
+      });
+    });
+
+    // Load conversations on page load
+    loadExampleConversations();
   </script>
 </body>
 </html>

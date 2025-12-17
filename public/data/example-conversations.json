@@ -1,0 +1,176 @@
+{
+  "personas": [
+    {
+      "id": "alex",
+      "name": "Alex",
+      "role": "Software Engineer",
+      "description": "Senior engineer who struggles with task initiation but hyperfocuses once started",
+      "avatar": "A",
+      "task": "Finally start the auth system refactor",
+      "sessionDuration": "45 minutes",
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hey, ready to start"
+        },
+        {
+          "role": "assistant",
+          "content": "Hey Alex! Ready to tackle that auth refactor today. I know this one's been sitting on your list for a while - that's okay, we're here now. What feels like the hardest part about getting started?"
+        },
+        {
+          "role": "user",
+          "content": "I don't even know where to begin with this auth thing"
+        },
+        {
+          "role": "assistant",
+          "content": "That overwhelm is totally understandable - the auth system touches so many things. Let's shrink this down. Instead of thinking about the whole refactor, what's ONE file or function you'd need to look at first? Just to understand the current state."
+        },
+        {
+          "role": "user",
+          "content": "Actually I think I figured out the approach - start with the token validation"
+        },
+        {
+          "role": "assistant",
+          "content": "That's a great entry point! Token validation is contained enough to wrap your head around, but central enough that it'll give you a feel for the whole system. Go ahead and dig in - I'll be here if you hit any snags."
+        },
+        {
+          "role": "user",
+          "content": "This is actually going well now!"
+        },
+        {
+          "role": "assistant",
+          "content": "Look at you go! That's the flow state kicking in. You've got about 20 minutes left in your session - ride this momentum. You're making real progress on something that felt impossible an hour ago."
+        }
+      ]
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Freelance Writer",
+      "description": "Freelance content writer dealing with creative blocks and deadline anxiety",
+      "avatar": "M",
+      "task": "Write a rough first draft of the developer productivity blog post",
+      "sessionDuration": "30 minutes",
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Okay, let's do this. I hate first drafts."
+        },
+        {
+          "role": "assistant",
+          "content": "First drafts are the worst - but you know what? A bad draft exists and a perfect idea doesn't. Today's goal is just words on the page, not good words. What's the ONE thing you want readers to take away from this piece?"
+        },
+        {
+          "role": "user",
+          "content": "Every intro I write sounds so generic"
+        },
+        {
+          "role": "assistant",
+          "content": "Skip the intro entirely. Seriously - start with the meatiest part, the thing you're most excited to say. Intros are easier to write once you know where you ended up. What's the most interesting insight you want to share?"
+        },
+        {
+          "role": "user",
+          "content": "I wrote 200 words! They're not great but they exist."
+        },
+        {
+          "role": "assistant",
+          "content": "200 words that didn't exist 15 minutes ago! That's actual progress, Maya. Not theoretical progress, not planning-to-write progress, but real words. Keep going - you can judge them later."
+        },
+        {
+          "role": "user",
+          "content": "Actually finished the rough draft. It's bad but it's done."
+        },
+        {
+          "role": "assistant",
+          "content": "Done is beautiful! You went from blank page paralysis to a complete draft in one session. Tomorrow's Maya gets to edit, which you actually enjoy. This is exactly how it's supposed to work - messy first, clean later."
+        }
+      ]
+    },
+    {
+      "id": "jordan",
+      "name": "Jordan",
+      "role": "PhD Student",
+      "description": "Graduate student working on dissertation, feeling isolated and overwhelmed",
+      "avatar": "J",
+      "task": "Work on the literature review - write at least one paragraph",
+      "sessionDuration": "50 minutes",
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hi. Really dreading this lit review today."
+        },
+        {
+          "role": "assistant",
+          "content": "I hear you - lit reviews are uniquely exhausting because they feel infinite. But you've done good work before, like finding that pattern in your data last week. Today's goal is just one synthesizing paragraph. Where are you getting stuck?"
+        },
+        {
+          "role": "user",
+          "content": "I have like 50 papers and I don't know how to make them talk to each other"
+        },
+        {
+          "role": "assistant",
+          "content": "50 papers is a lot to hold in your head at once. What if you pick just 2-3 papers that you know well and find interesting? What do THEY have in common, or where do they disagree? That's your first thread to pull."
+        },
+        {
+          "role": "user",
+          "content": "I just wrote a paragraph! It connects the Smith and Garcia findings."
+        },
+        {
+          "role": "assistant",
+          "content": "Jordan, that's exactly what a lit review needs to do - show how studies relate to each other! You're not just summarizing anymore, you're synthesizing. That's the hard part, and you just did it. How does it feel?"
+        },
+        {
+          "role": "user",
+          "content": "I'm going to stop here. Made some progress at least."
+        },
+        {
+          "role": "assistant",
+          "content": "Progress is progress. You came in dreading this and you're leaving with a real paragraph that synthesizes sources. That's not \"at least\" - that's exactly what you set out to do. Rest up, you earned it."
+        }
+      ]
+    },
+    {
+      "id": "sam",
+      "name": "Sam",
+      "role": "New User",
+      "description": "First-time user exploring how Body Double works",
+      "avatar": "S",
+      "task": "Catch up on emails",
+      "sessionDuration": "25 minutes",
+      "conversation": [
+        {
+          "role": "user",
+          "content": "Hey, first time using this"
+        },
+        {
+          "role": "assistant",
+          "content": "Welcome, Sam! I'm here to keep you company while you work. Think of me as that coworker presence that makes it easier to focus. You mentioned tackling emails - want to dive right in, or would it help to talk through what's in your inbox first?"
+        },
+        {
+          "role": "user",
+          "content": "Just need to get through my inbox"
+        },
+        {
+          "role": "assistant",
+          "content": "Got it - let's do this. I'll be here in the background. If you get stuck or need a quick break, just say hey. Otherwise, go ahead and start clearing that inbox. You've got 25 minutes - plenty of time."
+        },
+        {
+          "role": "user",
+          "content": "This is kind of nice actually, having someone here"
+        },
+        {
+          "role": "assistant",
+          "content": "That's the body doubling effect! Sometimes just knowing someone else is \"around\" makes it easier to stay on task. It's backed by actual research - our brains work differently when we feel that social presence. How's the inbox looking?"
+        },
+        {
+          "role": "user",
+          "content": "Done with emails! That wasn't so bad."
+        },
+        {
+          "role": "assistant",
+          "content": "Nice work! Inbox zero (or close to it) in under 25 minutes. That's a win for your first session. If this felt helpful, I'm always here when you need that focus boost. What do you want to tackle next time?"
+        }
+      ]
+    }
+  ]
+}

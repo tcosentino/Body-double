@@ -3,6 +3,11 @@
  *
  * These represent different target user types to test how the AI companion
  * adapts to different situations, challenges, and work styles.
+ *
+ * NOTE: The testQuestions in each scenario should align with the user messages
+ * in public/data/example-conversations.json, which is used for the marketing site.
+ * The JSON file contains curated "golden" conversations showing ideal AI responses.
+ * When updating test scenarios, ensure both files stay in sync.
  */
 
 import { PromptContext } from "./system-prompt.js";
