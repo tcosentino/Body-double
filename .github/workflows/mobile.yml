@@ -1,0 +1,83 @@
+name: Mobile Trigger
+
+# This workflow can be triggered manually from GitHub mobile app
+# Go to: Actions → Mobile Trigger → Run workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_demo:
+        description: 'Run chat demo'
+        required: false
+        default: true
+        type: boolean
+      run_tests:
+        description: 'Run tests'
+        required: false
+        default: true
+        type: boolean
+      branch:
+        description: 'Branch to run on'
+        required: false
+        default: 'main'
+        type: string
+
+jobs:
+  mobile-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        id: test
+        if: ${{ inputs.run_tests }}
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          npm test 2>&1 | tee test-output.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 test-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Run chat demo
+        id: demo
+        if: ${{ inputs.run_demo && secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          echo "## Chat Demo Output" >> $GITHUB_STEP_SUMMARY
+          npm run demo:chat 2>&1 | tee chat-output.txt
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat chat-output.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Upload outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-run-output
+          path: |
+            chat-output.txt
+            test-output.txt
+          if-no-files-found: ignore
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ inputs.branch }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Tests:** ${{ steps.test.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Demo:** ${{ steps.demo.outcome || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
