@@ -869,13 +869,8 @@
         // Add to sessions list
         sessions.unshift(data.session);
 
-        // Select the new session
+        // Select the new session (this loads messages including greeting from DB)
         await selectSession(data.session.id);
-
-        // Show greeting
-        if (data.greeting) {
-          addMessage(data.greeting, 'assistant');
-        }
 
         // Reset form
         taskInput.value = '';
