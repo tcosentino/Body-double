@@ -319,6 +319,265 @@
     .hidden {
       display: none !important;
     }
+
+    /* API Logs Section */
+    .logs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .logs-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .stat-card .label {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+
+    .logs-filters {
+      display: flex;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .logs-filters select {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      background: var(--white);
+    }
+
+    .logs-table-container {
+      overflow-x: auto;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+    }
+
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.813rem;
+    }
+
+    .logs-table th,
+    .logs-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .logs-table th {
+      background: var(--gray-50);
+      font-weight: 600;
+      color: var(--gray-700);
+    }
+
+    .logs-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .logs-table tr:hover {
+      background: var(--gray-50);
+    }
+
+    .log-method {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .log-method.GET { background: #dbeafe; color: #1e40af; }
+    .log-method.POST { background: #dcfce7; color: #166534; }
+    .log-method.PATCH { background: #fef3c7; color: #92400e; }
+    .log-method.DELETE { background: #fee2e2; color: #991b1b; }
+
+    .log-status {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    .log-status.success { background: #dcfce7; color: #166534; }
+    .log-status.error { background: #fee2e2; color: #991b1b; }
+
+    .log-endpoint {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .log-timestamp {
+      color: var(--gray-500);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .logs-pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--gray-100);
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-page {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .btn-page:hover:not(:disabled) {
+      background: var(--gray-50);
+    }
+
+    .btn-page:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .log-details-btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      cursor: pointer;
+    }
+
+    .log-details-btn:hover {
+      background: var(--gray-50);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      max-width: 700px;
+      width: 90%;
+      max-height: 80vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .modal-header h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--gray-400);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .detail-row {
+      margin-bottom: 1rem;
+    }
+
+    .detail-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+      font-size: 0.875rem;
+      color: var(--gray-900);
+    }
+
+    .detail-code {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 0.75rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 200px;
+    }
+
+    .empty-logs {
+      text-align: center;
+      padding: 2rem;
+      color: var(--gray-400);
+    }
   </style>
 </head>
 <body>
@@ -431,6 +690,102 @@
           </div>
         </div>
       </section>
+
+      <!-- API Logs Section -->
+      <section class="settings-section" id="logsSection">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          Notion API Activity
+        </h2>
+        <p>Full history of all API calls made to your Notion workspace by the assistant.</p>
+
+        <!-- Stats -->
+        <div class="logs-stats" id="logsStats">
+          <div class="stat-card">
+            <div class="value" id="statTotal">-</div>
+            <div class="label">Total Calls</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="statToday">-</div>
+            <div class="label">Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="statWeek">-</div>
+            <div class="label">This Week</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="statSuccess">-</div>
+            <div class="label">Success Rate</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="logs-filters">
+          <select id="filterOperation">
+            <option value="">All Operations</option>
+          </select>
+          <select id="filterLimit">
+            <option value="25">Show 25</option>
+            <option value="50" selected>Show 50</option>
+            <option value="100">Show 100</option>
+          </select>
+        </div>
+
+        <!-- Logs Table -->
+        <div class="logs-table-container">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Operation</th>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <tr>
+                <td colspan="7" class="empty-logs">
+                  <div class="loading">
+                    <div class="spinner"></div>
+                    Loading logs...
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="logs-pagination">
+          <div class="pagination-info" id="paginationInfo">Showing 0 of 0</div>
+          <div class="pagination-buttons">
+            <button class="btn-page" id="prevPage" disabled>Previous</button>
+            <button class="btn-page" id="nextPage" disabled>Next</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Log Details Modal -->
+  <div class="modal-overlay hidden" id="logModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>API Call Details</h3>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <!-- Populated by JS -->
+      </div>
     </div>
   </div>
 
@@ -634,6 +989,252 @@
         alert.remove();
       }, 5000);
     }
+
+    // ============================================
+    // API Logs
+    // ============================================
+    const logsTableBody = document.getElementById('logsTableBody');
+    const filterOperation = document.getElementById('filterOperation');
+    const filterLimit = document.getElementById('filterLimit');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const paginationInfo = document.getElementById('paginationInfo');
+    const logModal = document.getElementById('logModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalBody = document.getElementById('modalBody');
+
+    let logsData = [];
+    let logsTotal = 0;
+    let logsOffset = 0;
+
+    // Load logs on page load
+    loadLogsStats();
+    loadLogsOperations();
+    loadLogs();
+
+    // Filter change handlers
+    filterOperation.addEventListener('change', () => {
+      logsOffset = 0;
+      loadLogs();
+    });
+
+    filterLimit.addEventListener('change', () => {
+      logsOffset = 0;
+      loadLogs();
+    });
+
+    // Pagination
+    prevPage.addEventListener('click', () => {
+      const limit = parseInt(filterLimit.value);
+      logsOffset = Math.max(0, logsOffset - limit);
+      loadLogs();
+    });
+
+    nextPage.addEventListener('click', () => {
+      const limit = parseInt(filterLimit.value);
+      logsOffset += limit;
+      loadLogs();
+    });
+
+    // Modal close
+    closeModal.addEventListener('click', () => {
+      logModal.classList.add('hidden');
+    });
+
+    logModal.addEventListener('click', (e) => {
+      if (e.target === logModal) {
+        logModal.classList.add('hidden');
+      }
+    });
+
+    async function loadLogsStats() {
+      try {
+        const response = await fetch('/api/notion/logs/stats', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const stats = await response.json();
+
+        document.getElementById('statTotal').textContent = stats.total_calls.toLocaleString();
+        document.getElementById('statToday').textContent = stats.calls_today.toLocaleString();
+        document.getElementById('statWeek').textContent = stats.calls_this_week.toLocaleString();
+        document.getElementById('statSuccess').textContent = stats.success_rate.toFixed(1) + '%';
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    async function loadLogsOperations() {
+      try {
+        const response = await fetch('/api/notion/logs/operations', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        filterOperation.innerHTML = '<option value="">All Operations</option>' +
+          data.operations.map(op => `<option value="${op}">${op}</option>`).join('');
+      } catch (err) {
+        console.error('Failed to load operations:', err);
+      }
+    }
+
+    async function loadLogs() {
+      const limit = parseInt(filterLimit.value);
+      const operation = filterOperation.value;
+
+      logsTableBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="empty-logs">
+            <div class="loading">
+              <div class="spinner"></div>
+              Loading logs...
+            </div>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const params = new URLSearchParams({
+          limit: limit.toString(),
+          offset: logsOffset.toString()
+        });
+        if (operation) params.append('operation', operation);
+
+        const response = await fetch(`/api/notion/logs?${params}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        logsData = data.logs;
+        logsTotal = data.total;
+
+        renderLogsTable();
+        updatePagination();
+      } catch (err) {
+        logsTableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-logs">Failed to load logs</td>
+          </tr>
+        `;
+      }
+    }
+
+    function renderLogsTable() {
+      if (logsData.length === 0) {
+        logsTableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-logs">No API calls yet</td>
+          </tr>
+        `;
+        return;
+      }
+
+      logsTableBody.innerHTML = logsData.map((log, index) => {
+        const timestamp = new Date(log.timestamp + 'Z');
+        const timeStr = timestamp.toLocaleString();
+        const isSuccess = log.status_code >= 200 && log.status_code < 300;
+        const duration = log.duration_ms ? `${log.duration_ms}ms` : '-';
+
+        return `
+          <tr>
+            <td class="log-timestamp">${timeStr}</td>
+            <td>${log.operation}</td>
+            <td><span class="log-method ${log.method}">${log.method}</span></td>
+            <td class="log-endpoint" title="${log.endpoint}">${log.endpoint}</td>
+            <td><span class="log-status ${isSuccess ? 'success' : 'error'}">${log.status_code}</span></td>
+            <td>${duration}</td>
+            <td><button class="log-details-btn" onclick="showLogDetails(${index})">Details</button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function updatePagination() {
+      const limit = parseInt(filterLimit.value);
+      const start = logsTotal === 0 ? 0 : logsOffset + 1;
+      const end = Math.min(logsOffset + limit, logsTotal);
+
+      paginationInfo.textContent = `Showing ${start}-${end} of ${logsTotal}`;
+      prevPage.disabled = logsOffset === 0;
+      nextPage.disabled = logsOffset + limit >= logsTotal;
+    }
+
+    function showLogDetails(index) {
+      const log = logsData[index];
+      const timestamp = new Date(log.timestamp + 'Z');
+      const isSuccess = log.status_code >= 200 && log.status_code < 300;
+
+      let requestBody = '-';
+      if (log.request_body) {
+        try {
+          requestBody = JSON.stringify(JSON.parse(log.request_body), null, 2);
+        } catch {
+          requestBody = log.request_body;
+        }
+      }
+
+      let responseBody = '-';
+      if (log.response_body) {
+        try {
+          responseBody = JSON.stringify(JSON.parse(log.response_body), null, 2);
+        } catch {
+          responseBody = log.response_body;
+        }
+      }
+
+      modalBody.innerHTML = `
+        <div class="detail-row">
+          <div class="detail-label">Timestamp</div>
+          <div class="detail-value">${timestamp.toLocaleString()}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Operation</div>
+          <div class="detail-value">${log.operation}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Triggered By</div>
+          <div class="detail-value">${log.triggered_by || '-'}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Request</div>
+          <div class="detail-value">
+            <span class="log-method ${log.method}">${log.method}</span>
+            <code style="margin-left: 0.5rem;">${log.endpoint}</code>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Status</div>
+          <div class="detail-value">
+            <span class="log-status ${isSuccess ? 'success' : 'error'}">${log.status_code}</span>
+            ${log.duration_ms ? `<span style="margin-left: 0.5rem; color: var(--gray-500);">${log.duration_ms}ms</span>` : ''}
+          </div>
+        </div>
+        ${log.error_message ? `
+        <div class="detail-row">
+          <div class="detail-label">Error</div>
+          <div class="detail-code" style="color: #991b1b;">${log.error_message}</div>
+        </div>
+        ` : ''}
+        <div class="detail-row">
+          <div class="detail-label">Request Body</div>
+          <div class="detail-code">${requestBody}</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-label">Response Body</div>
+          <div class="detail-code">${responseBody}</div>
+        </div>
+        ${log.notion_object_id ? `
+        <div class="detail-row">
+          <div class="detail-label">Notion Object</div>
+          <div class="detail-value">${log.notion_object_type || 'unknown'}: ${log.notion_object_id}</div>
+        </div>
+        ` : ''}
+      `;
+
+      logModal.classList.remove('hidden');
+    }
+
+    // Make showLogDetails available globally
+    window.showLogDetails = showLogDetails;
   </script>
 </body>
 </html>

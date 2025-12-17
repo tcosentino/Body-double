@@ -8,7 +8,15 @@
 
 import crypto from "node:crypto";
 import { getDb } from "../db/index.js";
-import type { NotionConnection, NotionConnectionPublic } from "../db/schema.js";
+import type {
+  NotionConnection,
+  NotionConnectionPublic,
+  NotionApiLog,
+  NotionApiLogInput,
+} from "../db/schema.js";
+
+// Maximum size for stored request/response bodies (10KB)
+const MAX_BODY_SIZE = 10 * 1024;
 
 // Notion OAuth configuration
 const NOTION_CLIENT_ID = process.env.NOTION_CLIENT_ID || "";
@@ -304,36 +312,276 @@ function cleanupExpiredStates(): void {
 }
 
 // ============================================
-// Notion API Client Methods
+// API Logging Functions
 // ============================================
 
 /**
- * Make an authenticated request to the Notion API
+ * Truncate a string to a maximum size
+ */
+function truncateBody(body: string | null): string | null {
+  if (!body) return null;
+  if (body.length <= MAX_BODY_SIZE) return body;
+  return body.substring(0, MAX_BODY_SIZE) + "... [truncated]";
+}
+
+/**
+ * Log a Notion API call
+ */
+export function logNotionApiCall(userId: string, input: NotionApiLogInput): NotionApiLog {
+  const db = getDb();
+  const id = crypto.randomUUID();
+
+  const requestBody = input.request_body ? truncateBody(JSON.stringify(input.request_body)) : null;
+  const responseBody = input.response_body
+    ? truncateBody(JSON.stringify(input.response_body))
+    : null;
+
+  db.prepare(
+    `
+    INSERT INTO notion_api_logs (
+      id, user_id, method, endpoint, request_body, status_code, response_body,
+      operation, triggered_by, duration_ms, error_message, notion_object_id, notion_object_type
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `
+  ).run(
+    id,
+    userId,
+    input.method,
+    input.endpoint,
+    requestBody,
+    input.status_code,
+    responseBody,
+    input.operation,
+    input.triggered_by,
+    input.duration_ms ?? null,
+    input.error_message ?? null,
+    input.notion_object_id ?? null,
+    input.notion_object_type ?? null
+  );
+
+  return db.prepare("SELECT * FROM notion_api_logs WHERE id = ?").get(id) as NotionApiLog;
+}
+
+/**
+ * Get Notion API logs for a user
+ */
+export function getNotionApiLogs(
+  userId: string,
+  options: {
+    limit?: number;
+    offset?: number;
+    operation?: string;
+    startDate?: string;
+    endDate?: string;
+  } = {}
+): { logs: NotionApiLog[]; total: number } {
+  const db = getDb();
+  const { limit = 50, offset = 0, operation, startDate, endDate } = options;
+
+  let whereClause = "WHERE user_id = ?";
+  const params: (string | number)[] = [userId];
+
+  if (operation) {
+    whereClause += " AND operation = ?";
+    params.push(operation);
+  }
+  if (startDate) {
+    whereClause += " AND timestamp >= ?";
+    params.push(startDate);
+  }
+  if (endDate) {
+    whereClause += " AND timestamp <= ?";
+    params.push(endDate);
+  }
+
+  // Get total count
+  const countResult = db
+    .prepare(`SELECT COUNT(*) as count FROM notion_api_logs ${whereClause}`)
+    .get(...params) as { count: number };
+
+  // Get logs
+  const logs = db
+    .prepare(
+      `SELECT * FROM notion_api_logs ${whereClause} ORDER BY timestamp DESC LIMIT ? OFFSET ?`
+    )
+    .all(...params, limit, offset) as NotionApiLog[];
+
+  return { logs, total: countResult.count };
+}
+
+/**
+ * Get distinct operations for filtering
+ */
+export function getNotionApiLogOperations(userId: string): string[] {
+  const db = getDb();
+  const results = db
+    .prepare("SELECT DISTINCT operation FROM notion_api_logs WHERE user_id = ? ORDER BY operation")
+    .all(userId) as { operation: string }[];
+  return results.map((r) => r.operation);
+}
+
+/**
+ * Get API call statistics for a user
+ */
+export function getNotionApiStats(userId: string): {
+  total_calls: number;
+  calls_today: number;
+  calls_this_week: number;
+  success_rate: number;
+  avg_duration_ms: number;
+  by_operation: { operation: string; count: number }[];
+} {
+  const db = getDb();
+
+  const totalResult = db
+    .prepare("SELECT COUNT(*) as count FROM notion_api_logs WHERE user_id = ?")
+    .get(userId) as { count: number };
+
+  const todayResult = db
+    .prepare(
+      `SELECT COUNT(*) as count FROM notion_api_logs
+       WHERE user_id = ? AND timestamp >= date('now')`
+    )
+    .get(userId) as { count: number };
+
+  const weekResult = db
+    .prepare(
+      `SELECT COUNT(*) as count FROM notion_api_logs
+       WHERE user_id = ? AND timestamp >= date('now', '-7 days')`
+    )
+    .get(userId) as { count: number };
+
+  const successResult = db
+    .prepare(
+      `SELECT
+         COUNT(CASE WHEN status_code >= 200 AND status_code < 300 THEN 1 END) * 100.0 / COUNT(*) as rate
+       FROM notion_api_logs WHERE user_id = ?`
+    )
+    .get(userId) as { rate: number | null };
+
+  const durationResult = db
+    .prepare(
+      `SELECT AVG(duration_ms) as avg FROM notion_api_logs
+       WHERE user_id = ? AND duration_ms IS NOT NULL`
+    )
+    .get(userId) as { avg: number | null };
+
+  const byOperationResult = db
+    .prepare(
+      `SELECT operation, COUNT(*) as count FROM notion_api_logs
+       WHERE user_id = ? GROUP BY operation ORDER BY count DESC LIMIT 10`
+    )
+    .all(userId) as { operation: string; count: number }[];
+
+  return {
+    total_calls: totalResult.count,
+    calls_today: todayResult.count,
+    calls_this_week: weekResult.count,
+    success_rate: successResult.rate ?? 100,
+    avg_duration_ms: durationResult.avg ?? 0,
+    by_operation: byOperationResult,
+  };
+}
+
+/**
+ * Delete old API logs (retention policy)
+ */
+export function cleanupOldApiLogs(daysToKeep: number = 30): number {
+  const db = getDb();
+  const result = db
+    .prepare(`DELETE FROM notion_api_logs WHERE timestamp < date('now', '-' || ? || ' days')`)
+    .run(daysToKeep);
+  return result.changes;
+}
+
+// ============================================
+// Notion API Client Methods
+// ============================================
+
+interface NotionRequestOptions extends Omit<RequestInit, "body"> {
+  body?: object;
+  operation: string;
+  triggeredBy?: "user_request" | "proactive_check" | "assistant_action" | "system";
+  notionObjectId?: string;
+  notionObjectType?: "page" | "database" | "block" | "user";
+}
+
+/**
+ * Make an authenticated request to the Notion API with full logging
  */
 async function notionRequest<T>(
+  userId: string,
   accessToken: string,
   endpoint: string,
-  options: RequestInit = {}
+  options: NotionRequestOptions
 ): Promise<T | null> {
+  const startTime = Date.now();
+  const method = (options.method || "GET") as "GET" | "POST" | "PATCH" | "DELETE";
+
   try {
     const response = await fetch(`https://api.notion.com/v1${endpoint}`, {
       ...options,
+      method,
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Notion-Version": "2022-06-28",
         "Content-Type": "application/json",
         ...options.headers,
       },
+      body: options.body ? JSON.stringify(options.body) : undefined,
+    });
+
+    const durationMs = Date.now() - startTime;
+    const responseText = await response.text();
+    let responseData: T | null = null;
+
+    try {
+      responseData = JSON.parse(responseText) as T;
+    } catch {
+      // Response wasn't JSON
+    }
+
+    // Log the API call
+    logNotionApiCall(userId, {
+      method,
+      endpoint,
+      request_body: options.body ?? null,
+      status_code: response.status,
+      response_body: responseData as object | null,
+      operation: options.operation,
+      triggered_by: options.triggeredBy ?? "system",
+      duration_ms: durationMs,
+      error_message: response.ok ? undefined : responseText,
+      notion_object_id: options.notionObjectId,
+      notion_object_type: options.notionObjectType,
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error(`Notion API error (${endpoint}):`, error);
+      console.error(`Notion API error (${endpoint}):`, responseText);
       return null;
     }
 
-    return (await response.json()) as T;
+    return responseData;
   } catch (error) {
+    const durationMs = Date.now() - startTime;
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+
+    // Log the failed call
+    logNotionApiCall(userId, {
+      method,
+      endpoint,
+      request_body: options.body ?? null,
+      status_code: 0,
+      response_body: null,
+      operation: options.operation,
+      triggered_by: options.triggeredBy ?? "system",
+      duration_ms: durationMs,
+      error_message: errorMessage,
+      notion_object_id: options.notionObjectId,
+      notion_object_type: options.notionObjectType,
+    });
+
     console.error(`Notion API request failed (${endpoint}):`, error);
     return null;
   }
@@ -357,17 +605,15 @@ export async function searchDatabases(
     }>;
   }
 
-  const result = await notionRequest<NotionSearchResponse>(
-    connection.access_token,
-    "/search",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        filter: { property: "object", value: "database" },
-        page_size: 100,
-      }),
-    }
-  );
+  const result = await notionRequest<NotionSearchResponse>(userId, connection.access_token, "/search", {
+    method: "POST",
+    body: {
+      filter: { property: "object", value: "database" },
+      page_size: 100,
+    },
+    operation: "Search databases",
+    triggeredBy: "user_request",
+  });
 
   if (!result) return [];
 
@@ -391,7 +637,11 @@ export async function verifyNotionConnection(userId: string): Promise<boolean> {
     object: string;
   }
 
-  const result = await notionRequest<NotionUserResponse>(connection.access_token, "/users/me");
+  const result = await notionRequest<NotionUserResponse>(userId, connection.access_token, "/users/me", {
+    operation: "Verify connection",
+    triggeredBy: "system",
+    notionObjectType: "user",
+  });
   return result !== null;
 }
 

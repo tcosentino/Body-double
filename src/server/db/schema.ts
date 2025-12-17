@@ -101,6 +101,34 @@ CREATE TABLE IF NOT EXISTS notion_connections (
   UNIQUE(user_id)
 );
 
+-- Notion API call logs for full transparency
+CREATE TABLE IF NOT EXISTS notion_api_logs (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  timestamp TEXT DEFAULT (datetime('now')),
+
+  -- Request details
+  method TEXT NOT NULL,           -- GET, POST, PATCH, DELETE
+  endpoint TEXT NOT NULL,         -- /v1/pages, /v1/databases/{id}/query, etc.
+  request_body TEXT,              -- JSON stringified request body (if any)
+
+  -- Response details
+  status_code INTEGER NOT NULL,   -- HTTP status code
+  response_body TEXT,             -- JSON stringified response (truncated if large)
+
+  -- Context
+  operation TEXT NOT NULL,        -- Human readable: "Create task", "Query tasks", "Search", etc.
+  triggered_by TEXT,              -- "user_request", "proactive_check", "assistant_action"
+  duration_ms INTEGER,            -- How long the request took
+
+  -- Error tracking
+  error_message TEXT,             -- If request failed
+
+  -- Related entities
+  notion_object_id TEXT,          -- ID of the page/database involved (if applicable)
+  notion_object_type TEXT         -- "page", "database", "block", etc.
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
@@ -112,6 +140,9 @@ CREATE INDEX IF NOT EXISTS idx_magic_links_email ON magic_links(email);
 CREATE INDEX IF NOT EXISTS idx_auth_sessions_token ON auth_sessions(token);
 CREATE INDEX IF NOT EXISTS idx_auth_sessions_user_id ON auth_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_notion_connections_user_id ON notion_connections(user_id);
+CREATE INDEX IF NOT EXISTS idx_notion_api_logs_user_id ON notion_api_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_notion_api_logs_timestamp ON notion_api_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_notion_api_logs_operation ON notion_api_logs(operation);
 `;
 
 // TypeScript types matching the schema
@@ -227,4 +258,47 @@ export interface NotionConnectionPublic {
   calendar_database_id: string | null;
   notes_database_id: string | null;
   assistant_db_id: string | null;
+}
+
+// Notion API call log for transparency/auditing
+export interface NotionApiLog {
+  id: string;
+  user_id: string;
+  timestamp: string;
+
+  // Request
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  endpoint: string;
+  request_body: string | null;
+
+  // Response
+  status_code: number;
+  response_body: string | null;
+
+  // Context
+  operation: string;
+  triggered_by: "user_request" | "proactive_check" | "assistant_action" | "system";
+  duration_ms: number | null;
+
+  // Error
+  error_message: string | null;
+
+  // Related entities
+  notion_object_id: string | null;
+  notion_object_type: "page" | "database" | "block" | "user" | null;
+}
+
+// For creating new log entries
+export interface NotionApiLogInput {
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  endpoint: string;
+  request_body?: object | null;
+  status_code: number;
+  response_body?: object | null;
+  operation: string;
+  triggered_by: "user_request" | "proactive_check" | "assistant_action" | "system";
+  duration_ms?: number;
+  error_message?: string;
+  notion_object_id?: string;
+  notion_object_type?: "page" | "database" | "block" | "user";
 }

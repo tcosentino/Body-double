@@ -17,6 +17,9 @@ import {
   searchDatabases,
   verifyNotionConnection,
   isNotionConfigured,
+  getNotionApiLogs,
+  getNotionApiLogOperations,
+  getNotionApiStats,
 } from "../services/notion.js";
 
 const router = Router();
@@ -175,6 +178,55 @@ router.put("/configure", requireAuth, (req, res) => {
     success: true,
     connection,
   });
+});
+
+// ============================================
+// API Logs Endpoints
+// ============================================
+
+/**
+ * GET /api/notion/logs
+ * Get Notion API call history with pagination and filtering
+ */
+router.get("/logs", requireAuth, (req, res) => {
+  const userId = req.user!.id;
+  const {
+    limit = "50",
+    offset = "0",
+    operation,
+    start_date,
+    end_date,
+  } = req.query;
+
+  const result = getNotionApiLogs(userId, {
+    limit: parseInt(limit as string, 10),
+    offset: parseInt(offset as string, 10),
+    operation: operation as string | undefined,
+    startDate: start_date as string | undefined,
+    endDate: end_date as string | undefined,
+  });
+
+  res.json(result);
+});
+
+/**
+ * GET /api/notion/logs/operations
+ * Get list of distinct operations for filtering
+ */
+router.get("/logs/operations", requireAuth, (req, res) => {
+  const userId = req.user!.id;
+  const operations = getNotionApiLogOperations(userId);
+  res.json({ operations });
+});
+
+/**
+ * GET /api/notion/logs/stats
+ * Get API usage statistics
+ */
+router.get("/logs/stats", requireAuth, (req, res) => {
+  const userId = req.user!.id;
+  const stats = getNotionApiStats(userId);
+  res.json(stats);
 });
 
 export default router;
