@@ -16,6 +16,7 @@ import usersRouter from "./routes/users.js";
 import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
 import memoryRouter from "./routes/memory.js";
+import notionRouter from "./routes/notion.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -51,6 +52,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/memory", memoryRouter);
+app.use("/api/notion", notionRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -137,6 +139,14 @@ Memory Endpoints (auth required):
   PUT    /api/memory/:id         Update a memory
   DELETE /api/memory/:id         Delete a memory
   POST   /api/memory/bulk        Create multiple memories
+
+Notion Endpoints:
+  GET    /api/notion/status      Check Notion connection status
+  GET    /api/notion/connect     Start Notion OAuth flow
+  GET    /api/notion/callback    OAuth callback (internal)
+  DELETE /api/notion/disconnect  Disconnect Notion
+  GET    /api/notion/databases   List available databases
+  PUT    /api/notion/configure   Configure database mappings
 
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx

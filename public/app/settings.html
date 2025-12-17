@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings - Body Double</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--gray-50);
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .app-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+    }
+
+    .app-header .logo-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn-back {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .btn-back:hover {
+      background: var(--gray-50);
+    }
+
+    .settings-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      width: 100%;
+    }
+
+    .settings-header {
+      margin-bottom: 2rem;
+    }
+
+    .settings-header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+    }
+
+    .settings-header p {
+      color: var(--gray-500);
+    }
+
+    .settings-section {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--gray-200);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .settings-section h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .settings-section > p {
+      color: var(--gray-500);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Notion Integration */
+    .notion-status {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: var(--gray-50);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+    }
+
+    .notion-status.connected {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+    }
+
+    .notion-status.not-configured {
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+    }
+
+    .notion-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-200);
+      font-size: 1.5rem;
+    }
+
+    .notion-icon.workspace-icon {
+      font-size: 2rem;
+    }
+
+    .notion-info {
+      flex: 1;
+    }
+
+    .notion-info h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .notion-info p {
+      font-size: 0.875rem;
+      color: var(--gray-500);
+    }
+
+    .btn-connect {
+      padding: 0.75rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .btn-connect:hover {
+      opacity: 0.9;
+    }
+
+    .btn-connect:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-disconnect {
+      padding: 0.5rem 1rem;
+      background: var(--white);
+      color: #dc2626;
+      border: 1px solid #dc2626;
+      border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+
+    .btn-disconnect:hover {
+      background: #fef2f2;
+    }
+
+    /* Database Configuration */
+    .database-config {
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .database-config h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 1rem;
+    }
+
+    .database-field {
+      margin-bottom: 1rem;
+    }
+
+    .database-field label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      margin-bottom: 0.5rem;
+    }
+
+    .database-field select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      background: var(--white);
+      color: var(--gray-900);
+      cursor: pointer;
+    }
+
+    .database-field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .database-field .help-text {
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      margin-top: 0.25rem;
+    }
+
+    .btn-save-config {
+      padding: 0.75rem 1.5rem;
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+
+    .btn-save-config:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-save-config:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Alert Messages */
+    .alert {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      font-size: 0.875rem;
+    }
+
+    .alert-success {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    .alert-error {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .alert-warning {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+    }
+
+    /* Loading State */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: var(--gray-400);
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 0.5rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Hidden */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <header class="app-header">
+      <a href="/" class="logo">
+        <span class="logo-icon">&#9680;</span>
+        <span>Body Double</span>
+      </a>
+      <div class="header-actions">
+        <a href="/app" class="btn-back">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to App
+        </a>
+      </div>
+    </header>
+
+    <div class="settings-container">
+      <div class="settings-header">
+        <h1>Settings</h1>
+        <p>Configure your integrations and preferences</p>
+      </div>
+
+      <!-- Alerts -->
+      <div id="alertContainer"></div>
+
+      <!-- Notion Integration Section -->
+      <section class="settings-section">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <path d="M22 6l-10 7L2 6"/>
+          </svg>
+          Notion Integration
+        </h2>
+        <p>Connect your Notion workspace to let your assistant manage tasks, notes, and reminders.</p>
+
+        <!-- Loading State -->
+        <div class="loading" id="notionLoading">
+          <div class="spinner"></div>
+          Checking Notion connection...
+        </div>
+
+        <!-- Not Configured State -->
+        <div class="notion-status not-configured hidden" id="notionNotConfigured">
+          <div class="notion-icon">N</div>
+          <div class="notion-info">
+            <h3>Notion Integration Not Available</h3>
+            <p>The server needs to be configured with Notion API credentials.</p>
+          </div>
+        </div>
+
+        <!-- Disconnected State -->
+        <div id="notionDisconnected" class="hidden">
+          <div class="notion-status">
+            <div class="notion-icon">N</div>
+            <div class="notion-info">
+              <h3>Connect to Notion</h3>
+              <p>Allow your assistant to read and write to your Notion workspace.</p>
+            </div>
+            <button class="btn-connect" id="connectNotionBtn">Connect Notion</button>
+          </div>
+        </div>
+
+        <!-- Connected State -->
+        <div id="notionConnected" class="hidden">
+          <div class="notion-status connected">
+            <div class="notion-icon workspace-icon" id="workspaceIcon">N</div>
+            <div class="notion-info">
+              <h3 id="workspaceName">Connected Workspace</h3>
+              <p id="connectionDate">Connected on...</p>
+            </div>
+            <button class="btn-disconnect" id="disconnectNotionBtn">Disconnect</button>
+          </div>
+
+          <!-- Database Configuration -->
+          <div class="database-config">
+            <h3>Database Configuration</h3>
+            <p style="font-size: 0.875rem; color: var(--gray-500); margin-bottom: 1rem;">
+              Select which Notion databases your assistant should use for different purposes.
+            </p>
+
+            <div class="database-field">
+              <label for="tasksDb">Tasks Database</label>
+              <select id="tasksDb">
+                <option value="">Select a database...</option>
+              </select>
+              <p class="help-text">Where your assistant will create and track tasks</p>
+            </div>
+
+            <div class="database-field">
+              <label for="calendarDb">Calendar / Reminders Database</label>
+              <select id="calendarDb">
+                <option value="">Select a database...</option>
+              </select>
+              <p class="help-text">For scheduling and time-based reminders</p>
+            </div>
+
+            <div class="database-field">
+              <label for="notesDb">Notes Database</label>
+              <select id="notesDb">
+                <option value="">Select a database...</option>
+              </select>
+              <p class="help-text">Where your assistant will save notes and information</p>
+            </div>
+
+            <button class="btn-save-config" id="saveConfigBtn">Save Configuration</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // Auth check
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      window.location.href = '/auth/login';
+    }
+
+    // DOM elements
+    const alertContainer = document.getElementById('alertContainer');
+    const notionLoading = document.getElementById('notionLoading');
+    const notionNotConfigured = document.getElementById('notionNotConfigured');
+    const notionDisconnected = document.getElementById('notionDisconnected');
+    const notionConnected = document.getElementById('notionConnected');
+    const connectNotionBtn = document.getElementById('connectNotionBtn');
+    const disconnectNotionBtn = document.getElementById('disconnectNotionBtn');
+    const workspaceIcon = document.getElementById('workspaceIcon');
+    const workspaceName = document.getElementById('workspaceName');
+    const connectionDate = document.getElementById('connectionDate');
+    const tasksDb = document.getElementById('tasksDb');
+    const calendarDb = document.getElementById('calendarDb');
+    const notesDb = document.getElementById('notesDb');
+    const saveConfigBtn = document.getElementById('saveConfigBtn');
+
+    // State
+    let databases = [];
+    let currentConfig = null;
+
+    // Check URL params for OAuth result
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('notion_connected') === 'true') {
+      showAlert('Successfully connected to Notion!', 'success');
+      // Clean URL
+      window.history.replaceState({}, document.title, '/app/settings');
+    } else if (urlParams.get('notion_error')) {
+      const errorMap = {
+        'access_denied': 'You denied access to Notion.',
+        'invalid_request': 'Invalid OAuth request. Please try again.',
+        'invalid_state': 'Session expired. Please try connecting again.',
+        'token_exchange_failed': 'Failed to connect to Notion. Please try again.'
+      };
+      showAlert(errorMap[urlParams.get('notion_error')] || 'Failed to connect to Notion.', 'error');
+      window.history.replaceState({}, document.title, '/app/settings');
+    }
+
+    // Initialize
+    checkNotionStatus();
+
+    async function checkNotionStatus() {
+      notionLoading.classList.remove('hidden');
+      notionNotConfigured.classList.add('hidden');
+      notionDisconnected.classList.add('hidden');
+      notionConnected.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/notion/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        notionLoading.classList.add('hidden');
+
+        if (!data.configured) {
+          // Notion OAuth not configured on server
+          notionNotConfigured.classList.remove('hidden');
+          return;
+        }
+
+        if (!data.connected) {
+          // Not connected
+          notionDisconnected.classList.remove('hidden');
+          return;
+        }
+
+        // Connected!
+        notionConnected.classList.remove('hidden');
+        currentConfig = data.connection;
+
+        // Update UI with workspace info
+        workspaceName.textContent = data.connection.workspace_name || 'Connected Workspace';
+        if (data.connection.workspace_icon) {
+          workspaceIcon.textContent = data.connection.workspace_icon;
+        }
+        const connectedDate = new Date(data.connection.connected_at);
+        connectionDate.textContent = `Connected ${connectedDate.toLocaleDateString()}`;
+
+        // Load databases
+        await loadDatabases();
+
+      } catch (err) {
+        notionLoading.classList.add('hidden');
+        showAlert('Failed to check Notion status. Please try again.', 'error');
+      }
+    }
+
+    async function loadDatabases() {
+      try {
+        const response = await fetch('/api/notion/databases', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+        databases = data.databases || [];
+
+        // Populate dropdowns
+        const options = databases.map(db =>
+          `<option value="${db.id}">${db.icon ? db.icon + ' ' : ''}${db.title}</option>`
+        ).join('');
+
+        const defaultOption = '<option value="">Select a database...</option>';
+        tasksDb.innerHTML = defaultOption + options;
+        calendarDb.innerHTML = defaultOption + options;
+        notesDb.innerHTML = defaultOption + options;
+
+        // Set current values if configured
+        if (currentConfig) {
+          if (currentConfig.tasks_database_id) tasksDb.value = currentConfig.tasks_database_id;
+          if (currentConfig.calendar_database_id) calendarDb.value = currentConfig.calendar_database_id;
+          if (currentConfig.notes_database_id) notesDb.value = currentConfig.notes_database_id;
+        }
+
+      } catch (err) {
+        showAlert('Failed to load databases from Notion.', 'error');
+      }
+    }
+
+    // Connect to Notion
+    connectNotionBtn.addEventListener('click', () => {
+      // Redirect to OAuth flow
+      window.location.href = '/api/notion/connect';
+    });
+
+    // Disconnect from Notion
+    disconnectNotionBtn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to disconnect Notion? Your assistant will no longer be able to access your workspace.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/notion/disconnect', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          showAlert('Notion disconnected.', 'success');
+          checkNotionStatus();
+        } else {
+          showAlert('Failed to disconnect. Please try again.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.', 'error');
+      }
+    });
+
+    // Save database configuration
+    saveConfigBtn.addEventListener('click', async () => {
+      saveConfigBtn.disabled = true;
+      saveConfigBtn.textContent = 'Saving...';
+
+      try {
+        const response = await fetch('/api/notion/configure', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tasks_database_id: tasksDb.value || null,
+            calendar_database_id: calendarDb.value || null,
+            notes_database_id: notesDb.value || null
+          })
+        });
+
+        if (response.ok) {
+          showAlert('Configuration saved!', 'success');
+        } else {
+          showAlert('Failed to save configuration.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.', 'error');
+      } finally {
+        saveConfigBtn.disabled = false;
+        saveConfigBtn.textContent = 'Save Configuration';
+      }
+    });
+
+    // Show alert message
+    function showAlert(message, type) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+  </script>
+</body>
+</html>

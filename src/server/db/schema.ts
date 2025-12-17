@@ -80,6 +80,27 @@ CREATE TABLE IF NOT EXISTS user_context_items (
   created_at TEXT DEFAULT (datetime('now'))
 );
 
+-- Notion integration
+CREATE TABLE IF NOT EXISTS notion_connections (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  access_token TEXT NOT NULL,
+  workspace_id TEXT NOT NULL,
+  workspace_name TEXT,
+  workspace_icon TEXT,
+  bot_id TEXT NOT NULL,
+  connected_at TEXT DEFAULT (datetime('now')),
+  last_synced_at TEXT,
+
+  -- User-configured database mappings
+  tasks_database_id TEXT,
+  calendar_database_id TEXT,
+  notes_database_id TEXT,
+  assistant_db_id TEXT,
+
+  UNIQUE(user_id)
+);
+
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_status ON sessions(status);
@@ -90,6 +111,7 @@ CREATE INDEX IF NOT EXISTS idx_magic_links_token ON magic_links(token);
 CREATE INDEX IF NOT EXISTS idx_magic_links_email ON magic_links(email);
 CREATE INDEX IF NOT EXISTS idx_auth_sessions_token ON auth_sessions(token);
 CREATE INDEX IF NOT EXISTS idx_auth_sessions_user_id ON auth_sessions(user_id);
+CREATE INDEX IF NOT EXISTS idx_notion_connections_user_id ON notion_connections(user_id);
 `;
 
 // TypeScript types matching the schema
@@ -175,4 +197,34 @@ export interface AuthSession {
   expires_at: string;
   created_at: string;
   last_active_at: string;
+}
+
+// Notion integration types
+export interface NotionConnection {
+  id: string;
+  user_id: string;
+  access_token: string;
+  workspace_id: string;
+  workspace_name: string | null;
+  workspace_icon: string | null;
+  bot_id: string;
+  connected_at: string;
+  last_synced_at: string | null;
+  tasks_database_id: string | null;
+  calendar_database_id: string | null;
+  notes_database_id: string | null;
+  assistant_db_id: string | null;
+}
+
+export interface NotionConnectionPublic {
+  id: string;
+  workspace_id: string;
+  workspace_name: string | null;
+  workspace_icon: string | null;
+  connected_at: string;
+  last_synced_at: string | null;
+  tasks_database_id: string | null;
+  calendar_database_id: string | null;
+  notes_database_id: string | null;
+  assistant_db_id: string | null;
 }
