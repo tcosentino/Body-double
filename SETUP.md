@@ -136,12 +136,14 @@ PORT=3000
 ### Helicone Setup (Optional)
 
 [Helicone](https://helicone.ai) provides LLM observability with:
+
 - Request/response logging
 - Cost tracking per user/session
 - Latency metrics
 - 50K free logs/month
 
 To enable:
+
 1. Sign up at [helicone.ai](https://helicone.ai)
 2. Get your API key from the dashboard
 3. Add `HELICONE_API_KEY` to your environment
