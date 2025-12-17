@@ -34,7 +34,9 @@ function getAnthropic(): Anthropic {
       console.log("Anthropic client initialized with Helicone observability");
     } else {
       anthropic = new Anthropic();
-      console.log("Anthropic client initialized (no Helicone - set HELICONE_API_KEY for observability)");
+      console.log(
+        "Anthropic client initialized (no Helicone - set HELICONE_API_KEY for observability)"
+      );
     }
   }
   return anthropic;
