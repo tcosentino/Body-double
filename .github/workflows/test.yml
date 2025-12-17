@@ -29,6 +29,22 @@ jobs:
 
       - name: Run tests
         run: npm test
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Run type check
         run: npm run build
+
+      - name: Run sample chat demo
+        if: secrets.ANTHROPIC_API_KEY != ''
+        run: npm run demo:chat 2>&1 | tee chat-output.txt || true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Upload chat output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chat-output-node-${{ matrix.node-version }}
+          path: chat-output.txt
+          if-no-files-found: ignore

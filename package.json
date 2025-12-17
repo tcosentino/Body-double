@@ -11,6 +11,7 @@
     "test:prompts:watch": "tsx watch src/test-harness.ts",
     "test:batch": "tsx src/batch-test.ts",
     "test:batch:dry": "tsx src/batch-test.ts --dry-run",
+    "demo:chat": "tsx src/demo-chat.ts",
     "build": "tsc",
     "dev": "tsx watch src/server/index.ts",
     "dev:server": "tsx watch src/server/index.ts",
