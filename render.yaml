@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: body-double
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_PATH
+        value: /var/data/body-double.db
+    disk:
+      name: data
+      mountPath: /var/data
+      sizeGB: 1
