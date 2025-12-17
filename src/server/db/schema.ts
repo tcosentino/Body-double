@@ -127,12 +127,25 @@ export interface Message {
 export interface UserContextItem {
   id: string;
   user_id: string;
-  category: 'project' | 'interest' | 'challenge' | 'insight';
+  category: MemoryCategory;
   content: string;
   last_referenced: string;
   importance: number;
   created_at: string;
+  source?: string;  // Where this memory came from (session id, manual, etc.)
 }
+
+// Memory categories for the companion to remember
+export type MemoryCategory =
+  | 'project'      // Current projects user is working on
+  | 'interest'     // User interests and hobbies
+  | 'challenge'    // Common challenges/blockers
+  | 'insight'      // Insights about what works for this user
+  | 'distraction'  // Known distractions to watch for
+  | 'goal'         // Short or long-term goals
+  | 'preference'   // Interaction preferences (tone, check-in style)
+  | 'win'          // Past wins to reference for encouragement
+  | 'context';     // General context about user's life/work
 
 // Parsed types with JSON fields expanded
 export interface UserWithParsedFields extends Omit<User, 'interests' | 'preferences'> {

@@ -27,9 +27,9 @@ describe("Context Service", () => {
       expect(context.user.workContext).toBe("Not yet shared");
       expect(context.user.interests).toEqual([]);
       expect(context.recentSessions).toEqual([]);
-      expect(context.contextItems.projects).toEqual([]);
-      expect(context.contextItems.challenges).toEqual([]);
-      expect(context.contextItems.insights).toEqual([]);
+      expect(context.memories.projects).toEqual([]);
+      expect(context.memories.challenges).toEqual([]);
+      expect(context.memories.insights).toEqual([]);
     });
 
     it("should include work context and interests", () => {
@@ -101,12 +101,12 @@ describe("Context Service", () => {
 
       const context = buildUserContext(user.id);
 
-      expect(context.contextItems.projects).toEqual([
+      expect(context.memories.projects).toEqual([
         "Auth system refactor",
         "API documentation",
       ]);
-      expect(context.contextItems.challenges).toEqual(["Time management"]);
-      expect(context.contextItems.insights).toEqual(["Works better in mornings"]);
+      expect(context.memories.challenges).toEqual(["Time management"]);
+      expect(context.memories.insights).toEqual(["Works better in mornings"]);
     });
 
     it("should include current session details when provided", () => {
@@ -139,9 +139,9 @@ describe("Context Service", () => {
       const context = buildUserContext(user.id);
 
       // Should be ordered by importance DESC
-      expect(context.contextItems.projects[0]).toBe("High priority");
-      expect(context.contextItems.projects[1]).toBe("Medium priority");
-      expect(context.contextItems.projects[2]).toBe("Low priority");
+      expect(context.memories.projects[0]).toBe("High priority");
+      expect(context.memories.projects[1]).toBe("Medium priority");
+      expect(context.memories.projects[2]).toBe("Low priority");
     });
   });
 

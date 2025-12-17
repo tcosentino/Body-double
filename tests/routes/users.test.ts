@@ -67,8 +67,8 @@ describe("User Routes", () => {
       expect(response.status).toBe(200);
       expect(response.body.user.name).toBe("Context User");
       expect(response.body.user.workContext).toBe("Software developer");
-      expect(response.body.contextItems.projects).toContain("API development");
-      expect(response.body.contextItems.challenges).toContain("Focus issues");
+      expect(response.body.memories.projects).toContain("API development");
+      expect(response.body.memories.challenges).toContain("Focus issues");
     });
   });
 

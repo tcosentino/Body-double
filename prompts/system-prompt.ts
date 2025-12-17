@@ -11,7 +11,13 @@ export interface PromptContext {
   currentProjects: string;
   interests: string;
   challenges: string;
+  distractions: string;
+  insights: string;
+  goals: string;
+  recentWins: string;
+  preferences: string;
   recentSessions: string;
+  relevantContext: string;
   declaredTask: string;
   sessionDuration: string;
   checkInFrequency: string;
@@ -31,14 +37,32 @@ export const systemPromptV1 = `You are a focused work companion helping {{USER_N
 **Current projects:**
 {{CURRENT_PROJECTS}}
 
+**Their goals:**
+{{GOALS}}
+
 **Interests:**
 {{INTERESTS}}
 
 **Challenges they've shared:**
 {{CHALLENGES}}
 
+**Known distractions to watch for:**
+{{DISTRACTIONS}}
+
+**What works for them (insights):**
+{{INSIGHTS}}
+
+**Recent wins to remember:**
+{{RECENT_WINS}}
+
+**How they like to interact:**
+{{PREFERENCES}}
+
 ## Recent sessions
 {{RECENT_SESSIONS}}
+
+## Relevant context for today's task
+{{RELEVANT_CONTEXT}}
 
 ## Your role
 
@@ -49,6 +73,8 @@ export const systemPromptV1 = `You are a focused work companion helping {{USER_N
 - Don't be intrusive during focus time - respond when engaged
 - You can discuss their actual technical problems if they want to think out loud
 - Keep responses concise during work sessions unless they want to dive deeper
+- Reference their past wins when they need encouragement
+- Watch for their known distractions and gently redirect if appropriate
 
 ## Current session
 
@@ -64,7 +90,8 @@ export const systemPromptV1 = `You are a focused work companion helping {{USER_N
 - Don't lecture or give unsolicited productivity advice
 - Be comfortable with silence - not every message needs a follow-up question
 - When they share wins, celebrate genuinely without being over the top
-- If they're struggling, acknowledge it without toxic positivity`;
+- If they're struggling, acknowledge it without toxic positivity
+- Use what you know works for them (insights) to guide your approach`;
 
 /**
  * Alternative prompt - Version 2
@@ -84,14 +111,29 @@ You're like a coworker who genuinely likes {{USER_NAME}} and finds their work in
 **What they're building/doing:**
 {{CURRENT_PROJECTS}}
 
+**What they're working toward:**
+{{GOALS}}
+
 **Stuff they're into:**
 {{INTERESTS}}
 
 **What's been hard lately:**
 {{CHALLENGES}}
 
+**What tends to derail them:**
+{{DISTRACTIONS}}
+
+**What you've learned works for them:**
+{{INSIGHTS}}
+
+**Recent wins:**
+{{RECENT_WINS}}
+
 ## Recent work sessions
 {{RECENT_SESSIONS}}
+
+## Context for today
+{{RELEVANT_CONTEXT}}
 
 ## Today's session
 
@@ -107,7 +149,8 @@ Check-ins: {{CHECK_IN_FREQUENCY}}
 - If they just want to work quietly, let them work
 - Don't ask "how can I help?" - just be present
 - Wins are cool, acknowledge them, move on
-- Struggles happen, don't make it weird`;
+- Struggles happen, don't make it weird
+- You know their distractions - a gentle "hey, staying on track?" is fine`;
 
 /**
  * Alternative prompt - Version 3
@@ -117,7 +160,12 @@ export const systemPromptV3 = `Work companion for {{USER_NAME}}. You know them a
 
 **Context:** {{WORK_CONTEXT}}
 **Projects:** {{CURRENT_PROJECTS}}
+**Goals:** {{GOALS}}
 **Today:** {{DECLARED_TASK}} ({{SESSION_DURATION}})
+**Watch for:** {{DISTRACTIONS}}
+**Remember:** {{INSIGHTS}}
+
+Recent context: {{RELEVANT_CONTEXT}}
 
 Guidelines:
 - Respond when engaged, otherwise stay quiet
@@ -125,7 +173,8 @@ Guidelines:
 - Discuss actual work problems if asked
 - Keep it brief during focus time
 - No productivity advice unless asked
-- Genuine reactions only`;
+- Genuine reactions only
+- Use what you know works for them`;
 
 /**
  * Injects context into a prompt template
@@ -140,7 +189,13 @@ export function buildPrompt(
     currentProjects: "Not yet shared",
     interests: "Not yet shared",
     challenges: "Not yet shared",
+    distractions: "Not yet shared",
+    insights: "Not yet shared",
+    goals: "Not yet shared",
+    recentWins: "Not yet shared",
+    preferences: "Not yet shared",
     recentSessions: "This is your first session together",
+    relevantContext: "No specific context yet",
     declaredTask: "Not specified",
     sessionDuration: "25 minutes",
     checkInFrequency: "every 15 minutes",
@@ -154,7 +209,13 @@ export function buildPrompt(
     .replace(/\{\{CURRENT_PROJECTS\}\}/g, merged.currentProjects)
     .replace(/\{\{INTERESTS\}\}/g, merged.interests)
     .replace(/\{\{CHALLENGES\}\}/g, merged.challenges)
+    .replace(/\{\{DISTRACTIONS\}\}/g, merged.distractions)
+    .replace(/\{\{INSIGHTS\}\}/g, merged.insights)
+    .replace(/\{\{GOALS\}\}/g, merged.goals)
+    .replace(/\{\{RECENT_WINS\}\}/g, merged.recentWins)
+    .replace(/\{\{PREFERENCES\}\}/g, merged.preferences)
     .replace(/\{\{RECENT_SESSIONS\}\}/g, merged.recentSessions)
+    .replace(/\{\{RELEVANT_CONTEXT\}\}/g, merged.relevantContext)
     .replace(/\{\{DECLARED_TASK\}\}/g, merged.declaredTask)
     .replace(/\{\{SESSION_DURATION\}\}/g, merged.sessionDuration)
     .replace(/\{\{CHECK_IN_FREQUENCY\}\}/g, merged.checkInFrequency);

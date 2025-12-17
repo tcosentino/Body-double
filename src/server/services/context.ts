@@ -6,7 +6,8 @@
  */
 
 import { getDb } from "../db/index.js";
-import type { User, Session, UserContextItem } from "../db/schema.js";
+import type { User, Session } from "../db/schema.js";
+import { getMemorySummary, getRelevantMemories } from "./memory.js";
 
 export interface UserContext {
   user: {
@@ -15,11 +16,16 @@ export interface UserContext {
     interests: string[];
   };
   recentSessions: SessionSummary[];
-  contextItems: {
+  memories: {
     projects: string[];
     challenges: string[];
     insights: string[];
+    distractions: string[];
+    goals: string[];
+    wins: string[];
+    preferences: string[];
   };
+  relevantMemories: string[];  // Memories relevant to current task
   currentSession?: {
     declaredTask: string;
     durationPlanned: number;
@@ -57,21 +63,16 @@ export function buildUserContext(userId: string, currentSessionId?: string): Use
     LIMIT 10
   `).all(userId, currentSessionId || "") as Session[];
 
-  // Get context items by category
-  const contextItems = db.prepare(`
-    SELECT * FROM user_context_items
-    WHERE user_id = ?
-    ORDER BY importance DESC, last_referenced DESC
-  `).all(userId) as UserContextItem[];
-
   // Get current session if provided
   let currentSession: UserContext["currentSession"] | undefined;
+  let declaredTask = "";
   if (currentSessionId) {
     const session = db.prepare(`
       SELECT * FROM sessions WHERE id = ?
     `).get(currentSessionId) as Session | undefined;
 
     if (session) {
+      declaredTask = session.declared_task || "";
       currentSession = {
         declaredTask: session.declared_task || "Not specified",
         durationPlanned: session.duration_planned || 25,
@@ -90,16 +91,13 @@ export function buildUserContext(userId: string, currentSessionId?: string): Use
     }
   }
 
-  // Group context items by category
-  const projects = contextItems
-    .filter((c) => c.category === "project")
-    .map((c) => c.content);
-  const challenges = contextItems
-    .filter((c) => c.category === "challenge")
-    .map((c) => c.content);
-  const insights = contextItems
-    .filter((c) => c.category === "insight")
-    .map((c) => c.content);
+  // Get memories from the enhanced memory service
+  const memorySummary = getMemorySummary(userId);
+
+  // Get memories relevant to the current task
+  const relevantMems = declaredTask
+    ? getRelevantMemories(userId, declaredTask)
+    : [];
 
   return {
     user: {
@@ -113,11 +111,16 @@ export function buildUserContext(userId: string, currentSessionId?: string): Use
       outcome: s.outcome,
       durationMinutes: s.duration_actual || s.duration_planned || 0,
     })),
-    contextItems: {
-      projects,
-      challenges,
-      insights,
+    memories: {
+      projects: memorySummary.projects,
+      challenges: memorySummary.challenges,
+      insights: memorySummary.insights,
+      distractions: memorySummary.distractions,
+      goals: memorySummary.goals,
+      wins: memorySummary.wins,
+      preferences: memorySummary.preferences,
     },
+    relevantMemories: relevantMems.map((m) => `[${m.category}] ${m.content}`),
     currentSession,
   };
 }
@@ -131,7 +134,13 @@ export function formatContextForPrompt(context: UserContext): {
   currentProjects: string;
   interests: string;
   challenges: string;
+  distractions: string;
+  insights: string;
+  goals: string;
+  recentWins: string;
+  preferences: string;
   recentSessions: string;
+  relevantContext: string;
   declaredTask: string;
   sessionDuration: string;
   checkInFrequency: string;
@@ -157,15 +166,26 @@ export function formatContextForPrompt(context: UserContext): {
   const formatList = (items: string[]): string =>
     items.length > 0 ? items.map((i) => `- ${i}`).join("\n") : "Not yet shared";
 
+  // Format relevant context for current task
+  const relevantContext = context.relevantMemories.length > 0
+    ? context.relevantMemories.join("\n")
+    : "No specific context for this task yet";
+
   return {
     userName: context.user.name,
     workContext: context.user.workContext,
-    currentProjects: formatList(context.contextItems.projects),
+    currentProjects: formatList(context.memories.projects),
     interests: context.user.interests.length > 0
       ? context.user.interests.join(", ")
       : "Not yet shared",
-    challenges: formatList(context.contextItems.challenges),
+    challenges: formatList(context.memories.challenges),
+    distractions: formatList(context.memories.distractions),
+    insights: formatList(context.memories.insights),
+    goals: formatList(context.memories.goals),
+    recentWins: formatList(context.memories.wins),
+    preferences: formatList(context.memories.preferences),
     recentSessions: recentSessionsText,
+    relevantContext,
     declaredTask: context.currentSession?.declaredTask || "Not specified",
     sessionDuration: `${context.currentSession?.durationPlanned || 25} minutes`,
     checkInFrequency: `every ${context.currentSession?.checkInFrequency || 15} minutes`,
@@ -173,14 +193,14 @@ export function formatContextForPrompt(context: UserContext): {
 }
 
 /**
- * Add a context item for a user
+ * Add a context item for a user (legacy - use memory service instead)
  */
 export function addContextItem(
   userId: string,
-  category: UserContextItem["category"],
+  category: "project" | "interest" | "challenge" | "insight",
   content: string,
   importance: number = 1
-): UserContextItem {
+) {
   const db = getDb();
   const id = crypto.randomUUID();
 
@@ -189,7 +209,7 @@ export function addContextItem(
     VALUES (?, ?, ?, ?, ?)
   `).run(id, userId, category, content, importance);
 
-  return db.prepare(`SELECT * FROM user_context_items WHERE id = ?`).get(id) as UserContextItem;
+  return db.prepare(`SELECT * FROM user_context_items WHERE id = ?`).get(id);
 }
 
 /**

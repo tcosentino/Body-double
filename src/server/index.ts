@@ -15,6 +15,7 @@ import authRouter from "./routes/auth.js";
 import usersRouter from "./routes/users.js";
 import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
+import memoryRouter from "./routes/memory.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -48,6 +49,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/memory", memoryRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -117,6 +119,16 @@ API Endpoints (auth required):
   GET    /api/sessions/history   Session history
 
   POST   /api/chat               Send message (non-streaming)
+
+Memory Endpoints (auth required):
+  GET    /api/memory             List all memories
+  GET    /api/memory/summary     Get memory summary for AI
+  GET    /api/memory/stats       Get memory statistics
+  GET    /api/memory/categories  Get valid categories
+  POST   /api/memory             Create a memory
+  PUT    /api/memory/:id         Update a memory
+  DELETE /api/memory/:id         Delete a memory
+  POST   /api/memory/bulk        Create multiple memories
 
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx
