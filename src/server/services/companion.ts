@@ -10,6 +10,11 @@ import { getDb } from "../db/index.js";
 import { buildUserContext, formatContextForPrompt } from "./context.js";
 import { buildPrompt, systemPromptV1 } from "../../../prompts/system-prompt.js";
 import type { Message } from "../db/schema.js";
+import {
+  startApiCallLog,
+  completeApiCallLog,
+  failApiCallLog,
+} from "./apiLogger.js";
 
 // Use the prompt version - can be made configurable later
 const SYSTEM_PROMPT_TEMPLATE = systemPromptV1;
@@ -61,17 +66,44 @@ export async function generateResponse(
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
 
-  // Call the API
-  const response = await client.messages.create({
+  // Log the API call
+  const logId = startApiCallLog("messages.create", {
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
     system: systemPrompt,
     messages,
   });
+  const startTime = Date.now();
 
-  const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
+  try {
+    // Call the API
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    });
 
-  return assistantMessage;
+    const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
+
+    // Complete the log
+    completeApiCallLog(
+      logId,
+      {
+        id: response.id,
+        model: response.model,
+        content: assistantMessage,
+        usage: response.usage,
+        stop_reason: response.stop_reason || undefined,
+      },
+      Date.now() - startTime
+    );
+
+    return assistantMessage;
+  } catch (error) {
+    failApiCallLog(logId, error instanceof Error ? error.message : String(error), Date.now() - startTime);
+    throw error;
+  }
 }
 
 /**
@@ -104,18 +136,51 @@ export async function* generateStreamingResponse(
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
 
-  // Call the API with streaming
-  const stream = await client.messages.stream({
+  // Log the API call
+  const logId = startApiCallLog("messages.stream", {
     model: "claude-sonnet-4-20250514",
     max_tokens: 1024,
     system: systemPrompt,
     messages,
   });
+  const startTime = Date.now();
 
-  for await (const event of stream) {
-    if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-      yield event.delta.text;
+  try {
+    // Call the API with streaming
+    const stream = await client.messages.stream({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    });
+
+    let fullResponse = "";
+
+    for await (const event of stream) {
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        fullResponse += event.delta.text;
+        yield event.delta.text;
+      }
     }
+
+    // Get final message for usage stats
+    const finalMessage = await stream.finalMessage();
+
+    // Complete the log
+    completeApiCallLog(
+      logId,
+      {
+        id: finalMessage.id,
+        model: finalMessage.model,
+        content: fullResponse,
+        usage: finalMessage.usage,
+        stop_reason: finalMessage.stop_reason || undefined,
+      },
+      Date.now() - startTime
+    );
+  } catch (error) {
+    failApiCallLog(logId, error instanceof Error ? error.message : String(error), Date.now() - startTime);
+    throw error;
   }
 }
 
@@ -159,14 +224,44 @@ export async function getSessionGreeting(userId: string, sessionId: string): Pro
     greetingPrompt = `This is the start of a new session. ${context.user.name} is about to work on: "${task}". Their last session was working on "${lastSession.task}". Give a brief, warm greeting that naturally references something from your history together. Keep it concise (2-3 sentences).`;
   }
 
-  // Generate greeting using a simpler prompt
-  const client = getAnthropic();
-  const response = await client.messages.create({
+  const systemPrompt = `You are a warm, genuine work companion who knows ${context.user.name} well. Be natural and concise.`;
+
+  // Log the API call
+  const logId = startApiCallLog("messages.create", {
     model: "claude-sonnet-4-20250514",
     max_tokens: 256,
-    system: `You are a warm, genuine work companion who knows ${context.user.name} well. Be natural and concise.`,
+    system: systemPrompt,
     messages: [{ role: "user", content: greetingPrompt }],
   });
+  const startTime = Date.now();
 
-  return response.content[0].type === "text" ? response.content[0].text : "";
+  try {
+    // Generate greeting using a simpler prompt
+    const client = getAnthropic();
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 256,
+      system: systemPrompt,
+      messages: [{ role: "user", content: greetingPrompt }],
+    });
+
+    const greeting = response.content[0].type === "text" ? response.content[0].text : "";
+
+    completeApiCallLog(
+      logId,
+      {
+        id: response.id,
+        model: response.model,
+        content: greeting,
+        usage: response.usage,
+        stop_reason: response.stop_reason || undefined,
+      },
+      Date.now() - startTime
+    );
+
+    return greeting;
+  } catch (error) {
+    failApiCallLog(logId, error instanceof Error ? error.message : String(error), Date.now() - startTime);
+    throw error;
+  }
 }

@@ -16,6 +16,7 @@ import usersRouter from "./routes/users.js";
 import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
 import memoryRouter from "./routes/memory.js";
+import devRouter from "./routes/dev.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -51,6 +52,7 @@ app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/memory", memoryRouter);
+app.use("/api/dev", devRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -137,6 +139,21 @@ Memory Endpoints (auth required):
   PUT    /api/memory/:id         Update a memory
   DELETE /api/memory/:id         Delete a memory
   POST   /api/memory/bulk        Create multiple memories
+
+Dev Endpoints (dev mode only):
+  GET    /api/dev/status                 Dev mode status
+  GET    /api/dev/users                  List all users
+  GET    /api/dev/users/:id/context      User context (raw + formatted)
+  GET    /api/dev/users/:id/prompt       Full system prompt
+  GET    /api/dev/users/:id/memories     User memories + stats
+  GET    /api/dev/sessions               List all sessions
+  GET    /api/dev/api-calls              Anthropic API call logs
+  GET    /api/dev/api-calls/:id          Single API call details
+  DELETE /api/dev/api-calls              Clear API call logs
+  GET    /api/dev/database/tables        Database table info
+  GET    /api/dev/database/query?sql=    Execute SELECT query
+
+  Dev Page: http://localhost:${PORT}/dev
 
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev Mode - Body Double</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .dev-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .dev-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+    }
+
+    .dev-header h1 {
+      font-size: 1.25rem;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dev-badge {
+      background: #f59e0b;
+      color: #0f172a;
+      font-size: 0.625rem;
+      font-weight: 700;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .dev-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .dev-nav button {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.875rem;
+      transition: all 0.15s;
+    }
+
+    .dev-nav button:hover {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .dev-nav button.active {
+      background: #6366f1;
+      color: white;
+      border-color: #6366f1;
+    }
+
+    .dev-content {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+
+    .panel {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid #334155;
+    }
+
+    .card-header h2 {
+      font-size: 1rem;
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #6366f1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #334155;
+    }
+
+    .data-table th {
+      background: #0f172a;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    .data-table tr:hover {
+      background: #334155;
+    }
+
+    .data-table tr.clickable {
+      cursor: pointer;
+    }
+
+    .code-block {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .code-block.small {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .code-block.large {
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .badge-success { background: #065f46; color: #6ee7b7; }
+    .badge-error { background: #7f1d1d; color: #fca5a5; }
+    .badge-info { background: #1e3a5f; color: #7dd3fc; }
+    .badge-warning { background: #78350f; color: #fcd34d; }
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+    }
+
+    .btn-primary {
+      background: #6366f1;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4f46e5;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-sm {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .select-wrapper {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .select-wrapper select {
+      padding: 0.5rem;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: #e2e8f0;
+      font-size: 0.875rem;
+      min-width: 200px;
+    }
+
+    .select-wrapper label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+    }
+
+    .expandable {
+      cursor: pointer;
+    }
+
+    .expandable-content {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #334155;
+    }
+
+    .expandable.open .expandable-content {
+      display: block;
+    }
+
+    .expandable-toggle {
+      color: #6366f1;
+      font-size: 0.875rem;
+    }
+
+    .memory-category {
+      display: inline-block;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      background: #334155;
+      margin-right: 0.25rem;
+    }
+
+    .memory-category.project { background: #1e3a5f; }
+    .memory-category.challenge { background: #7f1d1d; }
+    .memory-category.insight { background: #065f46; }
+    .memory-category.distraction { background: #78350f; }
+    .memory-category.goal { background: #581c87; }
+    .memory-category.win { background: #166534; }
+    .memory-category.preference { background: #1e3a5f; }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 0.5rem;
+    }
+
+    .tabs button {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .tabs button:hover {
+      color: #e2e8f0;
+    }
+
+    .tabs button.active {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: #64748b;
+    }
+
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 0.375rem 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .refresh-btn:hover {
+      background: #334155;
+      color: #e2e8f0;
+    }
+
+    .token-count {
+      font-family: 'JetBrains Mono', monospace;
+      color: #f59e0b;
+    }
+
+    .duration {
+      font-family: 'JetBrains Mono', monospace;
+      color: #6ee7b7;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dev-layout">
+    <header class="dev-header">
+      <h1>
+        <a href="/" style="color: inherit; text-decoration: none;">Body Double</a>
+        <span class="dev-badge">Dev Mode</span>
+      </h1>
+      <nav class="dev-nav">
+        <button class="active" data-panel="overview">Overview</button>
+        <button data-panel="users">Users</button>
+        <button data-panel="api-calls">API Calls</button>
+        <button data-panel="database">Database</button>
+      </nav>
+    </header>
+
+    <main class="dev-content">
+      <!-- Overview Panel -->
+      <div class="panel active" id="panel-overview">
+        <div class="stats-grid" id="overviewStats">
+          <div class="stat-card">
+            <div class="stat-value" id="statUsers">-</div>
+            <div class="stat-label">Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statSessions">-</div>
+            <div class="stat-label">Sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statApiCalls">-</div>
+            <div class="stat-label">API Calls</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statTokens">-</div>
+            <div class="stat-label">Total Tokens</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h2>Recent Sessions</h2>
+              <button class="refresh-btn" onclick="loadOverview()">Refresh</button>
+            </div>
+            <div class="card-body">
+              <table class="data-table" id="recentSessionsTable">
+                <thead>
+                  <tr>
+                    <th>Task</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Messages</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Recent API Calls</h2>
+              <button class="refresh-btn" onclick="loadApiCalls()">Refresh</button>
+            </div>
+            <div class="card-body">
+              <table class="data-table" id="recentApiTable">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Duration</th>
+                    <th>Tokens</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Panel -->
+      <div class="panel" id="panel-users">
+        <div class="select-wrapper">
+          <label>Select User:</label>
+          <select id="userSelect" onchange="loadUserDetails()">
+            <option value="">-- Select a user --</option>
+          </select>
+          <button class="refresh-btn" onclick="loadUsers()">Refresh</button>
+        </div>
+
+        <div id="userDetails" style="display: none;">
+          <div class="tabs">
+            <button class="active" data-tab="context">Context</button>
+            <button data-tab="memories">Memories</button>
+            <button data-tab="prompt">System Prompt</button>
+          </div>
+
+          <div class="tab-content active" id="tab-context">
+            <div class="card">
+              <div class="card-header">
+                <h2>User Context (What AI Sees)</h2>
+              </div>
+              <div class="card-body">
+                <h3 style="font-size: 0.875rem; color: #94a3b8; margin-top: 0;">Raw Context</h3>
+                <div class="code-block small" id="rawContext"></div>
+                <h3 style="font-size: 0.875rem; color: #94a3b8; margin-top: 1rem;">Formatted Context</h3>
+                <div class="code-block small" id="formattedContext"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-memories" style="display: none;">
+            <div class="card">
+              <div class="card-header">
+                <h2>Memory Stats</h2>
+              </div>
+              <div class="card-body">
+                <div class="stats-grid" id="memoryStats"></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h2>All Memories</h2>
+              </div>
+              <div class="card-body">
+                <table class="data-table" id="memoriesTable">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Content</th>
+                      <th>Importance</th>
+                      <th>Last Referenced</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="tab-prompt" style="display: none;">
+            <div class="card">
+              <div class="card-header">
+                <h2>Full System Prompt</h2>
+                <span class="token-count" id="promptTokens"></span>
+              </div>
+              <div class="card-body">
+                <div class="code-block large" id="systemPrompt"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Calls Panel -->
+      <div class="panel" id="panel-api-calls">
+        <div class="stats-grid" id="apiStats"></div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>API Call Log</h2>
+            <div>
+              <button class="btn btn-danger btn-sm" onclick="clearApiLogs()">Clear Logs</button>
+              <button class="refresh-btn" onclick="loadApiCalls()" style="margin-left: 0.5rem;">Refresh</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="apiCallsList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Database Panel -->
+      <div class="panel" id="panel-database">
+        <div class="card">
+          <div class="card-header">
+            <h2>Tables</h2>
+            <button class="refresh-btn" onclick="loadDatabaseInfo()">Refresh</button>
+          </div>
+          <div class="card-body">
+            <table class="data-table" id="tablesTable">
+              <thead>
+                <tr>
+                  <th>Table Name</th>
+                  <th>Row Count</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Query (SELECT only)</h2>
+          </div>
+          <div class="card-body">
+            <textarea id="sqlQuery" style="width: 100%; height: 80px; background: #0f172a; border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; padding: 0.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem; resize: vertical;" placeholder="SELECT * FROM users LIMIT 10"></textarea>
+            <button class="btn btn-primary" onclick="runQuery()" style="margin-top: 0.5rem;">Run Query</button>
+            <div class="code-block small" id="queryResults" style="margin-top: 1rem; display: none;"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Panel navigation
+    document.querySelectorAll('.dev-nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dev-nav button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+      });
+    });
+
+    // Tab navigation
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.closest('.panel');
+        parent.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        parent.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).style.display = 'block';
+      });
+    });
+
+    // API helpers
+    async function api(path) {
+      const res = await fetch('/api/dev' + path);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Request failed');
+      }
+      return res.json();
+    }
+
+    // Load overview
+    async function loadOverview() {
+      try {
+        const [users, sessions, apiCalls] = await Promise.all([
+          api('/users'),
+          api('/sessions?limit=10'),
+          api('/api-calls')
+        ]);
+
+        document.getElementById('statUsers').textContent = users.users.length;
+        document.getElementById('statSessions').textContent = sessions.sessions.length;
+        document.getElementById('statApiCalls').textContent = apiCalls.stats.total;
+        document.getElementById('statTokens').textContent = (apiCalls.stats.totalInputTokens + apiCalls.stats.totalOutputTokens).toLocaleString();
+
+        // Recent sessions
+        const sessionsBody = document.querySelector('#recentSessionsTable tbody');
+        sessionsBody.innerHTML = sessions.sessions.slice(0, 5).map(s => `
+          <tr>
+            <td>${s.declared_task || 'N/A'}</td>
+            <td>${s.user_name || s.user_email}</td>
+            <td><span class="badge badge-${s.status === 'active' ? 'success' : 'info'}">${s.status}</span></td>
+            <td>${s.message_count}</td>
+          </tr>
+        `).join('');
+
+        // Recent API calls
+        const apiBody = document.querySelector('#recentApiTable tbody');
+        apiBody.innerHTML = apiCalls.calls.slice(0, 5).map(c => {
+          const time = new Date(c.timestamp).toLocaleTimeString();
+          const tokens = c.response?.usage
+            ? (c.response.usage.input_tokens + c.response.usage.output_tokens)
+            : '-';
+          return `
+            <tr>
+              <td>${time}</td>
+              <td><span class="badge badge-info">${c.type}</span></td>
+              <td class="duration">${c.durationMs ? c.durationMs + 'ms' : '-'}</td>
+              <td class="token-count">${tokens}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to load overview:', err);
+      }
+    }
+
+    // Load users
+    async function loadUsers() {
+      try {
+        const data = await api('/users');
+        const select = document.getElementById('userSelect');
+        select.innerHTML = '<option value="">-- Select a user --</option>' +
+          data.users.map(u => `<option value="${u.id}">${u.name || u.email}</option>`).join('');
+      } catch (err) {
+        console.error('Failed to load users:', err);
+      }
+    }
+
+    // Load user details
+    async function loadUserDetails() {
+      const userId = document.getElementById('userSelect').value;
+      const details = document.getElementById('userDetails');
+
+      if (!userId) {
+        details.style.display = 'none';
+        return;
+      }
+
+      details.style.display = 'block';
+
+      try {
+        const [context, memories, prompt] = await Promise.all([
+          api(`/users/${userId}/context`),
+          api(`/users/${userId}/memories`),
+          api(`/users/${userId}/prompt`)
+        ]);
+
+        // Context
+        document.getElementById('rawContext').textContent = JSON.stringify(context.raw, null, 2);
+        document.getElementById('formattedContext').textContent = JSON.stringify(context.formatted, null, 2);
+
+        // Memories
+        const statsGrid = document.getElementById('memoryStats');
+        statsGrid.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-value">${memories.stats.total}</div>
+            <div class="stat-label">Total Memories</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${memories.stats.recentlyAdded}</div>
+            <div class="stat-label">Added (7 days)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${memories.stats.recentlyReferenced}</div>
+            <div class="stat-label">Referenced (7 days)</div>
+          </div>
+        `;
+
+        const memoriesBody = document.querySelector('#memoriesTable tbody');
+        memoriesBody.innerHTML = memories.memories.map(m => `
+          <tr>
+            <td><span class="memory-category ${m.category}">${m.category}</span></td>
+            <td>${m.content}</td>
+            <td>${m.importance}</td>
+            <td>${new Date(m.lastReferenced).toLocaleDateString()}</td>
+          </tr>
+        `).join('') || '<tr><td colspan="4" class="empty-state">No memories</td></tr>';
+
+        // Prompt
+        document.getElementById('systemPrompt').textContent = prompt.prompt;
+        document.getElementById('promptTokens').textContent = `~${prompt.estimatedTokens.toLocaleString()} tokens (${prompt.promptLength.toLocaleString()} chars)`;
+
+      } catch (err) {
+        console.error('Failed to load user details:', err);
+      }
+    }
+
+    // Load API calls
+    async function loadApiCalls() {
+      try {
+        const data = await api('/api-calls');
+
+        // Stats
+        const statsGrid = document.getElementById('apiStats');
+        statsGrid.innerHTML = `
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.total}</div>
+            <div class="stat-label">Total Calls</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.successful}</div>
+            <div class="stat-label">Successful</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.failed}</div>
+            <div class="stat-label">Failed</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.averageDurationMs}ms</div>
+            <div class="stat-label">Avg Duration</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.totalInputTokens.toLocaleString()}</div>
+            <div class="stat-label">Input Tokens</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">${data.stats.totalOutputTokens.toLocaleString()}</div>
+            <div class="stat-label">Output Tokens</div>
+          </div>
+        `;
+
+        // Calls list
+        const list = document.getElementById('apiCallsList');
+        if (data.calls.length === 0) {
+          list.innerHTML = '<div class="empty-state">No API calls logged yet. Make some requests to see them here.</div>';
+          return;
+        }
+
+        list.innerHTML = data.calls.map(call => {
+          const time = new Date(call.timestamp).toLocaleString();
+          const statusBadge = call.error
+            ? '<span class="badge badge-error">Error</span>'
+            : '<span class="badge badge-success">Success</span>';
+          const tokens = call.response?.usage
+            ? `${call.response.usage.input_tokens} in / ${call.response.usage.output_tokens} out`
+            : '-';
+
+          return `
+            <div class="card expandable" onclick="this.classList.toggle('open')">
+              <div class="card-header">
+                <div>
+                  <span class="badge badge-info">${call.type}</span>
+                  ${statusBadge}
+                  <span style="margin-left: 0.5rem; color: #94a3b8;">${time}</span>
+                </div>
+                <div>
+                  <span class="duration">${call.durationMs ? call.durationMs + 'ms' : '-'}</span>
+                  <span class="token-count" style="margin-left: 1rem;">${tokens}</span>
+                  <span class="expandable-toggle" style="margin-left: 1rem;">+ Details</span>
+                </div>
+              </div>
+              <div class="expandable-content">
+                <h4 style="font-size: 0.875rem; color: #94a3b8; margin: 0 0 0.5rem;">System Prompt</h4>
+                <div class="code-block small">${escapeHtml(call.request.system)}</div>
+
+                <h4 style="font-size: 0.875rem; color: #94a3b8; margin: 1rem 0 0.5rem;">Messages</h4>
+                <div class="code-block small">${escapeHtml(JSON.stringify(call.request.messages, null, 2))}</div>
+
+                ${call.response ? `
+                  <h4 style="font-size: 0.875rem; color: #94a3b8; margin: 1rem 0 0.5rem;">Response</h4>
+                  <div class="code-block small">${escapeHtml(call.response.content || '')}</div>
+
+                  <h4 style="font-size: 0.875rem; color: #94a3b8; margin: 1rem 0 0.5rem;">Metadata</h4>
+                  <div class="code-block small">${escapeHtml(JSON.stringify({
+                    id: call.response.id,
+                    model: call.response.model,
+                    usage: call.response.usage,
+                    stop_reason: call.response.stop_reason
+                  }, null, 2))}</div>
+                ` : ''}
+
+                ${call.error ? `
+                  <h4 style="font-size: 0.875rem; color: #fca5a5; margin: 1rem 0 0.5rem;">Error</h4>
+                  <div class="code-block small" style="border-color: #7f1d1d;">${escapeHtml(call.error)}</div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('Failed to load API calls:', err);
+      }
+    }
+
+    // Clear API logs
+    async function clearApiLogs() {
+      if (!confirm('Clear all API call logs?')) return;
+      try {
+        await fetch('/api/dev/api-calls', { method: 'DELETE' });
+        loadApiCalls();
+      } catch (err) {
+        console.error('Failed to clear logs:', err);
+      }
+    }
+
+    // Load database info
+    async function loadDatabaseInfo() {
+      try {
+        const data = await api('/database/tables');
+        const body = document.querySelector('#tablesTable tbody');
+        body.innerHTML = data.tables.map(t => `
+          <tr>
+            <td>${t.name}</td>
+            <td>${t.rowCount}</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('Failed to load database info:', err);
+      }
+    }
+
+    // Run query
+    async function runQuery() {
+      const sql = document.getElementById('sqlQuery').value;
+      const results = document.getElementById('queryResults');
+
+      if (!sql.trim()) return;
+
+      results.style.display = 'block';
+      results.textContent = 'Running...';
+
+      try {
+        const data = await api('/database/query?sql=' + encodeURIComponent(sql));
+        results.textContent = JSON.stringify(data.results, null, 2);
+      } catch (err) {
+        results.textContent = 'Error: ' + err.message;
+      }
+    }
+
+    // Escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Initial load
+    loadOverview();
+    loadUsers();
+    loadApiCalls();
+    loadDatabaseInfo();
+  </script>
+</body>
+</html>
