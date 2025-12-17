@@ -20,6 +20,7 @@ Go to: **Repository → Settings → Secrets and variables → Actions → New r
 | Secret Name         | Description                                       | Required            |
 | ------------------- | ------------------------------------------------- | ------------------- |
 | `ANTHROPIC_API_KEY` | Your Anthropic API key (starts with `sk-ant-...`) | Yes, for chat demos |
+| `HELICONE_API_KEY`  | Helicone API key for LLM observability            | No, optional        |
 
 ### How to Get an Anthropic API Key
 
@@ -124,10 +125,30 @@ Create a `.env` file in the project root:
 # Required for AI features
 ANTHROPIC_API_KEY=sk-ant-your-key-here
 
+# Optional - Helicone observability (https://helicone.ai)
+HELICONE_API_KEY=sk-helicone-your-key-here
+
 # Optional
 NODE_ENV=development
 PORT=3000
 ```
+
+### Helicone Setup (Optional)
+
+[Helicone](https://helicone.ai) provides LLM observability with:
+
+- Request/response logging
+- Cost tracking per user/session
+- Latency metrics
+- 50K free logs/month
+
+To enable:
+
+1. Sign up at [helicone.ai](https://helicone.ai)
+2. Get your API key from the dashboard
+3. Add `HELICONE_API_KEY` to your environment
+
+The app includes deep links to Helicone filtered by session - click "API Logs" in the session header to view requests for that session.
 
 ---
 
