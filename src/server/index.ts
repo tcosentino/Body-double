@@ -77,12 +77,17 @@ const wss = setupWebSocket(server);
 initializeDb();
 
 // Periodic cleanup of expired auth tokens (every hour)
-setInterval(() => {
-  const cleaned = cleanupExpiredAuth();
-  if (cleaned.magicLinks > 0 || cleaned.sessions > 0) {
-    console.log(`Auth cleanup: removed ${cleaned.magicLinks} magic links, ${cleaned.sessions} sessions`);
-  }
-}, 60 * 60 * 1000);
+setInterval(
+  () => {
+    const cleaned = cleanupExpiredAuth();
+    if (cleaned.magicLinks > 0 || cleaned.sessions > 0) {
+      console.log(
+        `Auth cleanup: removed ${cleaned.magicLinks} magic links, ${cleaned.sessions} sessions`
+      );
+    }
+  },
+  60 * 60 * 1000
+);
 
 // Start server
 server.listen(PORT, () => {

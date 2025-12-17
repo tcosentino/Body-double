@@ -108,7 +108,9 @@ describe("Auth Service", () => {
 
       // Manually expire the token
       const db = getTestDb();
-      db.prepare(`UPDATE magic_links SET expires_at = datetime('now', '-1 hour') WHERE token = ?`).run(token);
+      db.prepare(
+        `UPDATE magic_links SET expires_at = datetime('now', '-1 hour') WHERE token = ?`
+      ).run(token);
 
       const result = verifyMagicLink(token);
       expect(result).toBeNull();
@@ -148,7 +150,9 @@ describe("Auth Service", () => {
 
       // Manually expire the session
       const db = getTestDb();
-      db.prepare(`UPDATE auth_sessions SET expires_at = datetime('now', '-1 day') WHERE token = ?`).run(sessionToken);
+      db.prepare(
+        `UPDATE auth_sessions SET expires_at = datetime('now', '-1 day') WHERE token = ?`
+      ).run(sessionToken);
 
       const result = validateSession(sessionToken);
       expect(result).toBeNull();
@@ -221,17 +225,21 @@ describe("Auth Service", () => {
       const db = getTestDb();
 
       // Create expired magic link
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO magic_links (id, email, token, expires_at)
         VALUES (?, ?, ?, datetime('now', '-1 hour'))
-      `).run(crypto.randomUUID(), "expired@example.com", "expired-token");
+      `
+      ).run(crypto.randomUUID(), "expired@example.com", "expired-token");
 
       // Create expired auth session
       const user = createTestUser();
-      db.prepare(`
+      db.prepare(
+        `
         INSERT INTO auth_sessions (id, user_id, token, expires_at)
         VALUES (?, ?, ?, datetime('now', '-1 day'))
-      `).run(crypto.randomUUID(), user.id, "expired-session-token");
+      `
+      ).run(crypto.randomUUID(), user.id, "expired-session-token");
 
       expect(getTableCount("magic_links")).toBe(1);
       expect(getTableCount("auth_sessions")).toBe(1);

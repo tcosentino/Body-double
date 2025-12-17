@@ -17,8 +17,8 @@ This guide explains how to configure the GitHub Actions CI pipeline and set up y
 
 Go to: **Repository → Settings → Secrets and variables → Actions → New repository secret**
 
-| Secret Name | Description | Required |
-|-------------|-------------|----------|
+| Secret Name         | Description                                       | Required            |
+| ------------------- | ------------------------------------------------- | ------------------- |
 | `ANTHROPIC_API_KEY` | Your Anthropic API key (starts with `sk-ant-...`) | Yes, for chat demos |
 
 ### How to Get an Anthropic API Key
@@ -36,11 +36,11 @@ Go to: **Repository → Settings → Secrets and variables → Actions → New r
 
 ### On Every Push/PR
 
-| Job | Purpose | Duration |
-|-----|---------|----------|
-| `test` | Run tests, lint, typecheck on Node 20 | ~2 min |
-| `test-node18` | Verify Node 18 compatibility | ~1 min |
-| `auto-format` | Auto-fix formatting issues (PRs only) | ~1 min |
+| Job           | Purpose                               | Duration |
+| ------------- | ------------------------------------- | -------- |
+| `test`        | Run tests, lint, typecheck on Node 20 | ~2 min   |
+| `test-node18` | Verify Node 18 compatibility          | ~1 min   |
+| `auto-format` | Auto-fix formatting issues (PRs only) | ~1 min   |
 
 ### PR Comments
 
@@ -65,8 +65,8 @@ Every PR gets an auto-updating comment showing:
 
 Download from the **Actions** tab → Select a run → **Artifacts** section:
 
-| Artifact | Contents |
-|----------|----------|
+| Artifact    | Contents                                                |
+| ----------- | ------------------------------------------------------- |
 | `ci-output` | `chat-output.txt`, `test-output.txt`, `lint-output.txt` |
 
 ---
@@ -183,6 +183,7 @@ This CI is optimized for reviewing PRs on mobile devices:
 Go to: **Repository → Settings → Branches → Add rule**
 
 Recommended settings for `main`:
+
 - ✅ Require a pull request before merging
 - ✅ Require status checks to pass before merging
   - Select: `test`, `test-node18`

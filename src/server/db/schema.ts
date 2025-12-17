@@ -99,8 +99,8 @@ export interface User {
   name: string;
   created_at: string;
   work_context: string | null;
-  interests: string | null;  // JSON string
-  preferences: string;       // JSON string
+  interests: string | null; // JSON string
+  preferences: string; // JSON string
 }
 
 export interface Session {
@@ -113,13 +113,13 @@ export interface Session {
   duration_planned: number | null;
   duration_actual: number | null;
   check_in_frequency: number;
-  status: 'active' | 'completed' | 'abandoned';
+  status: "active" | "completed" | "abandoned";
 }
 
 export interface Message {
   id: string;
   session_id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   created_at: string;
 }
@@ -132,28 +132,28 @@ export interface UserContextItem {
   last_referenced: string;
   importance: number;
   created_at: string;
-  source?: string;  // Where this memory came from (session id, manual, etc.)
+  source?: string; // Where this memory came from (session id, manual, etc.)
 }
 
 // Memory categories for the companion to remember
 export type MemoryCategory =
-  | 'project'      // Current projects user is working on
-  | 'interest'     // User interests and hobbies
-  | 'challenge'    // Common challenges/blockers
-  | 'insight'      // Insights about what works for this user
-  | 'distraction'  // Known distractions to watch for
-  | 'goal'         // Short or long-term goals
-  | 'preference'   // Interaction preferences (tone, check-in style)
-  | 'win'          // Past wins to reference for encouragement
-  | 'context';     // General context about user's life/work
+  | "project" // Current projects user is working on
+  | "interest" // User interests and hobbies
+  | "challenge" // Common challenges/blockers
+  | "insight" // Insights about what works for this user
+  | "distraction" // Known distractions to watch for
+  | "goal" // Short or long-term goals
+  | "preference" // Interaction preferences (tone, check-in style)
+  | "win" // Past wins to reference for encouragement
+  | "context"; // General context about user's life/work
 
 // Parsed types with JSON fields expanded
-export interface UserWithParsedFields extends Omit<User, 'interests' | 'preferences'> {
+export interface UserWithParsedFields extends Omit<User, "interests" | "preferences"> {
   interests: string[];
   preferences: {
     defaultSessionDuration?: number;
     defaultCheckInFrequency?: number;
-    theme?: 'light' | 'dark';
+    theme?: "light" | "dark";
   };
 }
 

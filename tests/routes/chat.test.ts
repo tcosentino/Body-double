@@ -58,13 +58,10 @@ describe("Chat Routes", () => {
       const { user, token } = createAuthenticatedUser();
       const session = createTestSession(user.id, { status: "active" });
 
-      await request(app)
-        .post("/api/chat")
-        .set("Authorization", `Bearer ${token}`)
-        .send({
-          sessionId: session.id,
-          message: "Hello!",
-        });
+      await request(app).post("/api/chat").set("Authorization", `Bearer ${token}`).send({
+        sessionId: session.id,
+        message: "Hello!",
+      });
 
       expect(generateResponse).toHaveBeenCalledWith(user.id, session.id, "Hello!");
     });
@@ -143,12 +140,10 @@ describe("Chat Routes", () => {
     });
 
     it("should return 401 when not authenticated", async () => {
-      const response = await request(app)
-        .post("/api/chat")
-        .send({
-          sessionId: "some-id",
-          message: "Hello",
-        });
+      const response = await request(app).post("/api/chat").send({
+        sessionId: "some-id",
+        message: "Hello",
+      });
 
       expect(response.status).toBe(401);
     });

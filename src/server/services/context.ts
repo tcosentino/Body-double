@@ -26,7 +26,7 @@ export interface UserContext {
     wins: string[];
     preferences: string[];
   };
-  relevantMemories: string[];  // Memories relevant to current task
+  relevantMemories: string[]; // Memories relevant to current task
   currentSession?: {
     declaredTask: string;
     durationPlanned: number;
@@ -48,29 +48,41 @@ export function buildUserContext(userId: string, currentSessionId?: string): Use
   const db = getDb();
 
   // Get user info
-  const user = db.prepare(`
+  const user = db
+    .prepare(
+      `
     SELECT * FROM users WHERE id = ?
-  `).get(userId) as User | undefined;
+  `
+    )
+    .get(userId) as User | undefined;
 
   if (!user) {
     throw new Error(`User not found: ${userId}`);
   }
 
   // Get recent sessions (last 10, excluding current)
-  const recentSessions = db.prepare(`
+  const recentSessions = db
+    .prepare(
+      `
     SELECT * FROM sessions
     WHERE user_id = ? AND status = 'completed' AND id != ?
     ORDER BY ended_at DESC
     LIMIT 10
-  `).all(userId, currentSessionId || "") as Session[];
+  `
+    )
+    .all(userId, currentSessionId || "") as Session[];
 
   // Get current session if provided
   let currentSession: UserContext["currentSession"] | undefined;
   let declaredTask = "";
   if (currentSessionId) {
-    const session = db.prepare(`
+    const session = db
+      .prepare(
+        `
       SELECT * FROM sessions WHERE id = ?
-    `).get(currentSessionId) as Session | undefined;
+    `
+      )
+      .get(currentSessionId) as Session | undefined;
 
     if (session) {
       declaredTask = session.declared_task || "";
@@ -96,9 +108,7 @@ export function buildUserContext(userId: string, currentSessionId?: string): Use
   const memorySummary = getMemorySummary(userId);
 
   // Get memories relevant to the current task
-  const relevantMems = declaredTask
-    ? getRelevantMemories(userId, declaredTask)
-    : [];
+  const relevantMems = declaredTask ? getRelevantMemories(userId, declaredTask) : [];
 
   return {
     user: {
@@ -168,17 +178,17 @@ export function formatContextForPrompt(context: UserContext): {
     items.length > 0 ? items.map((i) => `- ${i}`).join("\n") : "Not yet shared";
 
   // Format relevant context for current task
-  const relevantContext = context.relevantMemories.length > 0
-    ? context.relevantMemories.join("\n")
-    : "No specific context for this task yet";
+  const relevantContext =
+    context.relevantMemories.length > 0
+      ? context.relevantMemories.join("\n")
+      : "No specific context for this task yet";
 
   return {
     userName: context.user.name,
     workContext: context.user.workContext,
     currentProjects: formatList(context.memories.projects),
-    interests: context.user.interests.length > 0
-      ? context.user.interests.join(", ")
-      : "Not yet shared",
+    interests:
+      context.user.interests.length > 0 ? context.user.interests.join(", ") : "Not yet shared",
     challenges: formatList(context.memories.challenges),
     distractions: formatList(context.memories.distractions),
     insights: formatList(context.memories.insights),
@@ -205,10 +215,12 @@ export function addContextItem(
   const db = getDb();
   const id = crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO user_context_items (id, user_id, category, content, importance)
     VALUES (?, ?, ?, ?, ?)
-  `).run(id, userId, category, content, importance);
+  `
+  ).run(id, userId, category, content, importance);
 
   return db.prepare(`SELECT * FROM user_context_items WHERE id = ?`).get(id);
 }
@@ -218,9 +230,11 @@ export function addContextItem(
  */
 export function touchContextItem(itemId: string): void {
   const db = getDb();
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE user_context_items
     SET last_referenced = datetime('now')
     WHERE id = ?
-  `).run(itemId);
+  `
+  ).run(itemId);
 }

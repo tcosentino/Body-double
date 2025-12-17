@@ -41,9 +41,7 @@ function parseArgs(): {
   const args = process.argv.slice(2);
   return {
     dryRun: args.includes("--dry-run"),
-    scenario: args
-      .find((a) => a.startsWith("--scenario="))
-      ?.split("=")[1]
+    scenario: args.find((a) => a.startsWith("--scenario="))?.split("=")[1]
       ? parseInt(args.find((a) => a.startsWith("--scenario="))!.split("=")[1])
       : undefined,
     prompt: args.find((a) => a.startsWith("--prompt="))?.split("=")[1],
@@ -67,8 +65,7 @@ async function runConversation(
       messages: conversation,
     });
 
-    const assistantMessage =
-      response.content[0].type === "text" ? response.content[0].text : "";
+    const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
 
     conversation.push({ role: "assistant", content: assistantMessage });
 
@@ -103,10 +100,7 @@ function formatConversationMarkdown(result: ConversationResult): string {
   return md;
 }
 
-function formatComparisonMarkdown(
-  scenario: TestScenario,
-  results: ConversationResult[]
-): string {
+function formatComparisonMarkdown(scenario: TestScenario, results: ConversationResult[]): string {
   let md = `# Prompt Comparison: ${scenario.name}\n\n`;
   md += `**Scenario:** ${scenario.description}\n\n`;
   md += `**Task:** ${scenario.context.declaredTask}\n\n`;
@@ -165,9 +159,7 @@ async function main() {
   }
 
   // Filter scenarios and prompts if specified
-  const scenariosToRun = args.scenario
-    ? [allScenarios[args.scenario - 1]]
-    : allScenarios;
+  const scenariosToRun = args.scenario ? [allScenarios[args.scenario - 1]] : allScenarios;
 
   const promptsToRun = args.prompt
     ? { [args.prompt]: promptVersions[args.prompt as keyof typeof promptVersions] }
@@ -216,11 +208,7 @@ async function main() {
 
       console.log(`⏳ ${scenario.name} + ${name}...`);
 
-      const conversation = await runConversation(
-        anthropic,
-        systemPrompt,
-        scenario.testQuestions
-      );
+      const conversation = await runConversation(anthropic, systemPrompt, scenario.testQuestions);
 
       const result: ConversationResult = {
         promptVersion: version,

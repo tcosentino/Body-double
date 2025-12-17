@@ -48,11 +48,15 @@ export async function generateResponse(
   const systemPrompt = buildPrompt(SYSTEM_PROMPT_TEMPLATE, formattedContext);
 
   // Get conversation history for this session
-  const messages = db.prepare(`
+  const messages = db
+    .prepare(
+      `
     SELECT role, content FROM messages
     WHERE session_id = ?
     ORDER BY created_at ASC
-  `).all(sessionId) as CompanionMessage[];
+  `
+    )
+    .all(sessionId) as CompanionMessage[];
 
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
@@ -65,8 +69,7 @@ export async function generateResponse(
     messages,
   });
 
-  const assistantMessage =
-    response.content[0].type === "text" ? response.content[0].text : "";
+  const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
 
   return assistantMessage;
 }
@@ -88,11 +91,15 @@ export async function* generateStreamingResponse(
   const systemPrompt = buildPrompt(SYSTEM_PROMPT_TEMPLATE, formattedContext);
 
   // Get conversation history for this session
-  const messages = db.prepare(`
+  const messages = db
+    .prepare(
+      `
     SELECT role, content FROM messages
     WHERE session_id = ?
     ORDER BY created_at ASC
-  `).all(sessionId) as CompanionMessage[];
+  `
+    )
+    .all(sessionId) as CompanionMessage[];
 
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
@@ -106,10 +113,7 @@ export async function* generateStreamingResponse(
   });
 
   for await (const event of stream) {
-    if (
-      event.type === "content_block_delta" &&
-      event.delta.type === "text_delta"
-    ) {
+    if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
       yield event.delta.text;
     }
   }
@@ -126,10 +130,12 @@ export function saveMessage(
   const db = getDb();
   const id = crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO messages (id, session_id, role, content)
     VALUES (?, ?, ?, ?)
-  `).run(id, sessionId, role, content);
+  `
+  ).run(id, sessionId, role, content);
 
   return db.prepare(`SELECT * FROM messages WHERE id = ?`).get(id) as Message;
 }
@@ -137,10 +143,7 @@ export function saveMessage(
 /**
  * Get the session greeting when a session starts
  */
-export async function getSessionGreeting(
-  userId: string,
-  sessionId: string
-): Promise<string> {
+export async function getSessionGreeting(userId: string, sessionId: string): Promise<string> {
   const context = buildUserContext(userId, sessionId);
 
   // Create a greeting prompt based on context

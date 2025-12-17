@@ -27,9 +27,13 @@ router.post("/start", async (req, res) => {
   const db = getDb();
 
   // Check for existing active session
-  const activeSession = db.prepare(`
+  const activeSession = db
+    .prepare(
+      `
     SELECT id FROM sessions WHERE user_id = ? AND status = 'active'
-  `).get(user.id) as { id: string } | undefined;
+  `
+    )
+    .get(user.id) as { id: string } | undefined;
 
   if (activeSession) {
     res.status(409).json({
@@ -41,10 +45,12 @@ router.post("/start", async (req, res) => {
 
   // Create new session
   const sessionId = crypto.randomUUID();
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO sessions (id, user_id, declared_task, duration_planned, check_in_frequency, status)
     VALUES (?, ?, ?, ?, ?, 'active')
-  `).run(sessionId, user.id, declaredTask || null, durationPlanned || 25, checkInFrequency || 15);
+  `
+  ).run(sessionId, user.id, declaredTask || null, durationPlanned || 25, checkInFrequency || 15);
 
   const session = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(sessionId) as Session;
 
@@ -75,10 +81,14 @@ router.get("/active", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions
     WHERE user_id = ? AND status = 'active'
-  `).get(user.id) as Session | undefined;
+  `
+    )
+    .get(user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "No active session" });
@@ -98,16 +108,24 @@ router.get("/history", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const sessions = db.prepare(`
+  const sessions = db
+    .prepare(
+      `
     SELECT * FROM sessions
     WHERE user_id = ?
     ORDER BY started_at DESC
     LIMIT ? OFFSET ?
-  `).all(user.id, limit, offset) as Session[];
+  `
+    )
+    .all(user.id, limit, offset) as Session[];
 
-  const total = db.prepare(`
+  const total = db
+    .prepare(
+      `
     SELECT COUNT(*) as count FROM sessions WHERE user_id = ?
-  `).get(user.id) as { count: number };
+  `
+    )
+    .get(user.id) as { count: number };
 
   res.json({
     sessions,
@@ -125,9 +143,13 @@ router.get("/:id", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions WHERE id = ? AND user_id = ?
-  `).get(req.params.id, user.id) as Session | undefined;
+  `
+    )
+    .get(req.params.id, user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
@@ -145,20 +167,28 @@ router.get("/:id/messages", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT id FROM sessions WHERE id = ? AND user_id = ?
-  `).get(req.params.id, user.id);
+  `
+    )
+    .get(req.params.id, user.id);
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
     return;
   }
 
-  const messages = db.prepare(`
+  const messages = db
+    .prepare(
+      `
     SELECT * FROM messages
     WHERE session_id = ?
     ORDER BY created_at ASC
-  `).all(req.params.id) as Message[];
+  `
+    )
+    .all(req.params.id) as Message[];
 
   res.json(messages);
 });
@@ -172,9 +202,13 @@ router.post("/:id/end", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions WHERE id = ? AND user_id = ?
-  `).get(req.params.id, user.id) as Session | undefined;
+  `
+    )
+    .get(req.params.id, user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
@@ -191,16 +225,20 @@ router.post("/:id/end", (req, res) => {
   const endTime = Date.now();
   const durationActual = Math.round((endTime - startTime) / 60000);
 
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE sessions
     SET ended_at = datetime('now'),
         outcome = ?,
         duration_actual = ?,
         status = 'completed'
     WHERE id = ?
-  `).run(outcome || null, durationActual, req.params.id);
+  `
+  ).run(outcome || null, durationActual, req.params.id);
 
-  const updatedSession = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(req.params.id) as Session;
+  const updatedSession = db
+    .prepare(`SELECT * FROM sessions WHERE id = ?`)
+    .get(req.params.id) as Session;
   res.json(updatedSession);
 });
 
@@ -212,9 +250,13 @@ router.post("/:id/abandon", (req, res) => {
   const user = req.user!;
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions WHERE id = ? AND user_id = ?
-  `).get(req.params.id, user.id) as Session | undefined;
+  `
+    )
+    .get(req.params.id, user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
@@ -230,15 +272,19 @@ router.post("/:id/abandon", (req, res) => {
   const endTime = Date.now();
   const durationActual = Math.round((endTime - startTime) / 60000);
 
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE sessions
     SET ended_at = datetime('now'),
         duration_actual = ?,
         status = 'abandoned'
     WHERE id = ?
-  `).run(durationActual, req.params.id);
+  `
+  ).run(durationActual, req.params.id);
 
-  const updatedSession = db.prepare(`SELECT * FROM sessions WHERE id = ?`).get(req.params.id) as Session;
+  const updatedSession = db
+    .prepare(`SELECT * FROM sessions WHERE id = ?`)
+    .get(req.params.id) as Session;
   res.json(updatedSession);
 });
 

@@ -33,9 +33,13 @@ router.post("/", async (req, res) => {
   const db = getDb();
 
   // Get session and verify it belongs to user and is active
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions WHERE id = ? AND user_id = ?
-  `).get(sessionId, user.id) as Session | undefined;
+  `
+    )
+    .get(sessionId, user.id) as Session | undefined;
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
@@ -79,20 +83,28 @@ router.get("/:sessionId/history", (req, res) => {
   const db = getDb();
 
   // Verify session belongs to user
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT id FROM sessions WHERE id = ? AND user_id = ?
-  `).get(req.params.sessionId, user.id);
+  `
+    )
+    .get(req.params.sessionId, user.id);
 
   if (!session) {
     res.status(404).json({ error: "Session not found" });
     return;
   }
 
-  const messages = db.prepare(`
+  const messages = db
+    .prepare(
+      `
     SELECT * FROM messages
     WHERE session_id = ?
     ORDER BY created_at ASC
-  `).all(req.params.sessionId) as Message[];
+  `
+    )
+    .all(req.params.sessionId) as Message[];
 
   res.json(messages);
 });

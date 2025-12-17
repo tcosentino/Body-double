@@ -13,7 +13,15 @@ import { validateSession } from "./services/auth.js";
 import type { Session, User } from "./db/schema.js";
 
 interface ChatMessage {
-  type: "message" | "join" | "leave" | "error" | "stream_start" | "stream_chunk" | "stream_end" | "authenticated";
+  type:
+    | "message"
+    | "join"
+    | "leave"
+    | "error"
+    | "stream_start"
+    | "stream_chunk"
+    | "stream_end"
+    | "authenticated";
   sessionId?: string;
   content?: string;
   role?: "user" | "assistant";
@@ -36,7 +44,9 @@ export function setupWebSocket(server: Server): WebSocketServer {
     const user = authenticateConnection(req);
 
     if (!user) {
-      ws.send(JSON.stringify({ type: "error", error: "Authentication required. Connect with ?token=xxx" }));
+      ws.send(
+        JSON.stringify({ type: "error", error: "Authentication required. Connect with ?token=xxx" })
+      );
       ws.close(4001, "Authentication required");
       return;
     }
@@ -108,11 +118,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage): Promise<void>
   }
 }
 
-async function handleJoin(
-  ws: WebSocket,
-  state: ClientState,
-  message: ChatMessage
-): Promise<void> {
+async function handleJoin(ws: WebSocket, state: ClientState, message: ChatMessage): Promise<void> {
   const { sessionId } = message;
   const user = state.user!;
 
@@ -124,9 +130,13 @@ async function handleJoin(
   const db = getDb();
 
   // Verify session exists and belongs to this user
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM sessions WHERE id = ? AND user_id = ?
-  `).get(sessionId, user.id) as Session | undefined;
+  `
+    )
+    .get(sessionId, user.id) as Session | undefined;
 
   if (!session) {
     sendError(ws, "Session not found");
@@ -167,9 +177,13 @@ async function handleChatMessage(
 
   // Verify session is still active and belongs to user
   const db = getDb();
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT status FROM sessions WHERE id = ? AND user_id = ?
-  `).get(state.sessionId, user.id) as { status: string } | undefined;
+  `
+    )
+    .get(state.sessionId, user.id) as { status: string } | undefined;
 
   if (!session || session.status !== "active") {
     sendError(ws, "Session is no longer active");

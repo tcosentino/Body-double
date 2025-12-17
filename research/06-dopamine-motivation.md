@@ -14,7 +14,9 @@ Understanding dopamine's role in ADHD helps explain why external accountability 
 4. **Genetic studies** find variants in dopamine system genes in ADHD populations
 
 ### Low Dopamine Hypothesis
+
 Individuals with ADHD often have **lower dopamine levels**, leading to disruptions in brain circuits responsible for:
+
 - Attention
 - Decision-making
 - Motivation
@@ -23,11 +25,13 @@ Individuals with ADHD often have **lower dopamine levels**, leading to disruptio
 ## Key Brain Pathways
 
 ### Nigrostriatal Pathway
+
 - Runs from substantia nigra to striatum
 - Associated with movement and motor activity
 - Also plays role in cognition and learning
 
 ### Mesolimbic/Mesocortical Pathways
+
 - Originate in the VTA (ventral tegmental area)
 - Project to areas involved in:
   - Motivation
@@ -40,18 +44,22 @@ Individuals with ADHD often have **lower dopamine levels**, leading to disruptio
 ## Dopamine and Motivation
 
 ### The Motivation Challenge in ADHD
+
 ADHD has been characterized as a **motivational disorder** caused by impaired processing of reinforcing events.
 
 **Key research findings:**
+
 - Atypical response to positive reinforcement in children with ADHD
 - Greater emotional reactivity to immediate events
 - Fewer anticipatory emotional reactions to future events
 - Greater dependence on external sources for drive, motivation, and arousal
 
 ### Interest-Based Motivation
+
 > "Instead of being driven by routine, individuals with ADHD often rely on **interest-based motivation**. ADHD brains crave stimulation, which can show up as hyperfixation, novelty-seeking, or scrolling endlessly on social media."
 
 This explains why:
+
 - Some tasks are impossible to start while others are all-consuming
 - External deadlines create urgency that internal deadlines can't
 - Novel situations capture attention while routine tasks don't
@@ -59,7 +67,9 @@ This explains why:
 ## Social Interaction and Dopamine
 
 ### Social Encounters Activate Dopamine
+
 Research shows that dopamine is released in response to:
+
 - Social interaction
 - Feeding
 - Sex
@@ -68,13 +78,16 @@ Research shows that dopamine is released in response to:
 Dopamine is considered a "reward, feel-good, and love hormone" alongside oxytocin.
 
 ### Feedback-Related Negativity (FRN)
+
 The FRN is thought to reflect dopaminergic signals on neurons of the **anterior cingulate cortex**, a crucial area for:
+
 - Reward processing
 - Motivation in social interactions
 - Processing social rejection
 
 ### ADHD and Social Reward
-Research from the journal *Cognitive, Affective, & Behavioral Neuroscience* examined "The relationship between responsiveness to social and monetary rewards and ADHD symptoms."
+
+Research from the journal _Cognitive, Affective, & Behavioral Neuroscience_ examined "The relationship between responsiveness to social and monetary rewards and ADHD symptoms."
 
 **Implication:** The dopamine response to social interaction may be altered in ADHD, affecting how social accountability works.
 
@@ -96,12 +109,15 @@ Research from the journal *Cognitive, Affective, & Behavioral Neuroscience* exam
 ## Oxytocin-Dopamine Interaction
 
 ### Combined Effects
+
 Both oxytocin and dopamine:
+
 - Are released during social interaction
 - Are considered "feel-good" hormones
 - Lower levels associated with ADHD
 
 ### Implications
+
 Genuine social connection may be more effective than mere presence because it engages both dopamine AND oxytocin systems.
 
 **Question for our design:** Can an AI activate these systems, or only actual human connection?
@@ -125,15 +141,18 @@ Genuine social connection may be more effective than mere presence because it en
 ## Key Sources
 
 ### ADHD and Dopamine
+
 - [PMC: Dopamine Hypothesis for ADHD](https://pmc.ncbi.nlm.nih.gov/articles/PMC11604610/)
 - [ADDA: ADHD and Dopamine](https://add.org/adhd-dopamine/)
 - [Huberman Lab: Science of ADHD](https://www.hubermanlab.com/topics/science-of-adhd)
 
 ### Dopamine and Behavior
+
 - [PMC: ADHD, Dopamine, and Reinforcement](https://pmc.ncbi.nlm.nih.gov/articles/PMC4004668/)
 - [Mind Lab Neuroscience: Dopamine Depletion](https://mindlabneuroscience.com/dopamine-depletion-neuroscience/)
 
 ### Social Reward and ADHD
+
 - [Springer: Social and Monetary Rewards in ADHD](https://link.springer.com/article/10.3758/s13415-018-0609-1)
 - [Oxford Academic: Motivational Influence in ADHD](https://academic.oup.com/scan/article/17/5/482/6395445)
 - [MDPI: Oxytocin and Dopamine Interactions](https://www.mdpi.com/2227-9059/12/11/2440)

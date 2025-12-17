@@ -17,10 +17,12 @@ export function createTestUser(overrides: Partial<User> = {}): User {
   const email = overrides.email || `test-${id.slice(0, 8)}@example.com`;
   const name = overrides.name || "Test User";
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO users (id, email, name, work_context, interests, preferences)
     VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
+  `
+  ).run(
     id,
     email,
     name,
@@ -35,17 +37,16 @@ export function createTestUser(overrides: Partial<User> = {}): User {
 /**
  * Create a test session
  */
-export function createTestSession(
-  userId: string,
-  overrides: Partial<Session> = {}
-): Session {
+export function createTestSession(userId: string, overrides: Partial<Session> = {}): Session {
   const db = getTestDb();
   const id = overrides.id || crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO sessions (id, user_id, declared_task, duration_planned, check_in_frequency, status)
     VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
+  `
+  ).run(
     id,
     userId,
     overrides.declared_task || "Test task",
@@ -69,14 +70,14 @@ export function createTestAuthSession(userId: string): {
   const token = crypto.randomUUID() + crypto.randomUUID(); // 64 char token
   const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO auth_sessions (id, user_id, token, expires_at)
     VALUES (?, ?, ?, ?)
-  `).run(id, userId, token, expiresAt);
+  `
+  ).run(id, userId, token, expiresAt);
 
-  const session = db.prepare(`SELECT * FROM auth_sessions WHERE id = ?`).get(
-    id
-  ) as AuthSession;
+  const session = db.prepare(`SELECT * FROM auth_sessions WHERE id = ?`).get(id) as AuthSession;
 
   return { session, token };
 }
@@ -92,10 +93,12 @@ export function createTestMessage(
   const db = getTestDb();
   const id = crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO messages (id, session_id, role, content)
     VALUES (?, ?, ?, ?)
-  `).run(id, sessionId, role, content);
+  `
+  ).run(id, sessionId, role, content);
 }
 
 /**
@@ -110,10 +113,12 @@ export function createTestContextItem(
   const db = getTestDb();
   const id = crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO user_context_items (id, user_id, category, content, importance)
     VALUES (?, ?, ?, ?, ?)
-  `).run(id, userId, category, content, importance);
+  `
+  ).run(id, userId, category, content, importance);
 }
 
 /**
@@ -130,9 +135,10 @@ export function getTableCount(table: string): number {
 /**
  * Create a full test user with auth session
  */
-export function createAuthenticatedUser(
-  userOverrides: Partial<User> = {}
-): { user: User; token: string } {
+export function createAuthenticatedUser(userOverrides: Partial<User> = {}): {
+  user: User;
+  token: string;
+} {
   const user = createTestUser(userOverrides);
   const { token } = createTestAuthSession(user.id);
   return { user, token };

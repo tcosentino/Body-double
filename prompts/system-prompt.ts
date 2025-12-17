@@ -179,10 +179,7 @@ Guidelines:
 /**
  * Injects context into a prompt template
  */
-export function buildPrompt(
-  template: string,
-  context: Partial<PromptContext>
-): string {
+export function buildPrompt(template: string, context: Partial<PromptContext>): string {
   const defaults: PromptContext = {
     userName: "there",
     workContext: "Not yet shared",

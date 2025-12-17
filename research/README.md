@@ -4,15 +4,15 @@ This folder contains summaries of academic research relevant to designing an AI 
 
 ## Research Areas
 
-| File | Topic | Key Relevance |
-|------|-------|---------------|
-| [01-body-doubling.md](./01-body-doubling.md) | Body Doubling for ADHD | Core concept, mechanisms, limitations |
-| [02-social-facilitation.md](./02-social-facilitation.md) | Social Facilitation Theory | Why presence of others affects performance |
-| [03-adhd-external-structure.md](./03-adhd-external-structure.md) | ADHD and External Accountability | Why external support is essential |
-| [04-implementation-intentions.md](./04-implementation-intentions.md) | Implementation Intentions | "If-then" planning for goal achievement |
-| [05-ai-companions.md](./05-ai-companions.md) | AI Mental Health Companions | Digital therapeutic alliance research |
-| [06-dopamine-motivation.md](./06-dopamine-motivation.md) | Dopamine, ADHD, and Motivation | Neuroscience of motivation deficits |
-| [07-virtual-coworking.md](./07-virtual-coworking.md) | Virtual Coworking Research | Remote work and coworking effectiveness |
+| File                                                                 | Topic                            | Key Relevance                              |
+| -------------------------------------------------------------------- | -------------------------------- | ------------------------------------------ |
+| [01-body-doubling.md](./01-body-doubling.md)                         | Body Doubling for ADHD           | Core concept, mechanisms, limitations      |
+| [02-social-facilitation.md](./02-social-facilitation.md)             | Social Facilitation Theory       | Why presence of others affects performance |
+| [03-adhd-external-structure.md](./03-adhd-external-structure.md)     | ADHD and External Accountability | Why external support is essential          |
+| [04-implementation-intentions.md](./04-implementation-intentions.md) | Implementation Intentions        | "If-then" planning for goal achievement    |
+| [05-ai-companions.md](./05-ai-companions.md)                         | AI Mental Health Companions      | Digital therapeutic alliance research      |
+| [06-dopamine-motivation.md](./06-dopamine-motivation.md)             | Dopamine, ADHD, and Motivation   | Neuroscience of motivation deficits        |
+| [07-virtual-coworking.md](./07-virtual-coworking.md)                 | Virtual Coworking Research       | Remote work and coworking effectiveness    |
 
 ## Key Takeaways for Design
 
@@ -58,4 +58,4 @@ All summaries include links to original sources. Most key papers are available t
 
 ---
 
-*Last updated: December 2024*
+_Last updated: December 2024_

@@ -10,10 +10,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import {
-  buildPrompt,
-  promptVersions,
-} from "../prompts/system-prompt.js";
+import { buildPrompt, promptVersions } from "../prompts/system-prompt.js";
 import { allScenarios, type TestScenario } from "../prompts/user-contexts.js";
 
 // Check for API key
@@ -39,10 +36,7 @@ async function runScenarioDemo(scenario: TestScenario): Promise<void> {
   console.log(`  Duration: ${scenario.context.sessionDuration}`);
   console.log("\n" + "─".repeat(70) + "\n");
 
-  const systemPrompt = buildPrompt(
-    promptVersions.v1.template,
-    scenario.context
-  );
+  const systemPrompt = buildPrompt(promptVersions.v1.template, scenario.context);
 
   const conversationHistory: Message[] = [];
 
@@ -62,8 +56,7 @@ async function runScenarioDemo(scenario: TestScenario): Promise<void> {
         messages: conversationHistory,
       });
 
-      const assistantMessage =
-        response.content[0].type === "text" ? response.content[0].text : "";
+      const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
 
       console.log(`🤖 COMPANION: ${assistantMessage}\n`);
       console.log("─".repeat(70) + "\n");

@@ -54,13 +54,15 @@ describe("Context Service", () => {
 
       // Mark session as completed with outcome
       const db = getTestDb();
-      db.prepare(`
+      db.prepare(
+        `
         UPDATE sessions
         SET ended_at = datetime('now'),
             outcome = 'Got all tests passing!',
             status = 'completed'
         WHERE id = ?
-      `).run(session.id);
+      `
+      ).run(session.id);
 
       const context = buildUserContext(user.id);
 
@@ -82,7 +84,9 @@ describe("Context Service", () => {
 
       // Mark first session as completed
       const db = getTestDb();
-      db.prepare(`UPDATE sessions SET ended_at = datetime('now'), status = 'completed' WHERE id = ?`).run(completedSession.id);
+      db.prepare(
+        `UPDATE sessions SET ended_at = datetime('now'), status = 'completed' WHERE id = ?`
+      ).run(completedSession.id);
 
       const context = buildUserContext(user.id, currentSession.id);
 
@@ -101,10 +105,7 @@ describe("Context Service", () => {
 
       const context = buildUserContext(user.id);
 
-      expect(context.memories.projects).toEqual([
-        "Auth system refactor",
-        "API documentation",
-      ]);
+      expect(context.memories.projects).toEqual(["Auth system refactor", "API documentation"]);
       expect(context.memories.challenges).toEqual(["Time management"]);
       expect(context.memories.insights).toEqual(["Works better in mornings"]);
     });
@@ -197,14 +198,16 @@ describe("Context Service", () => {
       });
 
       const db = getTestDb();
-      db.prepare(`
+      db.prepare(
+        `
         UPDATE sessions
         SET ended_at = datetime('now'),
             outcome = 'Reviewed 3 PRs',
             duration_actual = 30,
             status = 'completed'
         WHERE id = ?
-      `).run(session.id);
+      `
+      ).run(session.id);
 
       const context = buildUserContext(user.id);
       const formatted = formatContextForPrompt(context);

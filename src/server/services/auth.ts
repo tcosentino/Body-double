@@ -28,7 +28,9 @@ export function createMagicLink(email: string): { token: string; isNewUser: bool
   const normalizedEmail = email.toLowerCase().trim();
 
   // Check if user exists
-  const existingUser = db.prepare(`SELECT id FROM users WHERE email = ?`).get(normalizedEmail) as { id: string } | undefined;
+  const existingUser = db.prepare(`SELECT id FROM users WHERE email = ?`).get(normalizedEmail) as
+    | { id: string }
+    | undefined;
 
   // Generate token
   const token = generateToken();
@@ -36,17 +38,21 @@ export function createMagicLink(email: string): { token: string; isNewUser: bool
   const expiresAt = new Date(Date.now() + MAGIC_LINK_EXPIRY_MINUTES * 60 * 1000).toISOString();
 
   // Invalidate any existing unused magic links for this email
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE magic_links
     SET used_at = datetime('now')
     WHERE email = ? AND used_at IS NULL
-  `).run(normalizedEmail);
+  `
+  ).run(normalizedEmail);
 
   // Create new magic link
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO magic_links (id, user_id, email, token, expires_at)
     VALUES (?, ?, ?, ?, ?)
-  `).run(id, existingUser?.id || null, normalizedEmail, token, expiresAt);
+  `
+  ).run(id, existingUser?.id || null, normalizedEmail, token, expiresAt);
 
   return {
     token,
@@ -64,10 +70,14 @@ export function verifyMagicLink(
   const db = getDb();
 
   // Find the magic link
-  const magicLink = db.prepare(`
+  const magicLink = db
+    .prepare(
+      `
     SELECT * FROM magic_links
     WHERE token = ? AND used_at IS NULL
-  `).get(token) as MagicLink | undefined;
+  `
+    )
+    .get(token) as MagicLink | undefined;
 
   if (!magicLink) {
     return null; // Invalid or already used token
@@ -79,9 +89,11 @@ export function verifyMagicLink(
   }
 
   // Mark as used
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE magic_links SET used_at = datetime('now') WHERE id = ?
-  `).run(magicLink.id);
+  `
+  ).run(magicLink.id);
 
   let user: User;
 
@@ -93,10 +105,12 @@ export function verifyMagicLink(
     const userId = crypto.randomUUID();
     const userName = name || magicLink.email.split("@")[0]; // Use email prefix as default name
 
-    db.prepare(`
+    db.prepare(
+      `
       INSERT INTO users (id, email, name)
       VALUES (?, ?, ?)
-    `).run(userId, magicLink.email, userName);
+    `
+    ).run(userId, magicLink.email, userName);
 
     user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(userId) as User;
 
@@ -111,10 +125,12 @@ export function verifyMagicLink(
     Date.now() + AUTH_SESSION_EXPIRY_DAYS * 24 * 60 * 60 * 1000
   ).toISOString();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO auth_sessions (id, user_id, token, expires_at)
     VALUES (?, ?, ?, ?)
-  `).run(sessionId, user.id, sessionToken, sessionExpiresAt);
+  `
+  ).run(sessionId, user.id, sessionToken, sessionExpiresAt);
 
   return { user, sessionToken };
 }
@@ -125,19 +141,25 @@ export function verifyMagicLink(
 export function validateSession(token: string): User | null {
   const db = getDb();
 
-  const session = db.prepare(`
+  const session = db
+    .prepare(
+      `
     SELECT * FROM auth_sessions
     WHERE token = ? AND expires_at > datetime('now')
-  `).get(token) as AuthSession | undefined;
+  `
+    )
+    .get(token) as AuthSession | undefined;
 
   if (!session) {
     return null;
   }
 
   // Update last active time
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE auth_sessions SET last_active_at = datetime('now') WHERE id = ?
-  `).run(session.id);
+  `
+  ).run(session.id);
 
   // Get user
   const user = db.prepare(`SELECT * FROM users WHERE id = ?`).get(session.user_id) as User;
@@ -151,9 +173,13 @@ export function validateSession(token: string): User | null {
 export function invalidateSession(token: string): boolean {
   const db = getDb();
 
-  const result = db.prepare(`
+  const result = db
+    .prepare(
+      `
     DELETE FROM auth_sessions WHERE token = ?
-  `).run(token);
+  `
+    )
+    .run(token);
 
   return result.changes > 0;
 }
@@ -164,9 +190,13 @@ export function invalidateSession(token: string): boolean {
 export function invalidateAllUserSessions(userId: string): number {
   const db = getDb();
 
-  const result = db.prepare(`
+  const result = db
+    .prepare(
+      `
     DELETE FROM auth_sessions WHERE user_id = ?
-  `).run(userId);
+  `
+    )
+    .run(userId);
 
   return result.changes;
 }
@@ -177,13 +207,21 @@ export function invalidateAllUserSessions(userId: string): number {
 export function cleanupExpiredAuth(): { magicLinks: number; sessions: number } {
   const db = getDb();
 
-  const magicLinksResult = db.prepare(`
+  const magicLinksResult = db
+    .prepare(
+      `
     DELETE FROM magic_links WHERE expires_at < datetime('now')
-  `).run();
+  `
+    )
+    .run();
 
-  const sessionsResult = db.prepare(`
+  const sessionsResult = db
+    .prepare(
+      `
     DELETE FROM auth_sessions WHERE expires_at < datetime('now')
-  `).run();
+  `
+    )
+    .run();
 
   return {
     magicLinks: magicLinksResult.changes,

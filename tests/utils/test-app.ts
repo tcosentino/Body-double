@@ -31,12 +31,7 @@ export function createTestApp() {
 
   // Error handling
   app.use(
-    (
-      err: Error,
-      _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction
-    ) => {
+    (err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
       console.error("Test server error:", err);
       res.status(500).json({ error: "Internal server error" });
     }
