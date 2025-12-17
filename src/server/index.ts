@@ -29,7 +29,8 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files from public directory
-app.use(express.static(path.join(__dirname, "../../public")));
+// extensions option allows /auth/login to serve /auth/login.html
+app.use(express.static(path.join(__dirname, "../../public"), { extensions: ["html"] }));
 
 // Request logging (skip static files)
 app.use((req, _res, next) => {
@@ -104,8 +105,10 @@ server.listen(PORT, () => {
 
 Marketing Site:
   /                             Landing page
-  /auth/login                   Login page (TODO)
-  /auth/signup                  Signup page (TODO)
+  /auth/login                   Login page
+  /auth/signup                  Signup page
+  /auth/verify                  Magic link verification
+  /app                          Main app (authenticated)
 
 Auth Endpoints:
   POST   /api/auth/request       Request magic link (email)
