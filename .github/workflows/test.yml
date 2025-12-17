@@ -5,6 +5,12 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      run_demo:
+        description: 'Run chat demo'
+        type: boolean
+        default: true
 
 jobs:
   test:
