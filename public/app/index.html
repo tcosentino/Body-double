@@ -183,6 +183,13 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
     }
 
+    .session-form .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
     .chat-container {
       flex: 1;
       display: flex;
@@ -601,7 +608,7 @@
             <option value="50">50 minutes</option>
             <option value="90">90 minutes (Deep work)</option>
           </select>
-          <button type="submit" class="btn btn-primary">Start Focus Session</button>
+          <button type="submit" class="btn btn-primary" id="startSessionBtn">Start Focus Session</button>
         </form>
       </div>
 
@@ -660,6 +667,7 @@
     const sessionForm = document.getElementById('sessionForm');
     const taskInput = document.getElementById('taskInput');
     const durationSelect = document.getElementById('durationSelect');
+    const startSessionBtn = document.getElementById('startSessionBtn');
     const chatContainer = document.getElementById('chatContainer');
     const chatMessages = document.getElementById('chatMessages');
     const chatForm = document.getElementById('chatForm');
@@ -735,8 +743,15 @@
     sessionForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      // Prevent double-click
+      if (startSessionBtn.disabled) return;
+
       const task = taskInput.value;
       const duration = parseInt(durationSelect.value);
+
+      // Show loading state
+      startSessionBtn.disabled = true;
+      startSessionBtn.textContent = 'Starting...';
 
       try {
         const response = await fetch('/api/sessions/start', {
@@ -755,6 +770,9 @@
         if (!response.ok) {
           const err = await response.json();
           alert(err.error || 'Failed to start session');
+          // Reset button on error
+          startSessionBtn.disabled = false;
+          startSessionBtn.textContent = 'Start Focus Session';
           return;
         }
 
@@ -783,6 +801,9 @@
 
       } catch (err) {
         alert('Network error. Please try again.');
+        // Reset button on error
+        startSessionBtn.disabled = false;
+        startSessionBtn.textContent = 'Start Focus Session';
       }
     });
 
@@ -836,6 +857,9 @@
         chatContainer.classList.add('hidden');
         sessionBanner.classList.remove('active');
         taskInput.value = '';
+        // Reset start button for next session
+        startSessionBtn.disabled = false;
+        startSessionBtn.textContent = 'Start Focus Session';
 
       } catch (err) {
         alert('Failed to end session');
