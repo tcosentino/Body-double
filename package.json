@@ -15,7 +15,11 @@
     "build": "tsc",
     "dev": "tsx watch src/server/index.ts",
     "dev:server": "tsx watch src/server/index.ts",
-    "db:setup": "tsx src/server/db/setup.ts"
+    "db:setup": "tsx src/server/db/setup.ts",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md}\""
   },
   "keywords": [
     "adhd",
@@ -40,7 +44,11 @@
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.5.13",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
     "@vitest/coverage-v8": "^2.1.9",
+    "eslint": "^8.57.0",
+    "prettier": "^3.4.2",
     "supertest": "^7.1.4",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",

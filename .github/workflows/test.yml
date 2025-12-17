@@ -9,20 +9,131 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Main test job on Node 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "npm"
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        id: lint
+        run: npm run lint 2>&1 | tee lint-output.txt || true
+        continue-on-error: true
+
+      - name: Run tests
+        id: test
+        run: npm test 2>&1 | tee test-output.txt
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Run type check
+        id: typecheck
+        run: npm run build 2>&1 | tee typecheck-output.txt
+
+      - name: Run sample chat demo
+        id: demo
+        if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: npm run demo:chat 2>&1 | tee chat-output.txt || true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-output
+          path: |
+            chat-output.txt
+            test-output.txt
+            lint-output.txt
+          if-no-files-found: ignore
+
+      - name: Post PR Comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Build status summary
+            const testStatus = '${{ steps.test.outcome }}' === 'success' ? '✅' : '❌';
+            const lintStatus = '${{ steps.lint.outcome }}' === 'success' ? '✅' : '⚠️';
+            const typeStatus = '${{ steps.typecheck.outcome }}' === 'success' ? '✅' : '❌';
+
+            let body = `## CI Results\n\n`;
+            body += `| Check | Status |\n|-------|--------|\n`;
+            body += `| Tests | ${testStatus} ${{ steps.test.outcome }} |\n`;
+            body += `| Lint | ${lintStatus} ${{ steps.lint.outcome }} |\n`;
+            body += `| TypeCheck | ${typeStatus} ${{ steps.typecheck.outcome }} |\n\n`;
+
+            // Add chat demo preview if available
+            if (fs.existsSync('chat-output.txt')) {
+              const chatOutput = fs.readFileSync('chat-output.txt', 'utf8');
+              if (chatOutput.length > 100) {
+                const truncated = chatOutput.slice(0, 3000);
+                body += `<details>\n<summary>🤖 Chat Demo Preview</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+              }
+            }
+
+            // Add test output snippet if failed
+            if ('${{ steps.test.outcome }}' !== 'success' && fs.existsSync('test-output.txt')) {
+              const testOutput = fs.readFileSync('test-output.txt', 'utf8');
+              const lastLines = testOutput.split('\n').slice(-30).join('\n');
+              body += `<details>\n<summary>❌ Test Output</summary>\n\n\`\`\`\n${lastLines}\n\`\`\`\n</details>\n\n`;
+            }
+
+            body += `\n---\n*Commit: ${{ github.sha }}*`.slice(0, 200);
+
+            // Find existing comment to update
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('## CI Results')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  # Separate job for Node 18 compatibility (runs in parallel)
+  test-node18:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js 18
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
+          node-version: 18.x
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -32,19 +143,34 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      - name: Run type check
-        run: npm run build
-
-      - name: Run sample chat demo
-        if: secrets.ANTHROPIC_API_KEY != ''
-        run: npm run demo:chat 2>&1 | tee chat-output.txt || true
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
-      - name: Upload chat output
-        if: always()
-        uses: actions/upload-artifact@v4
+  # Auto-fix formatting (only on PRs, commits back to branch)
+  auto-format:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          name: chat-output-node-${{ matrix.node-version }}
-          path: chat-output.txt
-          if-no-files-found: ignore
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run auto-fix
+        run: |
+          npm run lint:fix || true
+          npm run format || true
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style: auto-fix formatting"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
