@@ -724,7 +724,12 @@
           addMessage(data.content, 'assistant');
         } else if (data.type === 'stream_start') {
           typingIndicator.classList.add('show');
+        } else if (data.type === 'stream_end') {
+          // AI finished responding - display the full response
+          typingIndicator.classList.remove('show');
+          addMessage(data.content, 'assistant');
         } else if (data.type === 'error') {
+          typingIndicator.classList.remove('show');
           addMessage('Error: ' + data.message, 'system');
         }
       };
