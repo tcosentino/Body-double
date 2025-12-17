@@ -7,6 +7,8 @@
 import express from "express";
 import cors from "cors";
 import { createServer } from "http";
+import path from "path";
+import { fileURLToPath } from "url";
 import { initializeDb, closeDb } from "./db/index.js";
 import { setupWebSocket } from "./websocket.js";
 import authRouter from "./routes/auth.js";
@@ -15,6 +17,7 @@ import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3001;
 
 // Initialize Express
@@ -24,9 +27,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Request logging
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, "../../public")));
+
+// Request logging (skip static files)
 app.use((req, _res, next) => {
-  console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
+  if (!req.path.match(/\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2)$/)) {
+    console.log(`${new Date().toISOString()} ${req.method} ${req.path}`);
+  }
   next();
 });
 
@@ -47,9 +55,14 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: "Internal server error" });
 });
 
-// 404 handler
-app.use((_req, res) => {
-  res.status(404).json({ error: "Not found" });
+// Serve index.html for non-API routes (SPA fallback)
+app.get("*", (req, res) => {
+  // Only serve index.html for non-API routes
+  if (!req.path.startsWith("/api/")) {
+    res.sendFile(path.join(__dirname, "../../public/index.html"));
+  } else {
+    res.status(404).json({ error: "Not found" });
+  }
 });
 
 // Create HTTP server
@@ -73,12 +86,19 @@ setInterval(() => {
 server.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
-║                    Body Double API                         ║
+║                    Body Double                             ║
+║              AI-Powered Focus Companion                    ║
 ╠════════════════════════════════════════════════════════════╣
-║  HTTP:      http://localhost:${PORT}                          ║
+║  Website:   http://localhost:${PORT}                          ║
+║  API:       http://localhost:${PORT}/api                      ║
 ║  WebSocket: ws://localhost:${PORT}/ws                         ║
 ║  Health:    http://localhost:${PORT}/health                   ║
 ╚════════════════════════════════════════════════════════════╝
+
+Marketing Site:
+  /                             Landing page
+  /auth/login                   Login page (TODO)
+  /auth/signup                  Signup page (TODO)
 
 Auth Endpoints:
   POST   /api/auth/request       Request magic link (email)
