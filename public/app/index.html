@@ -22,9 +22,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
+      padding: 0.75rem 1.5rem;
       background: var(--white);
       border-bottom: 1px solid var(--gray-200);
+      flex-shrink: 0;
     }
 
     .app-header .logo {
@@ -43,7 +44,7 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     .user-menu {
@@ -55,24 +56,6 @@
       border-radius: var(--radius-full);
       font-size: 0.875rem;
       color: var(--gray-700);
-    }
-
-    .btn-header {
-      padding: 0.5rem 1rem;
-      font-size: 0.875rem;
-      color: var(--gray-600);
-      background: none;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .btn-header:hover {
-      background: var(--gray-50);
-      border-color: var(--gray-300);
     }
 
     .btn-logout {
@@ -88,121 +71,206 @@
       color: var(--gray-700);
     }
 
-    .app-main {
+    .app-body {
       flex: 1;
       display: flex;
-      flex-direction: column;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 1.5rem;
-      min-height: 0; /* Allow flex shrinking for proper scroll */
+      min-height: 0;
     }
 
-    .session-banner {
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.5rem;
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--white);
+      border-right: 1px solid var(--gray-200);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .btn-new-session {
+      width: 100%;
+      padding: 0.75rem 1rem;
       background: var(--gradient-primary);
       color: var(--white);
-      border-radius: var(--radius-lg);
-      margin-bottom: 1rem;
-    }
-
-    .session-banner.active {
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
       display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    .session-info h3 {
-      color: var(--white);
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .session-timer {
-      font-size: 0.875rem;
+    .btn-new-session:hover {
       opacity: 0.9;
     }
 
-    .btn-end-session {
+    .sidebar-title {
+      padding: 1rem 1rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .session-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+
+    .session-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid transparent;
+    }
+
+    .session-item:hover {
+      background: var(--gray-50);
+    }
+
+    .session-item.selected {
+      background: var(--gray-100);
+      border-color: var(--primary);
+    }
+
+    .session-item.active-session {
+      background: #eef2ff;
+    }
+
+    .session-item.active-session .session-status-dot {
+      background: var(--primary);
+      animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .session-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .session-status-dot.completed { background: #059669; }
+    .session-status-dot.abandoned { background: #dc2626; }
+    .session-status-dot.active { background: var(--primary); }
+
+    .session-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .session-item-task {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .session-item-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      margin-top: 0.125rem;
+    }
+
+    .empty-sidebar {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--gray-400);
+      font-size: 0.875rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .session-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .session-header-info h2 {
+      font-size: 1.125rem;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .session-header-meta {
+      font-size: 0.75rem;
+      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .session-timer {
+      color: var(--primary);
+      font-weight: 500;
+    }
+
+    .session-header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-resume {
       padding: 0.5rem 1rem;
-      background: rgba(255,255,255,0.2);
+      background: var(--gradient-primary);
       color: var(--white);
       border: none;
       border-radius: var(--radius-md);
       font-weight: 500;
       cursor: pointer;
+      font-size: 0.875rem;
     }
 
-    .btn-end-session:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    .start-session-card {
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      text-align: center;
-      box-shadow: var(--shadow-md);
-      margin-bottom: 1rem;
-    }
-
-    .start-session-card.hidden {
-      display: none;
-    }
-
-    .start-session-card h2 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .start-session-card p {
-      color: var(--gray-500);
-      margin-bottom: 1.5rem;
-    }
-
-    .session-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 400px;
-      margin: 0 auto;
-    }
-
-    .session-form input, .session-form select {
-      padding: 0.875rem 1rem;
-      font-size: 1rem;
-      border: 1px solid var(--gray-200);
+    .btn-end {
+      padding: 0.5rem 1rem;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: none;
       border-radius: var(--radius-md);
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.875rem;
     }
 
-    .session-form input:focus, .session-form select:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    .btn-end:hover {
+      background: var(--gray-200);
     }
 
-    .session-form .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .chat-container {
+    /* Chat Area */
+    .chat-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: var(--white);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
-      overflow: hidden;
-      min-height: 0; /* Allow flex shrinking for proper scroll */
-    }
-
-    .chat-container.hidden {
-      display: none;
+      min-height: 0;
+      background: var(--gray-50);
     }
 
     .chat-messages {
@@ -215,7 +283,7 @@
     }
 
     .message {
-      max-width: 80%;
+      max-width: 70%;
       padding: 1rem;
       border-radius: var(--radius-lg);
       line-height: 1.5;
@@ -230,9 +298,10 @@
 
     .message.assistant {
       align-self: flex-start;
-      background: var(--gray-100);
+      background: var(--white);
       color: var(--gray-800);
       border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
     }
 
     .message.system {
@@ -243,54 +312,14 @@
       padding: 0.5rem;
     }
 
-    .chat-input-container {
-      padding: 1rem;
-      border-top: 1px solid var(--gray-100);
-    }
-
-    .chat-input-form {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .chat-input {
-      flex: 1;
-      padding: 0.875rem 1rem;
-      font-size: 1rem;
-      border: 1px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      resize: none;
-    }
-
-    .chat-input:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-    }
-
-    .btn-send {
-      padding: 0.875rem 1.5rem;
-      background: var(--gradient-primary);
-      color: var(--white);
-      border: none;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-send:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     .typing-indicator {
       display: none;
       align-self: flex-start;
       padding: 1rem;
-      margin: 0 1.5rem 0.5rem 1.5rem;
-      background: var(--gray-100);
+      background: var(--white);
       border-radius: var(--radius-lg);
       border-bottom-left-radius: 4px;
+      box-shadow: var(--shadow-sm);
     }
 
     .typing-indicator.show {
@@ -314,18 +343,67 @@
       30% { transform: translateY(-4px); }
     }
 
+    .chat-input-container {
+      padding: 1rem 1.5rem;
+      background: var(--white);
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      resize: none;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .chat-input:disabled {
+      background: var(--gray-50);
+      cursor: not-allowed;
+    }
+
+    .btn-send {
+      padding: 0.875rem 1.5rem;
+      background: var(--gradient-primary);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .connection-status {
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.5rem;
       font-size: 0.75rem;
       color: var(--gray-400);
-      padding: 0.5rem 1rem;
+      padding: 0.5rem;
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--gray-300);
     }
@@ -334,237 +412,87 @@
       background: var(--secondary);
     }
 
-    /* History Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-
-    .modal-overlay.show {
-      display: flex;
-    }
-
-    .modal {
-      background: var(--white);
-      border-radius: var(--radius-xl);
-      width: 100%;
-      max-width: 600px;
-      max-height: 80vh;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-xl);
-    }
-
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem;
-      border-bottom: 1px solid var(--gray-100);
-    }
-
-    .modal-header h2 {
-      font-size: 1.25rem;
-      margin: 0;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: var(--gray-400);
-      cursor: pointer;
-      padding: 0.25rem;
-      line-height: 1;
-    }
-
-    .modal-close:hover {
-      color: var(--gray-600);
-    }
-
-    .modal-body {
+    /* Welcome State */
+    .welcome-state {
       flex: 1;
-      overflow-y: auto;
-      padding: 1rem;
-    }
-
-    .session-list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .session-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--gray-50);
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--transition-base);
-      border: 1px solid transparent;
-    }
-
-    .session-item:hover {
-      background: var(--white);
-      border-color: var(--gray-200);
-      box-shadow: var(--shadow-sm);
-    }
-
-    .session-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: var(--radius-md);
-      display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      flex-shrink: 0;
-    }
-
-    .session-icon.completed {
-      background: #ecfdf5;
-      color: #059669;
-    }
-
-    .session-icon.abandoned {
-      background: #fef2f2;
-      color: #dc2626;
-    }
-
-    .session-icon.active {
-      background: #eef2ff;
-      color: var(--primary);
-    }
-
-    .session-details {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .session-task {
-      font-weight: 500;
-      color: var(--gray-900);
-      margin-bottom: 0.25rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .session-meta {
-      font-size: 0.75rem;
-      color: var(--gray-500);
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-    }
-
-    .session-duration {
-      font-size: 0.875rem;
-      color: var(--gray-600);
-      white-space: nowrap;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--gray-500);
-    }
-
-    .empty-state svg {
-      width: 48px;
-      height: 48px;
-      color: var(--gray-300);
-      margin-bottom: 1rem;
-    }
-
-    /* Session Detail View */
-    .session-detail-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--gray-100);
-      margin-bottom: 1rem;
-    }
-
-    .btn-back {
-      background: none;
-      border: none;
-      color: var(--gray-500);
-      cursor: pointer;
-      padding: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-    }
-
-    .btn-back:hover {
-      color: var(--primary);
-    }
-
-    .detail-messages {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .detail-message {
-      padding: 0.75rem 1rem;
-      border-radius: var(--radius-md);
-      font-size: 0.875rem;
-      line-height: 1.5;
-    }
-
-    .detail-message.user {
-      background: var(--gradient-primary);
-      color: var(--white);
-      align-self: flex-end;
-      max-width: 85%;
-    }
-
-    .detail-message.assistant {
-      background: var(--gray-100);
-      color: var(--gray-800);
-      align-self: flex-start;
-      max-width: 85%;
-    }
-
-    .loading-spinner {
-      display: flex;
       justify-content: center;
       padding: 2rem;
+      text-align: center;
     }
 
-    .loading-spinner::after {
-      content: '';
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--gray-200);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+    .welcome-state h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .welcome-state p {
+      color: var(--gray-500);
+      margin-bottom: 1.5rem;
+      max-width: 400px;
+    }
+
+    .new-session-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .new-session-form input,
+    .new-session-form select {
+      padding: 0.875rem 1rem;
+      font-size: 1rem;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-md);
+    }
+
+    .new-session-form input:focus,
+    .new-session-form select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .new-session-form .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 240px;
+      }
+      .message {
+        max-width: 85%;
+      }
     }
 
     @media (max-width: 640px) {
-      .app-main { padding: 1rem; }
-      .message { max-width: 90%; }
-      .modal { max-height: 90vh; }
+      .app-body {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        max-height: 200px;
+        border-right: none;
+        border-bottom: 1px solid var(--gray-200);
+      }
+      .session-list {
+        flex-direction: row;
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding: 0.5rem;
+      }
+      .session-item {
+        flex-shrink: 0;
+        min-width: 200px;
+      }
     }
   </style>
 </head>
@@ -576,13 +504,6 @@
         <span>Body Double</span>
       </a>
       <div class="header-actions">
-        <button class="btn-header" id="historyBtn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-          History
-        </button>
         <div class="user-menu">
           <span id="userName">Loading...</span>
         </div>
@@ -590,60 +511,74 @@
       </div>
     </header>
 
-    <main class="app-main">
-      <div class="session-banner" id="sessionBanner">
-        <div class="session-info">
-          <h3 id="sessionTask">Focus Session</h3>
-          <div class="session-timer" id="sessionTimer">0:00 elapsed</div>
+    <div class="app-body">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <button class="btn-new-session" id="newSessionBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            New Session
+          </button>
         </div>
-        <button class="btn-end-session" id="endSessionBtn">End Session</button>
-      </div>
+        <div class="sidebar-title">History</div>
+        <div class="session-list" id="sessionList">
+          <div class="empty-sidebar">Loading sessions...</div>
+        </div>
+      </aside>
 
-      <div class="start-session-card" id="startSessionCard">
-        <h2>Ready to focus?</h2>
-        <p>Start a session and I'll be here to help you stay on track.</p>
-        <form class="session-form" id="sessionForm">
-          <input type="text" id="taskInput" placeholder="What are you working on?" required>
-          <select id="durationSelect">
-            <option value="25">25 minutes (Pomodoro)</option>
-            <option value="50">50 minutes</option>
-            <option value="90">90 minutes (Deep work)</option>
-          </select>
-          <button type="submit" class="btn btn-primary" id="startSessionBtn">Start Focus Session</button>
-        </form>
-      </div>
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Session Header (shown when viewing a session) -->
+        <div class="session-header" id="sessionHeader" style="display: none;">
+          <div class="session-header-info">
+            <h2 id="currentSessionTask">Focus Session</h2>
+            <div class="session-header-meta">
+              <span id="currentSessionDate"></span>
+              <span class="session-timer" id="sessionTimer"></span>
+            </div>
+          </div>
+          <div class="session-header-actions">
+            <button class="btn-resume" id="resumeBtn" style="display: none;">Resume Session</button>
+            <button class="btn-end" id="endSessionBtn" style="display: none;">End Session</button>
+          </div>
+        </div>
 
-      <div class="chat-container hidden" id="chatContainer">
-        <div class="chat-messages" id="chatMessages">
-          <!-- Messages will be added here -->
-        </div>
-        <div class="typing-indicator" id="typingIndicator">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="connection-status">
-          <span class="status-dot" id="statusDot"></span>
-          <span id="statusText">Connecting...</span>
-        </div>
-        <div class="chat-input-container">
-          <form class="chat-input-form" id="chatForm">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off">
-            <button type="submit" class="btn-send" id="sendBtn">Send</button>
+        <!-- Welcome State (new session form) -->
+        <div class="welcome-state" id="welcomeState">
+          <h2>Ready to focus?</h2>
+          <p>Start a new session and I'll be here to help you stay on track.</p>
+          <form class="new-session-form" id="sessionForm">
+            <input type="text" id="taskInput" placeholder="What are you working on?" required>
+            <select id="durationSelect">
+              <option value="25">25 minutes (Pomodoro)</option>
+              <option value="50">50 minutes</option>
+              <option value="90">90 minutes (Deep work)</option>
+            </select>
+            <button type="submit" class="btn btn-primary" id="startSessionBtn">Start Focus Session</button>
           </form>
         </div>
-      </div>
-    </main>
-  </div>
 
-  <!-- History Modal -->
-  <div class="modal-overlay" id="historyModal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2 id="modalTitle">Session History</h2>
-        <button class="modal-close" id="modalClose">&times;</button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        <div class="loading-spinner"></div>
-      </div>
+        <!-- Chat Area (shown when session is selected) -->
+        <div class="chat-area" id="chatArea" style="display: none;">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="typing-indicator" id="typingIndicator">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="connection-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">Connecting...</span>
+          </div>
+          <div class="chat-input-container">
+            <form class="chat-input-form" id="chatForm">
+              <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." autocomplete="off">
+              <button type="submit" class="btn-send" id="sendBtn">Send</button>
+            </form>
+          </div>
+        </div>
+      </main>
     </div>
   </div>
 
@@ -659,17 +594,20 @@
     // DOM elements
     const userName = document.getElementById('userName');
     const logoutBtn = document.getElementById('logoutBtn');
-    const historyBtn = document.getElementById('historyBtn');
-    const sessionBanner = document.getElementById('sessionBanner');
-    const sessionTask = document.getElementById('sessionTask');
+    const newSessionBtn = document.getElementById('newSessionBtn');
+    const sessionList = document.getElementById('sessionList');
+    const sessionHeader = document.getElementById('sessionHeader');
+    const currentSessionTask = document.getElementById('currentSessionTask');
+    const currentSessionDate = document.getElementById('currentSessionDate');
     const sessionTimer = document.getElementById('sessionTimer');
+    const resumeBtn = document.getElementById('resumeBtn');
     const endSessionBtn = document.getElementById('endSessionBtn');
-    const startSessionCard = document.getElementById('startSessionCard');
+    const welcomeState = document.getElementById('welcomeState');
     const sessionForm = document.getElementById('sessionForm');
     const taskInput = document.getElementById('taskInput');
     const durationSelect = document.getElementById('durationSelect');
     const startSessionBtn = document.getElementById('startSessionBtn');
-    const chatContainer = document.getElementById('chatContainer');
+    const chatArea = document.getElementById('chatArea');
     const chatMessages = document.getElementById('chatMessages');
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -677,19 +615,21 @@
     const typingIndicator = document.getElementById('typingIndicator');
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
-    const historyModal = document.getElementById('historyModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    const modalClose = document.getElementById('modalClose');
 
     // State
     let ws = null;
+    let sessions = [];
     let currentSession = null;
+    let viewingSession = null;
+    let isActiveSession = false;
     let sessionStartTime = null;
     let timerInterval = null;
 
     // Initialize
     userName.textContent = user?.name || user?.email || 'User';
+
+    // Load sessions on start
+    loadSessions();
 
     // WebSocket connection
     function connectWebSocket() {
@@ -699,7 +639,7 @@
       ws.onopen = () => {
         statusDot.classList.add('connected');
         statusText.textContent = 'Connected';
-        if (currentSession) {
+        if (currentSession && isActiveSession) {
           ws.send(JSON.stringify({ type: 'join', sessionId: currentSession.id }));
         }
       };
@@ -726,7 +666,6 @@
         } else if (data.type === 'stream_start') {
           typingIndicator.classList.add('show');
         } else if (data.type === 'stream_end') {
-          // AI finished responding - display the full response
           typingIndicator.classList.remove('show');
           addMessage(data.content, 'assistant');
         } else if (data.type === 'error') {
@@ -736,8 +675,139 @@
       };
     }
 
-    // Add message to chat
+    // Load session history
+    async function loadSessions() {
+      try {
+        const response = await fetch('/api/sessions/history?limit=50', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const data = await response.json();
+        sessions = data.sessions || [];
+        renderSessionList();
+      } catch (err) {
+        sessionList.innerHTML = '<div class="empty-sidebar">Failed to load sessions</div>';
+      }
+    }
+
+    function renderSessionList() {
+      if (sessions.length === 0) {
+        sessionList.innerHTML = '<div class="empty-sidebar">No sessions yet</div>';
+        return;
+      }
+
+      sessionList.innerHTML = sessions.map(session => {
+        const date = new Date(session.started_at);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const isSelected = viewingSession?.id === session.id;
+        const isActive = session.status === 'active';
+
+        return `
+          <div class="session-item ${isSelected ? 'selected' : ''} ${isActive ? 'active-session' : ''}"
+               data-id="${session.id}">
+            <span class="session-status-dot ${session.status}"></span>
+            <div class="session-item-content">
+              <div class="session-item-task">${session.declared_task || 'Focus session'}</div>
+              <div class="session-item-meta">${dateStr} · ${session.status}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Add click handlers
+      sessionList.querySelectorAll('.session-item').forEach(item => {
+        item.addEventListener('click', () => selectSession(item.dataset.id));
+      });
+    }
+
+    async function selectSession(sessionId) {
+      const session = sessions.find(s => s.id === sessionId);
+      if (!session) return;
+
+      viewingSession = session;
+      isActiveSession = session.status === 'active';
+
+      // Update sidebar selection
+      renderSessionList();
+
+      // Show chat area, hide welcome
+      welcomeState.style.display = 'none';
+      chatArea.style.display = 'flex';
+      sessionHeader.style.display = 'flex';
+
+      // Update header
+      currentSessionTask.textContent = session.declared_task || 'Focus session';
+      const date = new Date(session.started_at);
+      currentSessionDate.textContent = date.toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric'
+      });
+
+      // Show appropriate buttons
+      if (isActiveSession) {
+        currentSession = session;
+        sessionStartTime = new Date(session.started_at);
+        resumeBtn.style.display = 'none';
+        endSessionBtn.style.display = 'block';
+        chatInput.disabled = false;
+        sendBtn.disabled = false;
+
+        // Start timer
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Join session via WebSocket
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'join', sessionId: session.id }));
+        }
+      } else {
+        currentSession = null;
+        sessionStartTime = null;
+        clearInterval(timerInterval);
+        sessionTimer.textContent = session.status;
+        resumeBtn.style.display = 'block';
+        endSessionBtn.style.display = 'none';
+        chatInput.disabled = true;
+        sendBtn.disabled = true;
+        chatInput.placeholder = 'Resume session to continue chatting...';
+      }
+
+      // Load messages
+      await loadSessionMessages(sessionId);
+    }
+
+    async function loadSessionMessages(sessionId) {
+      chatMessages.innerHTML = '<div class="message system">Loading messages...</div>';
+
+      try {
+        const response = await fetch(`/api/sessions/${sessionId}/messages`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load');
+
+        const messages = await response.json();
+        chatMessages.innerHTML = '';
+
+        if (messages.length === 0) {
+          chatMessages.innerHTML = '<div class="message system">No messages yet</div>';
+        } else {
+          messages.forEach(m => addMessage(m.content, m.role));
+        }
+      } catch (err) {
+        chatMessages.innerHTML = '<div class="message system">Failed to load messages</div>';
+      }
+    }
+
     function addMessage(content, type) {
+      // Remove "no messages" placeholder if present
+      const placeholder = chatMessages.querySelector('.message.system');
+      if (placeholder && placeholder.textContent.includes('No messages')) {
+        placeholder.remove();
+      }
+
       const msgDiv = document.createElement('div');
       msgDiv.className = `message ${type}`;
       msgDiv.textContent = content;
@@ -745,17 +815,30 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // New session button
+    newSessionBtn.addEventListener('click', () => {
+      viewingSession = null;
+      currentSession = null;
+      isActiveSession = false;
+      clearInterval(timerInterval);
+
+      renderSessionList();
+      welcomeState.style.display = 'flex';
+      chatArea.style.display = 'none';
+      sessionHeader.style.display = 'none';
+      chatInput.disabled = false;
+      chatInput.placeholder = 'Type a message...';
+      sendBtn.disabled = false;
+    });
+
     // Start session
     sessionForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      // Prevent double-click
       if (startSessionBtn.disabled) return;
 
       const task = taskInput.value;
       const duration = parseInt(durationSelect.value);
 
-      // Show loading state
       startSessionBtn.disabled = true;
       startSessionBtn.textContent = 'Starting...';
 
@@ -776,62 +859,76 @@
         if (!response.ok) {
           const err = await response.json();
           alert(err.error || 'Failed to start session');
-          // Reset button on error
           startSessionBtn.disabled = false;
           startSessionBtn.textContent = 'Start Focus Session';
           return;
         }
 
         const data = await response.json();
-        currentSession = data.session;
-        sessionStartTime = new Date();
 
-        // Update UI
-        startSessionCard.classList.add('hidden');
-        chatContainer.classList.remove('hidden');
-        sessionBanner.classList.add('active');
-        sessionTask.textContent = task;
+        // Add to sessions list
+        sessions.unshift(data.session);
 
-        // Start timer
-        timerInterval = setInterval(updateTimer, 1000);
-
-        // Join session via WebSocket
-        if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'join', sessionId: currentSession.id }));
-        }
+        // Select the new session
+        await selectSession(data.session.id);
 
         // Show greeting
         if (data.greeting) {
           addMessage(data.greeting, 'assistant');
         }
 
+        // Reset form
+        taskInput.value = '';
+        startSessionBtn.disabled = false;
+        startSessionBtn.textContent = 'Start Focus Session';
+
       } catch (err) {
         alert('Network error. Please try again.');
-        // Reset button on error
         startSessionBtn.disabled = false;
         startSessionBtn.textContent = 'Start Focus Session';
       }
     });
 
-    // Update timer
-    function updateTimer() {
-      if (!sessionStartTime) return;
-      const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-      const mins = Math.floor(elapsed / 60);
-      const secs = elapsed % 60;
-      sessionTimer.textContent = `${mins}:${secs.toString().padStart(2, '0')} elapsed`;
-    }
+    // Resume session
+    resumeBtn.addEventListener('click', async () => {
+      if (!viewingSession) return;
 
-    // Send message
-    chatForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const content = chatInput.value.trim();
-      if (!content || !ws || ws.readyState !== WebSocket.OPEN) return;
+      resumeBtn.disabled = true;
+      resumeBtn.textContent = 'Resuming...';
 
-      addMessage(content, 'user');
-      ws.send(JSON.stringify({ type: 'message', content }));
-      chatInput.value = '';
-      typingIndicator.classList.add('show');
+      try {
+        const response = await fetch(`/api/sessions/${viewingSession.id}/resume`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          const err = await response.json();
+          alert(err.error || 'Failed to resume session');
+          resumeBtn.disabled = false;
+          resumeBtn.textContent = 'Resume Session';
+          return;
+        }
+
+        // Update session status
+        viewingSession.status = 'active';
+        const idx = sessions.findIndex(s => s.id === viewingSession.id);
+        if (idx !== -1) sessions[idx].status = 'active';
+
+        // Re-select to update UI
+        await selectSession(viewingSession.id);
+
+        resumeBtn.disabled = false;
+        resumeBtn.textContent = 'Resume Session';
+
+      } catch (err) {
+        alert('Network error. Please try again.');
+        resumeBtn.disabled = false;
+        resumeBtn.textContent = 'Resume Session';
+      }
     });
 
     // End session
@@ -854,23 +951,49 @@
           ws.send(JSON.stringify({ type: 'leave' }));
         }
 
-        // Reset UI
-        clearInterval(timerInterval);
+        // Update session status
+        const idx = sessions.findIndex(s => s.id === currentSession.id);
+        if (idx !== -1) sessions[idx].status = 'completed';
+
+        viewingSession.status = 'completed';
+        isActiveSession = false;
         currentSession = null;
-        sessionStartTime = null;
-        chatMessages.innerHTML = '';
-        startSessionCard.classList.remove('hidden');
-        chatContainer.classList.add('hidden');
-        sessionBanner.classList.remove('active');
-        taskInput.value = '';
-        // Reset start button for next session
-        startSessionBtn.disabled = false;
-        startSessionBtn.textContent = 'Start Focus Session';
+        clearInterval(timerInterval);
+
+        // Update UI
+        renderSessionList();
+        sessionTimer.textContent = 'completed';
+        resumeBtn.style.display = 'block';
+        endSessionBtn.style.display = 'none';
+        chatInput.disabled = true;
+        chatInput.placeholder = 'Resume session to continue chatting...';
+        sendBtn.disabled = true;
 
       } catch (err) {
         alert('Failed to end session');
       }
     });
+
+    // Send message
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const content = chatInput.value.trim();
+      if (!content || !ws || ws.readyState !== WebSocket.OPEN || !isActiveSession) return;
+
+      addMessage(content, 'user');
+      ws.send(JSON.stringify({ type: 'message', content }));
+      chatInput.value = '';
+      typingIndicator.classList.add('show');
+    });
+
+    // Update timer
+    function updateTimer() {
+      if (!sessionStartTime) return;
+      const elapsed = Math.floor((Date.now() - new Date(sessionStartTime)) / 1000);
+      const mins = Math.floor(elapsed / 60);
+      const secs = elapsed % 60;
+      sessionTimer.textContent = `${mins}:${secs.toString().padStart(2, '0')} elapsed`;
+    }
 
     // Logout
     logoutBtn.addEventListener('click', async () => {
@@ -879,150 +1002,13 @@
           method: 'POST',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-      } catch (e) {
-        // Ignore errors
-      }
+      } catch (e) {}
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       window.location.href = '/';
     });
 
-    // History Modal
-    historyBtn.addEventListener('click', () => {
-      historyModal.classList.add('show');
-      loadSessionHistory();
-    });
-
-    modalClose.addEventListener('click', () => {
-      historyModal.classList.remove('show');
-    });
-
-    historyModal.addEventListener('click', (e) => {
-      if (e.target === historyModal) {
-        historyModal.classList.remove('show');
-      }
-    });
-
-    async function loadSessionHistory() {
-      modalTitle.textContent = 'Session History';
-      modalBody.innerHTML = '<div class="loading-spinner"></div>';
-
-      try {
-        const response = await fetch('/api/sessions/history?limit=20', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (!response.ok) throw new Error('Failed to load history');
-
-        const data = await response.json();
-
-        if (data.sessions.length === 0) {
-          modalBody.innerHTML = `
-            <div class="empty-state">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              <p>No sessions yet.<br>Start your first focus session!</p>
-            </div>
-          `;
-          return;
-        }
-
-        modalBody.innerHTML = `<div class="session-list">${data.sessions.map(renderSessionItem).join('')}</div>`;
-
-        // Add click handlers
-        modalBody.querySelectorAll('.session-item').forEach(item => {
-          item.addEventListener('click', () => loadSessionDetail(item.dataset.id));
-        });
-
-      } catch (err) {
-        modalBody.innerHTML = '<div class="empty-state"><p>Failed to load history</p></div>';
-      }
-    }
-
-    function renderSessionItem(session) {
-      const date = new Date(session.started_at);
-      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-      const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-      const duration = session.duration_actual || session.duration_planned || 0;
-
-      const statusIcon = {
-        'completed': '&#10003;',
-        'abandoned': '&#10005;',
-        'active': '&#9679;'
-      }[session.status] || '&#9679;';
-
-      return `
-        <div class="session-item" data-id="${session.id}">
-          <div class="session-icon ${session.status}">${statusIcon}</div>
-          <div class="session-details">
-            <div class="session-task">${session.declared_task || 'Focus session'}</div>
-            <div class="session-meta">
-              <span>${dateStr} at ${timeStr}</span>
-              <span>${session.status}</span>
-            </div>
-          </div>
-          <div class="session-duration">${duration} min</div>
-        </div>
-      `;
-    }
-
-    async function loadSessionDetail(sessionId) {
-      modalTitle.textContent = 'Session Messages';
-      modalBody.innerHTML = '<div class="loading-spinner"></div>';
-
-      try {
-        const [sessionRes, messagesRes] = await Promise.all([
-          fetch(`/api/sessions/${sessionId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          }),
-          fetch(`/api/sessions/${sessionId}/messages`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          })
-        ]);
-
-        if (!sessionRes.ok || !messagesRes.ok) throw new Error('Failed to load');
-
-        const session = await sessionRes.json();
-        const messages = await messagesRes.json();
-
-        const date = new Date(session.started_at);
-        const dateStr = date.toLocaleDateString('en-US', {
-          weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
-        });
-
-        modalBody.innerHTML = `
-          <div class="session-detail-header">
-            <button class="btn-back" id="backToList">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-              Back
-            </button>
-            <div>
-              <strong>${session.declared_task || 'Focus session'}</strong>
-              <div style="font-size: 0.75rem; color: var(--gray-500);">${dateStr}</div>
-            </div>
-          </div>
-          <div class="detail-messages">
-            ${messages.length === 0
-              ? '<div class="empty-state"><p>No messages in this session</p></div>'
-              : messages.map(m => `
-                  <div class="detail-message ${m.role}">${m.content}</div>
-                `).join('')
-            }
-          </div>
-        `;
-
-        document.getElementById('backToList').addEventListener('click', loadSessionHistory);
-
-      } catch (err) {
-        modalBody.innerHTML = '<div class="empty-state"><p>Failed to load session</p></div>';
-      }
-    }
-
-    // Start WebSocket connection
+    // Start WebSocket
     connectWebSocket();
   </script>
 </body>

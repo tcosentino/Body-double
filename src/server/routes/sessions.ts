@@ -243,6 +243,65 @@ router.post("/:id/end", (req, res) => {
 });
 
 /**
+ * POST /api/sessions/:id/resume
+ * Resume a completed or abandoned session
+ */
+router.post("/:id/resume", (req, res) => {
+  const user = req.user!;
+  const db = getDb();
+
+  const session = db
+    .prepare(
+      `
+    SELECT * FROM sessions WHERE id = ? AND user_id = ?
+  `
+    )
+    .get(req.params.id, user.id) as Session | undefined;
+
+  if (!session) {
+    res.status(404).json({ error: "Session not found" });
+    return;
+  }
+
+  if (session.status === "active") {
+    res.status(400).json({ error: "Session is already active" });
+    return;
+  }
+
+  // Check for other active sessions
+  const activeSession = db
+    .prepare(
+      `
+    SELECT id FROM sessions WHERE user_id = ? AND status = 'active'
+  `
+    )
+    .get(user.id) as { id: string } | undefined;
+
+  if (activeSession) {
+    res.status(409).json({
+      error: "You already have an active session",
+      sessionId: activeSession.id,
+    });
+    return;
+  }
+
+  // Reactivate the session
+  db.prepare(
+    `
+    UPDATE sessions
+    SET status = 'active',
+        ended_at = NULL
+    WHERE id = ?
+  `
+  ).run(req.params.id);
+
+  const updatedSession = db
+    .prepare(`SELECT * FROM sessions WHERE id = ?`)
+    .get(req.params.id) as Session;
+  res.json(updatedSession);
+});
+
+/**
  * POST /api/sessions/:id/abandon
  * Abandon a session (user left without completing)
  */
