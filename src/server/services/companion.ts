@@ -2,6 +2,7 @@
  * AI Companion Service
  *
  * Wraps the Anthropic API and handles conversation with context injection.
+ * Optionally routes through Helicone for observability when HELICONE_API_KEY is set.
  */
 
 import crypto from "node:crypto";
@@ -21,7 +22,20 @@ function getAnthropic(): Anthropic {
     if (!process.env.ANTHROPIC_API_KEY) {
       throw new Error("ANTHROPIC_API_KEY environment variable is required");
     }
-    anthropic = new Anthropic();
+
+    // If Helicone API key is set, route through Helicone proxy for observability
+    if (process.env.HELICONE_API_KEY) {
+      anthropic = new Anthropic({
+        baseURL: "https://anthropic.helicone.ai",
+        defaultHeaders: {
+          "Helicone-Auth": `Bearer ${process.env.HELICONE_API_KEY}`,
+        },
+      });
+      console.log("Anthropic client initialized with Helicone observability");
+    } else {
+      anthropic = new Anthropic();
+      console.log("Anthropic client initialized (no Helicone - set HELICONE_API_KEY for observability)");
+    }
   }
   return anthropic;
 }
