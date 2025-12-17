@@ -34,15 +34,15 @@ export interface MemoryUpdateInput {
 
 // Valid memory categories
 export const MEMORY_CATEGORIES: MemoryCategory[] = [
-  'project',
-  'interest',
-  'challenge',
-  'insight',
-  'distraction',
-  'goal',
-  'preference',
-  'win',
-  'context',
+  "project",
+  "interest",
+  "challenge",
+  "insight",
+  "distraction",
+  "goal",
+  "preference",
+  "win",
+  "context",
 ];
 
 /**
@@ -65,11 +65,15 @@ function toMemory(row: UserContextItem): Memory {
  */
 export function getAllMemories(userId: string): Memory[] {
   const db = getDb();
-  const rows = db.prepare(`
+  const rows = db
+    .prepare(
+      `
     SELECT * FROM user_context_items
     WHERE user_id = ?
     ORDER BY importance DESC, last_referenced DESC
-  `).all(userId) as UserContextItem[];
+  `
+    )
+    .all(userId) as UserContextItem[];
 
   return rows.map(toMemory);
 }
@@ -79,11 +83,15 @@ export function getAllMemories(userId: string): Memory[] {
  */
 export function getMemoriesByCategory(userId: string, category: MemoryCategory): Memory[] {
   const db = getDb();
-  const rows = db.prepare(`
+  const rows = db
+    .prepare(
+      `
     SELECT * FROM user_context_items
     WHERE user_id = ? AND category = ?
     ORDER BY importance DESC, last_referenced DESC
-  `).all(userId, category) as UserContextItem[];
+  `
+    )
+    .all(userId, category) as UserContextItem[];
 
   return rows.map(toMemory);
 }
@@ -93,10 +101,14 @@ export function getMemoriesByCategory(userId: string, category: MemoryCategory):
  */
 export function getMemory(userId: string, memoryId: string): Memory | null {
   const db = getDb();
-  const row = db.prepare(`
+  const row = db
+    .prepare(
+      `
     SELECT * FROM user_context_items
     WHERE id = ? AND user_id = ?
-  `).get(memoryId, userId) as UserContextItem | undefined;
+  `
+    )
+    .get(memoryId, userId) as UserContextItem | undefined;
 
   return row ? toMemory(row) : null;
 }
@@ -108,17 +120,12 @@ export function createMemory(userId: string, input: MemoryCreateInput): Memory {
   const db = getDb();
   const id = crypto.randomUUID();
 
-  db.prepare(`
+  db.prepare(
+    `
     INSERT INTO user_context_items (id, user_id, category, content, importance, source)
     VALUES (?, ?, ?, ?, ?, ?)
-  `).run(
-    id,
-    userId,
-    input.category,
-    input.content,
-    input.importance ?? 1,
-    input.source ?? null
-  );
+  `
+  ).run(id, userId, input.category, input.content, input.importance ?? 1, input.source ?? null);
 
   return getMemory(userId, id)!;
 }
@@ -126,7 +133,11 @@ export function createMemory(userId: string, input: MemoryCreateInput): Memory {
 /**
  * Update an existing memory
  */
-export function updateMemory(userId: string, memoryId: string, input: MemoryUpdateInput): Memory | null {
+export function updateMemory(
+  userId: string,
+  memoryId: string,
+  input: MemoryUpdateInput
+): Memory | null {
   const db = getDb();
 
   // Verify ownership
@@ -157,11 +168,13 @@ export function updateMemory(userId: string, memoryId: string, input: MemoryUpda
 
   values.push(memoryId);
 
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE user_context_items
     SET ${updates.join(", ")}
     WHERE id = ?
-  `).run(...values);
+  `
+  ).run(...values);
 
   return getMemory(userId, memoryId);
 }
@@ -172,10 +185,14 @@ export function updateMemory(userId: string, memoryId: string, input: MemoryUpda
 export function deleteMemory(userId: string, memoryId: string): boolean {
   const db = getDb();
 
-  const result = db.prepare(`
+  const result = db
+    .prepare(
+      `
     DELETE FROM user_context_items
     WHERE id = ? AND user_id = ?
-  `).run(memoryId, userId);
+  `
+    )
+    .run(memoryId, userId);
 
   return result.changes > 0;
 }
@@ -185,11 +202,13 @@ export function deleteMemory(userId: string, memoryId: string): boolean {
  */
 export function touchMemory(memoryId: string): void {
   const db = getDb();
-  db.prepare(`
+  db.prepare(
+    `
     UPDATE user_context_items
     SET last_referenced = datetime('now')
     WHERE id = ?
-  `).run(memoryId);
+  `
+  ).run(memoryId);
 }
 
 /**
@@ -197,11 +216,15 @@ export function touchMemory(memoryId: string): void {
  */
 export function searchMemories(userId: string, query: string): Memory[] {
   const db = getDb();
-  const rows = db.prepare(`
+  const rows = db
+    .prepare(
+      `
     SELECT * FROM user_context_items
     WHERE user_id = ? AND content LIKE ?
     ORDER BY importance DESC, last_referenced DESC
-  `).all(userId, `%${query}%`) as UserContextItem[];
+  `
+    )
+    .all(userId, `%${query}%`) as UserContextItem[];
 
   return rows.map(toMemory);
 }
@@ -229,15 +252,15 @@ export function getMemorySummary(userId: string): {
       .map((m) => m.content);
 
   return {
-    projects: byCategory('project'),
-    challenges: byCategory('challenge'),
-    distractions: byCategory('distraction'),
-    insights: byCategory('insight'),
-    goals: byCategory('goal'),
-    wins: byCategory('win'),
-    preferences: byCategory('preference'),
-    interests: byCategory('interest'),
-    context: byCategory('context'),
+    projects: byCategory("project"),
+    challenges: byCategory("challenge"),
+    distractions: byCategory("distraction"),
+    insights: byCategory("insight"),
+    goals: byCategory("goal"),
+    wins: byCategory("win"),
+    preferences: byCategory("preference"),
+    interests: byCategory("interest"),
+    context: byCategory("context"),
   };
 }
 
@@ -265,13 +288,14 @@ export function getRelevantMemories(userId: string, taskDescription: string): Me
     score += memory.importance * 0.5;
 
     // Boost recent memories
-    const daysSinceReference = (Date.now() - new Date(memory.lastReferenced).getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceReference =
+      (Date.now() - new Date(memory.lastReferenced).getTime()) / (1000 * 60 * 60 * 24);
     if (daysSinceReference < 7) {
       score += 1;
     }
 
     // Boost certain categories for task context
-    if (['distraction', 'challenge', 'insight'].includes(memory.category)) {
+    if (["distraction", "challenge", "insight"].includes(memory.category)) {
       score += 0.5;
     }
 
@@ -304,16 +328,26 @@ export function getMemoryStats(userId: string): {
 } {
   const db = getDb();
 
-  const total = (db.prepare(`
+  const total = (
+    db
+      .prepare(
+        `
     SELECT COUNT(*) as count FROM user_context_items WHERE user_id = ?
-  `).get(userId) as { count: number }).count;
+  `
+      )
+      .get(userId) as { count: number }
+  ).count;
 
-  const byCategoryRows = db.prepare(`
+  const byCategoryRows = db
+    .prepare(
+      `
     SELECT category, COUNT(*) as count
     FROM user_context_items
     WHERE user_id = ?
     GROUP BY category
-  `).all(userId) as { category: MemoryCategory; count: number }[];
+  `
+    )
+    .all(userId) as { category: MemoryCategory; count: number }[];
 
   const byCategory = {} as Record<MemoryCategory, number>;
   for (const cat of MEMORY_CATEGORIES) {
@@ -323,15 +357,27 @@ export function getMemoryStats(userId: string): {
     byCategory[row.category] = row.count;
   }
 
-  const recentlyAdded = (db.prepare(`
+  const recentlyAdded = (
+    db
+      .prepare(
+        `
     SELECT COUNT(*) as count FROM user_context_items
     WHERE user_id = ? AND created_at > datetime('now', '-7 days')
-  `).get(userId) as { count: number }).count;
+  `
+      )
+      .get(userId) as { count: number }
+  ).count;
 
-  const recentlyReferenced = (db.prepare(`
+  const recentlyReferenced = (
+    db
+      .prepare(
+        `
     SELECT COUNT(*) as count FROM user_context_items
     WHERE user_id = ? AND last_referenced > datetime('now', '-7 days')
-  `).get(userId) as { count: number }).count;
+  `
+      )
+      .get(userId) as { count: number }
+  ).count;
 
   return {
     total,

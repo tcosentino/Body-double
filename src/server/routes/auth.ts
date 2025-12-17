@@ -135,10 +135,7 @@ router.post("/logout", requireAuth, (req, res) => {
   }
 
   // Clear cookie
-  res.setHeader(
-    "Set-Cookie",
-    "auth_token=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0"
-  );
+  res.setHeader("Set-Cookie", "auth_token=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0");
 
   res.json({ success: true, message: "Logged out" });
 });

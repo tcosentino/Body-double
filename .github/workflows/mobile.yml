@@ -54,7 +54,7 @@ jobs:
 
       - name: Run chat demo
         id: demo
-        if: ${{ inputs.run_demo && secrets.ANTHROPIC_API_KEY != '' }}
+        if: ${{ inputs.run_demo }}
         run: |
           echo "## Chat Demo Output" >> $GITHUB_STEP_SUMMARY
           npm run demo:chat 2>&1 | tee chat-output.txt

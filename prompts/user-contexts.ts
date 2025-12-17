@@ -87,7 +87,8 @@ Wrote 3 different intros, deleted all of them. Ended session frustrated.
 
 **Last week (45 min):** Wrote in personal journal instead of client work.
 Felt guilty but also said it helped clear her head.`,
-    declaredTask: "Write a rough first draft of the developer productivity blog post - doesn't have to be good",
+    declaredTask:
+      "Write a rough first draft of the developer productivity blog post - doesn't have to be good",
     sessionDuration: "30 minutes",
     checkInFrequency: "every 15 minutes",
   },
@@ -133,7 +134,8 @@ Ended feeling stuck.
 
 **Last week (30 min):** Organized Zotero library instead of writing.
 Felt productive but also like avoidance.`,
-    declaredTask: "Work on the literature review - write at least one paragraph synthesizing the attention studies",
+    declaredTask:
+      "Work on the literature review - write at least one paragraph synthesizing the attention studies",
     sessionDuration: "50 minutes",
     checkInFrequency: "every 25 minutes",
   },
@@ -173,9 +175,4 @@ export const newUserSam: TestScenario = {
   ],
 };
 
-export const allScenarios: TestScenario[] = [
-  engineerAlex,
-  writerMaya,
-  studentJordan,
-  newUserSam,
-];
+export const allScenarios: TestScenario[] = [engineerAlex, writerMaya, studentJordan, newUserSam];

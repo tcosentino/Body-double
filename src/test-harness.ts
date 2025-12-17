@@ -19,11 +19,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import * as readline from "readline";
-import {
-  buildPrompt,
-  promptVersions,
-  type PromptContext,
-} from "../prompts/system-prompt.js";
+import { buildPrompt, promptVersions } from "../prompts/system-prompt.js";
 import { allScenarios, type TestScenario } from "../prompts/user-contexts.js";
 
 // Check for API key
@@ -62,7 +58,9 @@ class PromptTester {
     console.log("\n" + "=".repeat(60));
     console.log("  🎯 Body Double - Prompt Testing Harness");
     console.log("=".repeat(60));
-    console.log(`\n  Prompt: ${promptVersions[this.currentPromptVersion].name} (${this.currentPromptVersion})`);
+    console.log(
+      `\n  Prompt: ${promptVersions[this.currentPromptVersion].name} (${this.currentPromptVersion})`
+    );
     console.log(`  Scenario: ${this.currentScenario.name}`);
     console.log(`  Task: ${this.currentScenario.context.declaredTask}`);
     console.log("\n  Type /help for commands, or start chatting.\n");
@@ -99,10 +97,7 @@ Available commands:
       let fullResponse = "";
 
       for await (const event of stream) {
-        if (
-          event.type === "content_block_delta" &&
-          event.delta.type === "text_delta"
-        ) {
+        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
           process.stdout.write(event.delta.text);
           fullResponse += event.delta.text;
         }
@@ -136,6 +131,7 @@ Available commands:
         console.log("\n👋 Goodbye!\n");
         this.rl.close();
         process.exit(0);
+        break; // unreachable but satisfies linter
 
       case "/prompt":
         console.log("\n--- Current System Prompt ---\n");
@@ -227,6 +223,7 @@ Available commands:
   async run(): Promise<void> {
     this.printHeader();
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const input = await this.prompt();
 

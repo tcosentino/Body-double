@@ -7,6 +7,7 @@
 import Database from "better-sqlite3";
 import { schema } from "./schema.js";
 import * as path from "path";
+import * as fs from "fs";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -22,13 +23,11 @@ export function getDb(): Database.Database {
   }
 
   if (!db) {
-    // Ensure data directory exists
+    // Ensure data directory exists (synchronously, before opening DB)
     const dataDir = path.dirname(DB_PATH);
-    import("fs").then((fs) => {
-      if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-      }
-    });
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
 
     db = new Database(DB_PATH);
     db.pragma("journal_mode = WAL");

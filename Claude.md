@@ -10,7 +10,7 @@ Body doubling works because of social accountability - you don’t want to let s
 
 The user should feel genuinely known and understood, creating natural accountability without artificial pressure.
 
------
+---
 
 ## Target User
 
@@ -19,7 +19,7 @@ The user should feel genuinely known and understood, creating natural accountabi
 - Engineers and knowledge workers dealing with ambiguous, undefined tasks
 - Anyone who works better when someone is “with them”
 
------
+---
 
 ## Key Psychological Principles
 
@@ -37,24 +37,29 @@ The user should feel genuinely known and understood, creating natural accountabi
 - Genuine relationship creates accountability you can’t buy out of
 - Deep personalization makes the AI feel like a real companion
 
------
+---
 
 ## Core Features
 
 ### Phase 1: MVP
 
 1. **Session Management**
+
 - Start/end focus sessions with configurable duration
 - Session timer with gentle check-ins
 - Pre-session task declaration (“What are you working on?”)
 - Post-session reflection (“How did it go?”)
+
 1. **AI Conversation Partner**
+
 - Real-time chat during work sessions
 - Remembers user’s work context, interests, and history
 - Asks thoughtful check-in questions
 - Provides encouragement without being annoying
 - Can discuss the actual work (technical problems, brainstorming)
+
 1. **User Profile & Memory**
+
 - Persistent storage of user context
 - Work history and patterns
 - Interests and conversation topics
@@ -73,7 +78,7 @@ The user should feel genuinely known and understood, creating natural accountabi
 - Identify what conditions lead to successful sessions
 - Gentle suggestions based on observed patterns
 
------
+---
 
 ## Technical Architecture
 
@@ -88,22 +93,27 @@ The user should feel genuinely known and understood, creating natural accountabi
 ### Key Technical Decisions
 
 1. **Context Management**
+
 - Build comprehensive user context from history
 - Include recent sessions, current projects, known challenges
 - Pass relevant context to Claude on each message
 - Balance context size with API costs
+
 1. **Conversation Flow**
+
 - System prompt establishes companion personality
 - User context injected dynamically
 - Conversation history maintained within session
 - Key insights extracted and stored after sessions
+
 1. **Personalization Storage**
+
 - User profile (name, work context, interests)
 - Project/task history
 - Session logs with outcomes
 - Conversation highlights worth remembering
 
------
+---
 
 ## AI Companion Design
 
@@ -132,7 +142,7 @@ The user should feel genuinely known and understood, creating natural accountabi
 - Don’t pretend to have emotions it doesn’t have
 - Don’t be so supportive it feels hollow
 
------
+---
 
 ## Sample System Prompt
 
@@ -161,7 +171,7 @@ Current session:
 Keep responses concise during work sessions unless they want to dive deeper into something.
 ```
 
------
+---
 
 ## Development Phases
 
@@ -196,7 +206,7 @@ Keep responses concise during work sessions unless they want to dive deeper into
 - [ ] Refine AI responses based on testing
 - [ ] Basic mobile responsiveness
 
------
+---
 
 ## API Integration Notes
 
@@ -218,7 +228,7 @@ GET  /api/user/context       - Current user profile
 PUT  /api/user/context       - Update user profile
 ```
 
------
+---
 
 ## Database Schema (Initial)
 
@@ -244,30 +254,37 @@ user_context_items
   - content, last_referenced, importance
 ```
 
------
+---
 
 ## Interview Talking Points
 
 When discussing this project in interviews, emphasize:
 
 1. **Problem-Solution Fit**
+
 - Identified real user need through personal experience
 - Researched existing solutions and their limitations
 - Designed for psychological effectiveness, not just features
+
 1. **AI Integration Expertise**
+
 - Context management and prompt engineering
 - Making AI feel authentic vs. robotic
 - Balancing personalization with API costs
+
 1. **Technical Architecture**
+
 - Real-time conversation handling
 - State management across sessions
 - Scaling considerations for concurrent users
+
 1. **Product Thinking**
+
 - Why body doubling works (mirror neurons, accountability)
 - Why stakes-based approaches fail
 - How genuine relationship creates better outcomes
 
------
+---
 
 ## Commands
 
@@ -285,7 +302,7 @@ npm test
 npm run build
 ```
 
------
+---
 
 ## Environment Variables
 
@@ -295,7 +312,7 @@ DATABASE_URL=
 SESSION_SECRET=
 ```
 
------
+---
 
 ## Open Questions
 

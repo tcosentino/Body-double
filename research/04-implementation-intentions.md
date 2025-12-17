@@ -15,6 +15,7 @@ Implementation intentions are a psychological strategy for bridging the gap betw
 ## What Are Implementation Intentions?
 
 Introduced by psychologist **Peter Gollwitzer** in 1999, implementation intentions are specific plans that spell out:
+
 - **When** you will act
 - **Where** you will act
 - **How** you will act
@@ -26,6 +27,7 @@ Introduced by psychologist **Peter Gollwitzer** in 1999, implementation intentio
 ## Meta-Analytic Evidence
 
 ### Gollwitzer & Sheeran (2006)
+
 The landmark meta-analysis examining implementation intentions:
 
 - **94 independent tests**
@@ -37,6 +39,7 @@ The landmark meta-analysis examining implementation intentions:
   - Conserving capability for future goal striving
 
 ### Recent Meta-Analysis (2024)
+
 Updated analysis with **642 independent tests**:
 
 - Effective for cognitive, affective, AND behavioral outcomes
@@ -45,6 +48,7 @@ Updated analysis with **642 independent tests**:
 - Effects persist at long-term follow-ups
 
 **Factors that increase effectiveness:**
+
 - If-then contingent format
 - High motivation toward the goal
 - Rehearsing the plan at least once
@@ -52,9 +56,11 @@ Updated analysis with **642 independent tests**:
 ## How Implementation Intentions Work
 
 ### "Passing Control to the Environment"
+
 Gollwitzer describes implementation intentions as "passing the control of one's behavior on to the environment."
 
 **Mechanism:**
+
 1. Form an if-then plan
 2. The specified situation becomes highly accessible in memory
 3. When the situation occurs, behavior is triggered automatically
@@ -64,6 +70,7 @@ Gollwitzer describes implementation intentions as "passing the control of one's 
 This is called **strategic automaticity** - deliberately creating automatic responses.
 
 ### The Role of Commitment
+
 The strength of commitment to both the plan and the goal is crucial.
 
 Without commitment, implementation intentions have little effect. Research shows that **plans made as commitments to another person** are particularly effective because breaking commitments generates discomfort.
@@ -80,6 +87,7 @@ This transforms positive fantasies into binding goals by connecting them to real
 ## Practical Applications
 
 Research shows that facilitating plan creation helps because it:
+
 - Forces consideration of logistic obstacles
 - Develops specific tactics to navigate around them
 - Reduces underestimation of time required
@@ -126,10 +134,12 @@ If Slack distracts you, you'll close it and return. Ready?"
 ## Key Sources
 
 ### Primary Papers
-- Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis of effects and processes. *Advances in Experimental Social Psychology*, 38, 69-119.
-- Gollwitzer, P. M. (1999). Implementation intentions: Strong effects of simple plans. *American Psychologist*, 54(7), 493-503.
+
+- Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis of effects and processes. _Advances in Experimental Social Psychology_, 38, 69-119.
+- Gollwitzer, P. M. (1999). Implementation intentions: Strong effects of simple plans. _American Psychologist_, 54(7), 493-503.
 
 ### Access Points
+
 - [ResearchGate: Full Meta-Analysis PDF](https://www.researchgate.net/publication/37367696_Implementation_Intentions_and_Goal_Achievement_A_Meta-Analysis_of_Effects_and_Processes)
 - [NIH/Cancer Control: Implementation Intentions PDF](https://cancercontrol.cancer.gov/sites/default/files/2020-06/goal_intent_attain.pdf)
 - [ScienceDirect: Original Paper](https://www.sciencedirect.com/science/article/abs/pii/S0065260106380021)

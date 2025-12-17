@@ -5,11 +5,20 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      run_demo:
+        description: 'Run chat demo'
+        type: boolean
+        default: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
     # Main test job on Node 20
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,7 +52,6 @@ jobs:
 
       - name: Run sample chat demo
         id: demo
-        if: ${{ secrets.ANTHROPIC_API_KEY != '' }}
         run: npm run demo:chat 2>&1 | tee chat-output.txt || true
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -81,8 +89,8 @@ jobs:
             if (fs.existsSync('chat-output.txt')) {
               const chatOutput = fs.readFileSync('chat-output.txt', 'utf8');
               if (chatOutput.length > 100) {
-                const truncated = chatOutput.slice(0, 3000);
-                body += `<details>\n<summary>🤖 Chat Demo Preview</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                const truncated = chatOutput.slice(0, 8000);
+                body += `<details>\n<summary>🤖 Chat Demo Preview</summary>\n\n\`\`\`\n${truncated}${chatOutput.length > 8000 ? '\n\n... (truncated, see artifact for full output)' : ''}\n\`\`\`\n</details>\n\n`;
               }
             }
 
@@ -147,12 +155,14 @@ jobs:
   auto-format:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -7,6 +7,7 @@ This document tracks feature ideas for Body Double, prioritized by research back
 ## Research-Backed Features
 
 ### 1. Implementation Intentions Wizard
+
 **Status:** 📋 Planned
 **Priority:** High
 **Complexity:** Medium
@@ -14,12 +15,14 @@ This document tracks feature ideas for Body Double, prioritized by research back
 
 **Description:**
 Guide users through creating if-then plans at session start:
+
 1. "What's your task?"
 2. "When specifically will you do it?"
 3. "What might distract you?"
 4. "If [distraction], then I will [response]"
 
 **Implementation Notes:**
+
 - Add to session start flow
 - Store implementation intentions in session data
 - Reference during check-ins ("Remember, if Slack distracts you...")
@@ -29,6 +32,7 @@ Guide users through creating if-then plans at session start:
 ---
 
 ### 2. Task Complexity Mode Selector
+
 **Status:** 📋 Planned
 **Priority:** High
 **Complexity:** Low
@@ -36,10 +40,12 @@ Guide users through creating if-then plans at session start:
 
 **Description:**
 Let users choose interaction style based on task type:
+
 - **Simple Task Mode** - More frequent check-ins, encouraging presence (cleaning, emails, routine work)
 - **Deep Work Mode** - Minimal interruption, quiet presence (complex coding, writing, creative work)
 
 **Implementation Notes:**
+
 - Add mode selection to session start
 - Adjust check-in frequency and tone based on mode
 - Deep work: only check in at user request or session milestones
@@ -49,6 +55,7 @@ Let users choose interaction style based on task type:
 ---
 
 ### 3. Micro-Win Celebrations
+
 **Status:** 📋 Planned
 **Priority:** High
 **Complexity:** Low
@@ -56,12 +63,14 @@ Let users choose interaction style based on task type:
 
 **Description:**
 Immediate positive feedback when users report any progress:
+
 - Celebrate small completions enthusiastically
 - No shame for incomplete tasks
 - Focus on effort, not just outcomes
 - Varied celebration messages to maintain novelty
 
 **Implementation Notes:**
+
 - Create celebration message templates
 - Trigger on user progress reports
 - Track what user responded well to
@@ -71,6 +80,7 @@ Immediate positive feedback when users report any progress:
 ---
 
 ### 4. Obstacle Pre-Mortems
+
 **Status:** 📋 Planned
 **Priority:** Medium
 **Complexity:** Medium
@@ -78,11 +88,13 @@ Immediate positive feedback when users report any progress:
 
 **Description:**
 Before each session, proactively identify potential obstacles:
+
 - "What's most likely to derail you today?"
 - Create specific if-then plan for each obstacle
 - Reference during session if user gets stuck
 
 **Implementation Notes:**
+
 - Integrate with implementation intentions wizard
 - Store common obstacles per user for suggestions
 - "Last time, Slack was an issue - want to plan for that?"
@@ -92,6 +104,7 @@ Before each session, proactively identify potential obstacles:
 ---
 
 ### 5. Adjustable Check-In Frequency
+
 **Status:** 📋 Planned
 **Priority:** High
 **Complexity:** Low
@@ -99,11 +112,13 @@ Before each session, proactively identify potential obstacles:
 
 **Description:**
 Let users customize accountability cadence:
+
 - **High structure** (every 5 min) - for those who need frequent nudges
 - **Moderate** (every 15 min) - default balanced approach
 - **Low structure** (only at milestones) - for those who find check-ins disruptive
 
 **Implementation Notes:**
+
 - Already have `check_in_frequency` in session schema
 - Add UI for selecting frequency
 - Allow mid-session adjustment
@@ -113,6 +128,7 @@ Let users customize accountability cadence:
 ---
 
 ### 6. Session Memory & Continuity
+
 **Status:** 📋 Planned
 **Priority:** Medium
 **Complexity:** High
@@ -120,11 +136,13 @@ Let users customize accountability cadence:
 
 **Description:**
 Remember context across sessions:
+
 - "Last time you worked on the API refactor - picking up there?"
 - "You mentioned Slack is your big distractor"
 - Track recurring tasks, obstacles, and preferences
 
 **Implementation Notes:**
+
 - Already have `user_context_items` table
 - Build context injection into companion prompts
 - Summarize previous sessions for continuity
@@ -134,6 +152,7 @@ Remember context across sessions:
 ---
 
 ### 7. Presence Without Pressure Mode
+
 **Status:** 📋 Planned
 **Priority:** Medium
 **Complexity:** Low
@@ -141,12 +160,14 @@ Remember context across sessions:
 
 **Description:**
 Option for silent companionship:
+
 - No proactive messages after session start
 - User can ping when they need support
 - Subtle "I'm here" indicator without interruption
 - Reduces evaluation anxiety while maintaining presence benefit
 
 **Implementation Notes:**
+
 - Add as a mode option alongside task complexity
 - Disable automatic check-ins
 - Keep connection open for user-initiated chat
@@ -156,6 +177,7 @@ Option for silent companionship:
 ---
 
 ### 8. Energy/Context Matching
+
 **Status:** 📋 Planned
 **Priority:** Medium
 **Complexity:** Medium
@@ -163,16 +185,19 @@ Option for silent companionship:
 
 **Description:**
 At session start, assess current state:
+
 - "What's your energy like right now?" (Low/Medium/High)
 - "How's your focus feeling?" (Scattered/Okay/Sharp)
 - Adapt companion tone and task suggestions accordingly
 
 **Adaptation Rules:**
+
 - Low energy → Gentler tone, smaller steps, more celebration
 - High energy → More ambitious goals, less hand-holding
 - Scattered → More structure, shorter intervals
 
 **Implementation Notes:**
+
 - Add energy check to session start
 - Store as session metadata
 - Adjust prompt injection based on state
@@ -182,6 +207,7 @@ At session start, assess current state:
 ---
 
 ### 9. Task Breakdown Assistant
+
 **Status:** 📋 Planned
 **Priority:** High
 **Complexity:** Medium
@@ -189,12 +215,14 @@ At session start, assess current state:
 
 **Description:**
 When users are stuck or overwhelmed:
+
 - "What's the smallest possible first step?"
 - "Can you do just 5 minutes of that?"
 - Help decompose large tasks into actionable pieces
 - Offer to hold the list while user focuses on one item
 
 **Implementation Notes:**
+
 - Trigger when user expresses feeling stuck
 - Store task breakdowns for reference
 - Check off sub-tasks for micro-wins
@@ -204,6 +232,7 @@ When users are stuck or overwhelmed:
 ---
 
 ### 10. Honest Limitations Messaging
+
 **Status:** 📋 Planned
 **Priority:** Low
 **Complexity:** Low
@@ -211,12 +240,14 @@ When users are stuck or overwhelmed:
 
 **Description:**
 Periodically remind users of healthy boundaries:
+
 - "I'm an AI companion, not a replacement for human connection"
 - "If you're struggling beyond focus, talking to a person might help"
 - Suggest breaks, social activities, outside time
 - Don't create inappropriate dependency
 
 **Implementation Notes:**
+
 - Add occasional reminders (not every session)
 - Trigger after extended use periods
 - Suggest when user expresses emotional distress
@@ -228,35 +259,41 @@ Periodically remind users of healthy boundaries:
 ## Additional Feature Ideas
 
 ### User-Suggested Features
-*Add features requested by users here*
+
+_Add features requested by users here_
 
 | Feature | Requested By | Date | Notes |
-|---------|--------------|------|-------|
-| | | | |
+| ------- | ------------ | ---- | ----- |
+|         |              |      |       |
 
 ### Future Exploration
 
 #### Pomodoro Integration
+
 - Built-in timer with traditional 25/5 intervals
 - Flexible intervals for ADHD (some prefer shorter)
 - Break reminders with suggested activities
 
 #### Social Body Doubling
+
 - Match users for virtual co-working sessions
 - Accountability partnerships
 - Group focus sessions
 
 #### Progress Analytics
+
 - Visualize focus patterns over time
 - Identify best times of day for different tasks
 - Celebrate streaks and consistency
 
 #### Distraction Blocking Integration
+
 - Integrate with browser extensions
 - Suggest blocking distracting sites during sessions
 - "I noticed you left - want to come back?"
 
 #### Voice Interface
+
 - Hands-free interaction for physical tasks
 - Ambient audio presence option
 - Voice check-ins
@@ -265,18 +302,18 @@ Periodically remind users of healthy boundaries:
 
 ## Implementation Priority Matrix
 
-| Priority | Feature | Complexity | Research Strength |
-|----------|---------|------------|-------------------|
-| 🔴 High | Implementation Intentions Wizard | Medium | Strong (d=0.65) |
-| 🔴 High | Task Complexity Mode | Low | Strong (meta-analysis) |
-| 🔴 High | Micro-Win Celebrations | Low | Moderate |
-| 🔴 High | Adjustable Check-Ins | Low | Strong |
-| 🔴 High | Task Breakdown Assistant | Medium | Strong |
-| 🟡 Medium | Obstacle Pre-Mortems | Medium | Strong |
-| 🟡 Medium | Session Memory | High | Moderate |
-| 🟡 Medium | Presence Without Pressure | Low | Moderate |
-| 🟡 Medium | Energy Matching | Medium | Moderate |
-| 🟢 Low | Honest Limitations | Low | Ethics-based |
+| Priority  | Feature                          | Complexity | Research Strength      |
+| --------- | -------------------------------- | ---------- | ---------------------- |
+| 🔴 High   | Implementation Intentions Wizard | Medium     | Strong (d=0.65)        |
+| 🔴 High   | Task Complexity Mode             | Low        | Strong (meta-analysis) |
+| 🔴 High   | Micro-Win Celebrations           | Low        | Moderate               |
+| 🔴 High   | Adjustable Check-Ins             | Low        | Strong                 |
+| 🔴 High   | Task Breakdown Assistant         | Medium     | Strong                 |
+| 🟡 Medium | Obstacle Pre-Mortems             | Medium     | Strong                 |
+| 🟡 Medium | Session Memory                   | High       | Moderate               |
+| 🟡 Medium | Presence Without Pressure        | Low        | Moderate               |
+| 🟡 Medium | Energy Matching                  | Medium     | Moderate               |
+| 🟢 Low    | Honest Limitations               | Low        | Ethics-based           |
 
 ---
 

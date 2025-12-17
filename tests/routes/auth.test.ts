@@ -80,9 +80,7 @@ describe("Auth Routes", () => {
     });
 
     it("should return 401 for invalid token", async () => {
-      const response = await request(app)
-        .post("/api/auth/verify")
-        .send({ token: "invalid-token" });
+      const response = await request(app).post("/api/auth/verify").send({ token: "invalid-token" });
 
       expect(response.status).toBe(401);
       expect(response.body.error).toBe("Invalid or expired magic link");
@@ -145,9 +143,7 @@ describe("Auth Routes", () => {
       expect(logoutRes.body.success).toBe(true);
 
       // Try to use the token again
-      const meRes = await request(app)
-        .get("/api/auth/me")
-        .set("Authorization", `Bearer ${token}`);
+      const meRes = await request(app).get("/api/auth/me").set("Authorization", `Bearer ${token}`);
 
       expect(meRes.status).toBe(401);
     });

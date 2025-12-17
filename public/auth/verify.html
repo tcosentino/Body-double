@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifying... - Body Double</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .auth-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: var(--gradient-hero);
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      padding: 2.5rem;
+      text-align: center;
+    }
+    .auth-card .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 2rem;
+    }
+    .auth-card .logo-icon {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+    .status-message {
+      margin-bottom: 1.5rem;
+    }
+    .status-message h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .status-message p {
+      color: var(--gray-500);
+    }
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-state {
+      display: none;
+    }
+    .error-state.show {
+      display: block;
+    }
+    .error-icon {
+      width: 64px;
+      height: 64px;
+      background: #fef2f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: #dc2626;
+    }
+    .success-state {
+      display: none;
+    }
+    .success-state.show {
+      display: block;
+    }
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      background: #ecfdf5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: #059669;
+    }
+    .loading-state {
+      display: block;
+    }
+    .loading-state.hide {
+      display: none;
+    }
+    .btn {
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body class="auth-page">
+  <div class="auth-container">
+    <div class="auth-card">
+      <a href="/" class="logo">
+        <span class="logo-icon">&#9680;</span>
+        <span>Body Double</span>
+      </a>
+
+      <div class="loading-state" id="loadingState">
+        <div class="spinner"></div>
+        <div class="status-message">
+          <h2>Verifying your link...</h2>
+          <p>Please wait a moment</p>
+        </div>
+      </div>
+
+      <div class="success-state" id="successState">
+        <div class="success-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="status-message">
+          <h2>You're in!</h2>
+          <p>Redirecting you to the app...</p>
+        </div>
+      </div>
+
+      <div class="error-state" id="errorState">
+        <div class="error-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="15" y1="9" x2="9" y2="15"></line>
+            <line x1="9" y1="9" x2="15" y2="15"></line>
+          </svg>
+        </div>
+        <div class="status-message">
+          <h2>Link expired or invalid</h2>
+          <p id="errorText">This magic link has expired or has already been used.</p>
+        </div>
+        <a href="/auth/login" class="btn btn-primary">Try again</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const loadingState = document.getElementById('loadingState');
+    const successState = document.getElementById('successState');
+    const errorState = document.getElementById('errorState');
+    const errorText = document.getElementById('errorText');
+
+    async function verifyToken() {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token) {
+        showError('No verification token found in the URL.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/auth/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Store token in localStorage for API calls
+          localStorage.setItem('auth_token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+
+          showSuccess();
+
+          // Redirect to app after brief delay
+          setTimeout(() => {
+            window.location.href = '/app';
+          }, 1500);
+        } else {
+          showError(data.error || 'This magic link has expired or has already been used.');
+        }
+      } catch (err) {
+        showError('Network error. Please check your connection and try again.');
+      }
+    }
+
+    function showError(message) {
+      loadingState.classList.add('hide');
+      errorText.textContent = message;
+      errorState.classList.add('show');
+    }
+
+    function showSuccess() {
+      loadingState.classList.add('hide');
+      successState.classList.add('show');
+    }
+
+    // Start verification on page load
+    verifyToken();
+  </script>
+</body>
+</html>
