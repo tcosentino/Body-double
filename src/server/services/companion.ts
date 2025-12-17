@@ -4,6 +4,7 @@
  * Wraps the Anthropic API and handles conversation with context injection.
  */
 
+import crypto from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { getDb } from "../db/index.js";
 import { buildUserContext, formatContextForPrompt } from "./context.js";

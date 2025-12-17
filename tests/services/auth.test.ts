@@ -2,6 +2,7 @@
  * Auth Service Tests
  */
 
+import crypto from "node:crypto";
 import { describe, it, expect, beforeEach } from "vitest";
 import {
   createMagicLink,

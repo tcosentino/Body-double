@@ -4,6 +4,7 @@
  * Handles magic link generation, verification, and session management.
  */
 
+import crypto from "node:crypto";
 import { getDb } from "../db/index.js";
 import type { User, MagicLink, AuthSession } from "../db/schema.js";
 
@@ -15,11 +16,7 @@ const AUTH_SESSION_EXPIRY_DAYS = 30;
  * Generate a secure random token
  */
 function generateToken(): string {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
+  return crypto.randomBytes(32).toString("hex");
 }
 
 /**

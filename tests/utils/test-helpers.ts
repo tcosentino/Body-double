@@ -4,6 +4,7 @@
  * Common utilities for creating test data and making assertions.
  */
 
+import crypto from "node:crypto";
 import { getTestDb } from "./test-db.js";
 import type { User, Session, AuthSession } from "../../src/server/db/schema.js";
 

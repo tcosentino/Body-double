@@ -5,6 +5,7 @@
  * All routes require authentication.
  */
 
+import crypto from "node:crypto";
 import { Router } from "express";
 import { getDb } from "../db/index.js";
 import { getSessionGreeting, saveMessage } from "../services/companion.js";
