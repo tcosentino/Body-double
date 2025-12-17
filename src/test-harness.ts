@@ -22,7 +22,6 @@ import * as readline from "readline";
 import {
   buildPrompt,
   promptVersions,
-  type PromptContext,
 } from "../prompts/system-prompt.js";
 import { allScenarios, type TestScenario } from "../prompts/user-contexts.js";
 
@@ -136,6 +135,7 @@ Available commands:
         console.log("\n👋 Goodbye!\n");
         this.rl.close();
         process.exit(0);
+        break; // unreachable but satisfies linter
 
       case "/prompt":
         console.log("\n--- Current System Prompt ---\n");
@@ -227,6 +227,7 @@ Available commands:
   async run(): Promise<void> {
     this.printHeader();
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const input = await this.prompt();
 

@@ -9,11 +9,9 @@ import { validateSession } from "../services/auth.js";
 import type { User } from "../db/schema.js";
 
 // Extend Express Request to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: User;
-    }
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: User;
   }
 }
 
