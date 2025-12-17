@@ -4,6 +4,7 @@
   "description": "AI-powered body doubling companion for focus and productivity",
   "type": "module",
   "scripts": {
+    "start": "tsx src/server/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
