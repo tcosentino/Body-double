@@ -747,7 +747,8 @@
       // Show appropriate buttons
       if (isActiveSession) {
         currentSession = session;
-        sessionStartTime = new Date(session.started_at);
+        // Append 'Z' to indicate UTC (SQLite datetime('now') stores in UTC)
+        sessionStartTime = new Date(session.started_at + 'Z');
         resumeBtn.style.display = 'none';
         endSessionBtn.style.display = 'block';
         chatInput.disabled = false;
