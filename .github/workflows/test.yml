@@ -89,8 +89,8 @@ jobs:
             if (fs.existsSync('chat-output.txt')) {
               const chatOutput = fs.readFileSync('chat-output.txt', 'utf8');
               if (chatOutput.length > 100) {
-                const truncated = chatOutput.slice(0, 3000);
-                body += `<details>\n<summary>🤖 Chat Demo Preview</summary>\n\n\`\`\`\n${truncated}\n\`\`\`\n</details>\n\n`;
+                const truncated = chatOutput.slice(0, 8000);
+                body += `<details>\n<summary>🤖 Chat Demo Preview</summary>\n\n\`\`\`\n${truncated}${chatOutput.length > 8000 ? '\n\n... (truncated, see artifact for full output)' : ''}\n\`\`\`\n</details>\n\n`;
               }
             }
 
