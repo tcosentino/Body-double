@@ -3,10 +3,12 @@
  *
  * Wraps the Anthropic API and handles conversation with context injection.
  * Optionally routes through Helicone for observability when HELICONE_API_KEY is set.
+ * Uses prompt caching to reduce costs and latency for repeated context.
  */
 
 import crypto from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
+import type { MessageParam, TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 import { getDb } from "../db/index.js";
 import { buildUserContext, formatContextForPrompt } from "./context.js";
 import { buildPrompt, systemPromptV1 } from "../../../prompts/system-prompt.js";
@@ -62,6 +64,66 @@ function getHeliconeHeaders(props: {
   };
 }
 
+/**
+ * Build a cached system prompt block
+ * Caches the system prompt to avoid reprocessing on every message
+ */
+function buildCachedSystemPrompt(systemPrompt: string): TextBlockParam[] {
+  return [
+    {
+      type: "text",
+      text: systemPrompt,
+      cache_control: { type: "ephemeral" },
+    },
+  ];
+}
+
+/**
+ * Build messages array with caching for conversation history
+ * Applies cache_control to the last message in history to cache the full conversation
+ */
+function buildCachedMessages(
+  historyMessages: CompanionMessage[],
+  newUserMessage: string
+): MessageParam[] {
+  const messages: MessageParam[] = [];
+
+  // Add all history messages
+  for (let i = 0; i < historyMessages.length; i++) {
+    const msg = historyMessages[i];
+    const isLastHistoryMessage = i === historyMessages.length - 1;
+
+    if (isLastHistoryMessage && historyMessages.length >= 2) {
+      // Cache up to the last history message (requires at least 1024 tokens to cache)
+      // This ensures subsequent requests can reuse the cached conversation
+      messages.push({
+        role: msg.role,
+        content: [
+          {
+            type: "text",
+            text: msg.content,
+            cache_control: { type: "ephemeral" },
+          },
+        ],
+      });
+    } else {
+      // Regular message without cache control
+      messages.push({
+        role: msg.role,
+        content: msg.content,
+      });
+    }
+  }
+
+  // Add the new user message (not cached - it's new)
+  messages.push({
+    role: "user",
+    content: newUserMessage,
+  });
+
+  return messages;
+}
+
 export interface CompanionMessage {
   role: "user" | "assistant";
   content: string;
@@ -84,7 +146,7 @@ export async function generateResponse(
   const systemPrompt = buildPrompt(SYSTEM_PROMPT_TEMPLATE, formattedContext);
 
   // Get conversation history for this session
-  const messages = db
+  const historyMessages = db
     .prepare(
       `
     SELECT role, content FROM messages
@@ -94,15 +156,15 @@ export async function generateResponse(
     )
     .all(sessionId) as CompanionMessage[];
 
-  // Add the new user message
-  messages.push({ role: "user", content: userMessage });
+  // Build cached messages
+  const messages = buildCachedMessages(historyMessages, userMessage);
 
-  // Call the API with Helicone tracking headers
+  // Call the API with caching and Helicone tracking headers
   const response = await client.messages.create(
     {
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: systemPrompt,
+      system: buildCachedSystemPrompt(systemPrompt),
       messages,
     },
     {
@@ -132,7 +194,7 @@ export async function* generateStreamingResponse(
   const systemPrompt = buildPrompt(SYSTEM_PROMPT_TEMPLATE, formattedContext);
 
   // Get conversation history for this session
-  const messages = db
+  const historyMessages = db
     .prepare(
       `
     SELECT role, content FROM messages
@@ -142,15 +204,15 @@ export async function* generateStreamingResponse(
     )
     .all(sessionId) as CompanionMessage[];
 
-  // Add the new user message
-  messages.push({ role: "user", content: userMessage });
+  // Build cached messages
+  const messages = buildCachedMessages(historyMessages, userMessage);
 
-  // Call the API with streaming and Helicone tracking headers
+  // Call the API with streaming, caching, and Helicone tracking headers
   const stream = await client.messages.stream(
     {
       model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
-      system: systemPrompt,
+      system: buildCachedSystemPrompt(systemPrompt),
       messages,
     },
     {
@@ -205,7 +267,7 @@ export async function getSessionGreeting(userId: string, sessionId: string): Pro
     greetingPrompt = `This is the start of a new session. ${context.user.name} is about to work on: "${task}". Their last session was working on "${lastSession.task}". Give a brief, warm greeting that naturally references something from your history together. Keep it concise (2-3 sentences).`;
   }
 
-  // Generate greeting using a simpler prompt with Helicone tracking
+  // Generate greeting - no caching for single-shot greeting (too small to benefit)
   const client = getAnthropic();
   const response = await client.messages.create(
     {
