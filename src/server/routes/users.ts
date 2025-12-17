@@ -9,6 +9,7 @@ import { Router } from "express";
 import { getDb } from "../db/index.js";
 import { buildUserContext } from "../services/context.js";
 import { requireAuth } from "../middleware/auth.js";
+import { parseInterests, parsePreferences } from "../utils/json.js";
 import type { User } from "../db/schema.js";
 
 const router = Router();
@@ -29,8 +30,8 @@ router.get("/me", (req, res) => {
     name: user.name,
     created_at: user.created_at,
     work_context: user.work_context,
-    interests: user.interests ? JSON.parse(user.interests) : [],
-    preferences: JSON.parse(user.preferences),
+    interests: parseInterests(user.interests),
+    preferences: parsePreferences(user.preferences),
   });
 });
 
@@ -55,8 +56,8 @@ router.put("/me", (req, res) => {
     name: updatedUser.name,
     created_at: updatedUser.created_at,
     work_context: updatedUser.work_context,
-    interests: updatedUser.interests ? JSON.parse(updatedUser.interests) : [],
-    preferences: JSON.parse(updatedUser.preferences),
+    interests: parseInterests(updatedUser.interests),
+    preferences: parsePreferences(updatedUser.preferences),
   });
 });
 
@@ -107,8 +108,8 @@ router.put("/me/context", (req, res) => {
     email: updatedUser.email,
     name: updatedUser.name,
     work_context: updatedUser.work_context,
-    interests: updatedUser.interests ? JSON.parse(updatedUser.interests) : [],
-    preferences: JSON.parse(updatedUser.preferences),
+    interests: parseInterests(updatedUser.interests),
+    preferences: parsePreferences(updatedUser.preferences),
   });
 });
 
@@ -120,7 +121,7 @@ router.put("/me/preferences", (req, res) => {
   const db = getDb();
   const user = req.user!;
 
-  const currentPrefs = JSON.parse(user.preferences);
+  const currentPrefs = parsePreferences(user.preferences);
   const newPrefs = { ...currentPrefs, ...req.body };
 
   db.prepare(`UPDATE users SET preferences = ? WHERE id = ?`).run(

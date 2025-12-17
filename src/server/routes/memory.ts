@@ -19,6 +19,7 @@ import {
   getMemoryStats,
   MEMORY_CATEGORIES,
 } from "../services/memory.js";
+import { validateMemoryContent } from "../utils/validation.js";
 import type { MemoryCategory } from "../db/schema.js";
 
 const router = Router();
@@ -149,6 +150,12 @@ router.post("/", (req, res) => {
 
   if (!category || !content) {
     res.status(400).json({ error: "category and content are required" });
+    return;
+  }
+
+  const contentValidation = validateMemoryContent(content);
+  if (!contentValidation.valid) {
+    res.status(400).json({ error: contentValidation.error });
     return;
   }
 

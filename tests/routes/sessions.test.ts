@@ -9,7 +9,6 @@ import {
   createAuthenticatedUser,
   createTestSession,
   createTestMessage,
-  getTableCount,
 } from "../utils/test-helpers.js";
 import { getTestDb } from "../utils/test-db.js";
 

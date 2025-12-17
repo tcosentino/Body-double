@@ -13,6 +13,7 @@ import {
   getMagicLinkUrl,
 } from "../services/auth.js";
 import { requireAuth } from "../middleware/auth.js";
+import { parseInterests, parsePreferences } from "../utils/json.js";
 
 const router = Router();
 
@@ -107,8 +108,8 @@ router.get("/me", requireAuth, (req, res) => {
     name: user.name,
     created_at: user.created_at,
     work_context: user.work_context,
-    interests: user.interests ? JSON.parse(user.interests) : [],
-    preferences: JSON.parse(user.preferences),
+    interests: parseInterests(user.interests),
+    preferences: parsePreferences(user.preferences),
   });
 });
 

@@ -51,7 +51,14 @@ describe("WebSocket Chat", () => {
     });
   });
 
-  function waitForMessage(ws: WebSocket, timeout = 2000): Promise<any> {
+  interface WsMessage {
+    type: string;
+    content?: string;
+    message?: string;
+    sessionId?: string;
+  }
+
+  function waitForMessage(ws: WebSocket, timeout = 2000): Promise<WsMessage> {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error("Timeout waiting for message")), timeout);
       ws.once("message", (data) => {
@@ -61,9 +68,9 @@ describe("WebSocket Chat", () => {
     });
   }
 
-  function collectMessages(ws: WebSocket, count: number, timeout = 3000): Promise<any[]> {
-    return new Promise((resolve, reject) => {
-      const messages: any[] = [];
+  function collectMessages(ws: WebSocket, count: number, timeout = 3000): Promise<WsMessage[]> {
+    return new Promise((resolve, _reject) => {
+      const messages: WsMessage[] = [];
       const timer = setTimeout(() => {
         // Return what we have even on timeout
         resolve(messages);

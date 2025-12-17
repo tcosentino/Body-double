@@ -3,7 +3,7 @@
  */
 
 import crypto from "node:crypto";
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
   createMagicLink,
   verifyMagicLink,
@@ -176,6 +176,7 @@ describe("Auth Service", () => {
         .get(sessionToken) as { last_active_at: string };
 
       // last_active_at should be updated (or at least not fail)
+      expect(before.last_active_at).toBeDefined();
       expect(after.last_active_at).toBeDefined();
     });
   });

@@ -12,7 +12,6 @@ import {
 import {
   createTestUser,
   createTestSession,
-  createTestMessage,
   createTestContextItem,
 } from "../utils/test-helpers.js";
 import { getTestDb } from "../utils/test-db.js";
@@ -255,6 +254,7 @@ describe("Context Service", () => {
         .get(item.id) as { last_referenced: string };
 
       // Should be updated (or at least not fail)
+      expect(before.last_referenced).toBeDefined();
       expect(after.last_referenced).toBeDefined();
     });
   });

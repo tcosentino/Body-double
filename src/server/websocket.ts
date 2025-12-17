@@ -10,6 +10,7 @@ import type { Server, IncomingMessage } from "http";
 import { getDb } from "./db/index.js";
 import { generateStreamingResponse, saveMessage } from "./services/companion.js";
 import { validateSession } from "./services/auth.js";
+import { validateMessageLength } from "./utils/validation.js";
 import type { Session, User } from "./db/schema.js";
 
 interface ChatMessage {
@@ -64,7 +65,7 @@ export function setupWebSocket(server: Server): WebSocketServer {
       try {
         const message = JSON.parse(data.toString()) as ChatMessage;
         await handleMessage(ws, message);
-      } catch (error) {
+      } catch {
         sendError(ws, "Invalid message format");
       }
     });
@@ -172,6 +173,12 @@ async function handleChatMessage(
   const { content } = message;
   if (!content) {
     sendError(ws, "Message content is required");
+    return;
+  }
+
+  const messageValidation = validateMessageLength(content);
+  if (!messageValidation.valid) {
+    sendError(ws, messageValidation.error || "Invalid message");
     return;
   }
 

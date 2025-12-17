@@ -10,6 +10,7 @@ import { Router } from "express";
 import { getDb } from "../db/index.js";
 import { generateResponse, saveMessage } from "../services/companion.js";
 import { requireAuth } from "../middleware/auth.js";
+import { validateMessageLength } from "../utils/validation.js";
 import type { Session, Message } from "../db/schema.js";
 
 const router = Router();
@@ -27,6 +28,12 @@ router.post("/", async (req, res) => {
 
   if (!sessionId || !message) {
     res.status(400).json({ error: "sessionId and message are required" });
+    return;
+  }
+
+  const messageValidation = validateMessageLength(message);
+  if (!messageValidation.valid) {
+    res.status(400).json({ error: messageValidation.error });
     return;
   }
 

@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS user_context_items (
   content TEXT NOT NULL,
   last_referenced TEXT DEFAULT (datetime('now')),
   importance INTEGER DEFAULT 1,  -- 1-5 scale
+  source TEXT,  -- 'user', 'conversation', 'inferred'
   created_at TEXT DEFAULT (datetime('now'))
 );
 
