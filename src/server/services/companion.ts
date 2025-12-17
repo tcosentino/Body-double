@@ -42,6 +42,26 @@ function getAnthropic(): Anthropic {
   return anthropic;
 }
 
+/**
+ * Build Helicone custom property headers for request tracking
+ */
+function getHeliconeHeaders(props: {
+  userId: string;
+  sessionId: string;
+  requestType: "chat" | "greeting";
+}): Record<string, string> {
+  // Only add Helicone headers if Helicone is enabled
+  if (!process.env.HELICONE_API_KEY) {
+    return {};
+  }
+
+  return {
+    "Helicone-Property-User": props.userId,
+    "Helicone-Property-Session": props.sessionId,
+    "Helicone-Property-Type": props.requestType,
+  };
+}
+
 export interface CompanionMessage {
   role: "user" | "assistant";
   content: string;
@@ -77,13 +97,18 @@ export async function generateResponse(
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
 
-  // Call the API
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
-  });
+  // Call the API with Helicone tracking headers
+  const response = await client.messages.create(
+    {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    },
+    {
+      headers: getHeliconeHeaders({ userId, sessionId, requestType: "chat" }),
+    }
+  );
 
   const assistantMessage = response.content[0].type === "text" ? response.content[0].text : "";
 
@@ -120,13 +145,18 @@ export async function* generateStreamingResponse(
   // Add the new user message
   messages.push({ role: "user", content: userMessage });
 
-  // Call the API with streaming
-  const stream = await client.messages.stream({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: systemPrompt,
-    messages,
-  });
+  // Call the API with streaming and Helicone tracking headers
+  const stream = await client.messages.stream(
+    {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages,
+    },
+    {
+      headers: getHeliconeHeaders({ userId, sessionId, requestType: "chat" }),
+    }
+  );
 
   for await (const event of stream) {
     if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
@@ -175,14 +205,19 @@ export async function getSessionGreeting(userId: string, sessionId: string): Pro
     greetingPrompt = `This is the start of a new session. ${context.user.name} is about to work on: "${task}". Their last session was working on "${lastSession.task}". Give a brief, warm greeting that naturally references something from your history together. Keep it concise (2-3 sentences).`;
   }
 
-  // Generate greeting using a simpler prompt
+  // Generate greeting using a simpler prompt with Helicone tracking
   const client = getAnthropic();
-  const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 256,
-    system: `You are a warm, genuine work companion who knows ${context.user.name} well. Be natural and concise.`,
-    messages: [{ role: "user", content: greetingPrompt }],
-  });
+  const response = await client.messages.create(
+    {
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 256,
+      system: `You are a warm, genuine work companion who knows ${context.user.name} well. Be natural and concise.`,
+      messages: [{ role: "user", content: greetingPrompt }],
+    },
+    {
+      headers: getHeliconeHeaders({ userId, sessionId, requestType: "greeting" }),
+    }
+  );
 
   return response.content[0].type === "text" ? response.content[0].text : "";
 }
