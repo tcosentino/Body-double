@@ -233,7 +233,8 @@ export function cleanupExpiredAuth(): { magicLinks: number; sessions: number } {
  * Generate the magic link URL
  */
 export function getMagicLinkUrl(token: string, baseUrl?: string): string {
-  const base = baseUrl || process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000";
+  const base =
+    baseUrl || process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:3000";
   return `${base}/auth/verify?token=${token}`;
 }
 

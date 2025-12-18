@@ -81,6 +81,7 @@
       background: var(--gray-100);
       border-radius: var(--radius-md);
       transition: all 0.15s;
+      text-decoration: none;
     }
 
     .btn-settings:hover {
@@ -112,6 +113,44 @@
       background: var(--gray-100);
       color: var(--primary);
       font-weight: 500;
+    }
+
+    .helicone-link {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .helicone-link:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: #4f46e5;
+    }
+
+    .btn-helicone {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      color: #6366f1;
+      background: rgba(99, 102, 241, 0.1);
+      border: none;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-helicone:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: #4f46e5;
     }
 
     .app-body {
@@ -551,6 +590,14 @@
         <a href="/app/chat" class="nav-link">Chat</a>
       </nav>
       <div class="header-actions">
+        <a href="https://www.helicone.ai/requests" target="_blank" class="helicone-link" id="heliconeLink" title="View in Helicone">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          Helicone
+        </a>
         <a href="/app/settings" class="btn-settings" title="Settings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
@@ -594,6 +641,14 @@
             </div>
           </div>
           <div class="session-header-actions">
+            <a href="#" target="_blank" class="btn-helicone" id="sessionHeliconeLink" title="View session in Helicone">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              API Logs
+            </a>
             <button class="btn-resume" id="resumeBtn" style="display: none;">Resume Session</button>
             <button class="btn-end" id="endSessionBtn" style="display: none;">End Session</button>
           </div>
@@ -796,6 +851,10 @@
       currentSessionDate.textContent = date.toLocaleDateString('en-US', {
         weekday: 'short', month: 'short', day: 'numeric'
       });
+
+      // Update Helicone session link
+      const sessionHeliconeLink = document.getElementById('sessionHeliconeLink');
+      sessionHeliconeLink.href = `https://www.helicone.ai/requests?properties%5BSession%5D=${encodeURIComponent(session.id)}`;
 
       // Show appropriate buttons
       if (isActiveSession) {

@@ -33,6 +33,8 @@ npm test
 - 🤖 **AI Companion** - Warm, supportive presence that remembers your context
 - 💾 **Memory** - Companion learns your projects, challenges, and preferences
 - 🔐 **Magic Link Auth** - Passwordless authentication
+- 📊 **Helicone Observability** - Optional LLM monitoring and cost tracking
+- ⚡ **Prompt Caching** - Reduced costs and latency via Anthropic caching
 
 ## Development
 
