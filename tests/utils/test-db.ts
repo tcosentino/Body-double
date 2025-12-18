@@ -33,8 +33,23 @@ export async function teardownTestDb(): Promise<void> {
 export async function resetTestDb(): Promise<void> {
   if (!testDb) return;
 
-  // Clear all tables in reverse dependency order
+  // Clear all tables in reverse dependency order (children before parents)
   const tables = [
+    // Briefing/alerts system
+    "background_checks",
+    "briefings",
+    "alerts",
+    // Google integration
+    "google_api_logs",
+    "google_connections",
+    // Notion integration
+    "notion_api_logs",
+    "notion_connections",
+    // Chat system
+    "side_chat_messages",
+    "main_chat_messages",
+    "side_chats",
+    // Core tables
     "messages",
     "user_context_items",
     "sessions",

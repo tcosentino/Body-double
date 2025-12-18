@@ -16,7 +16,12 @@ import usersRouter from "./routes/users.js";
 import sessionsRouter from "./routes/sessions.js";
 import chatRouter from "./routes/chat.js";
 import memoryRouter from "./routes/memory.js";
+import notionRouter from "./routes/notion.js";
+import chatsRouter from "./routes/chats.js";
+import googleRouter from "./routes/google.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
+import { startScheduler, stopScheduler } from "./services/scheduler.js";
+import briefingRouter from "./routes/briefing.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3001;
@@ -51,6 +56,10 @@ app.use("/api/users", usersRouter);
 app.use("/api/sessions", sessionsRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/memory", memoryRouter);
+app.use("/api/notion", notionRouter);
+app.use("/api/chats", chatsRouter);
+app.use("/api/google", googleRouter);
+app.use("/api/briefing", briefingRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -76,6 +85,9 @@ const wss = setupWebSocket(server);
 
 // Initialize database
 initializeDb();
+
+// Start background scheduler
+startScheduler();
 
 // Periodic cleanup of expired auth tokens (every hour)
 setInterval(
@@ -138,6 +150,54 @@ Memory Endpoints (auth required):
   DELETE /api/memory/:id         Delete a memory
   POST   /api/memory/bulk        Create multiple memories
 
+Notion Endpoints:
+  GET    /api/notion/status      Check Notion connection status
+  GET    /api/notion/connect     Start Notion OAuth flow
+  GET    /api/notion/callback    OAuth callback (internal)
+  DELETE /api/notion/disconnect  Disconnect Notion
+  GET    /api/notion/databases   List available databases
+  PUT    /api/notion/configure   Configure database mappings
+
+Chat Endpoints (auth required):
+  GET    /api/chats/main              Get main chat messages
+  POST   /api/chats/main/messages     Add message to main chat
+  DELETE /api/chats/main              Clear main chat history
+  GET    /api/chats/side              List side chats
+  POST   /api/chats/side              Create side chat
+  POST   /api/chats/side/spawn        Spawn side chat from main
+  GET    /api/chats/side/:id          Get side chat
+  PATCH  /api/chats/side/:id          Update side chat
+  DELETE /api/chats/side/:id          Delete side chat
+  POST   /api/chats/side/:id/archive  Archive side chat
+  POST   /api/chats/side/:id/pin      Toggle pin status
+  GET    /api/chats/side/:id/messages Get side chat messages
+  POST   /api/chats/side/:id/messages Add message to side chat
+  GET    /api/chats/activity          Get recent chat activity
+
+Google Endpoints (auth required):
+  GET    /api/google/status           Check Google connection status
+  GET    /api/google/connect          Start Google OAuth flow
+  GET    /api/google/callback         OAuth callback (internal)
+  DELETE /api/google/disconnect       Disconnect Google
+  GET    /api/google/gmail/messages   List recent emails
+  GET    /api/google/gmail/messages/:id  Get email by ID
+  GET    /api/google/gmail/unread     Get unread email count
+  GET    /api/google/calendar/events  List calendar events
+  GET    /api/google/calendar/today   Get today's events
+  GET    /api/google/logs             Get API call logs
+
+Briefing & Alerts (auth required):
+  GET    /api/briefing/today          Get today's briefing
+  POST   /api/briefing/generate       Force generate new briefing
+  GET    /api/briefing/data           Get raw briefing data
+  GET    /api/briefing/history        Get recent briefings
+  GET    /api/briefing/alerts         Get alerts
+  GET    /api/briefing/alerts/unread  Get unread alert count
+  POST   /api/briefing/alerts/:id/read     Mark alert read
+  POST   /api/briefing/alerts/read-all     Mark all alerts read
+  POST   /api/briefing/alerts/:id/dismiss  Dismiss alert
+  POST   /api/briefing/check          Trigger background checks
+
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx
   Send: { "type": "join", "sessionId": "..." }
@@ -149,6 +209,7 @@ WebSocket:
 // Graceful shutdown
 process.on("SIGINT", () => {
   console.log("\nShutting down...");
+  stopScheduler();
   wss.close();
   server.close();
   closeDb();
@@ -157,6 +218,7 @@ process.on("SIGINT", () => {
 
 process.on("SIGTERM", () => {
   console.log("\nShutting down...");
+  stopScheduler();
   wss.close();
   server.close();
   closeDb();
