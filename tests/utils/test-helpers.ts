@@ -143,3 +143,115 @@ export function createAuthenticatedUser(userOverrides: Partial<User> = {}): {
   const { token } = createTestAuthSession(user.id);
   return { user, token };
 }
+
+/**
+ * Create a test alert
+ */
+export function createTestAlert(
+  userId: string,
+  overrides: {
+    type?: string;
+    title?: string;
+    content?: string;
+    priority?: string;
+    status?: string;
+    source_type?: string;
+    source_id?: string;
+    action_type?: string;
+    action_data?: object;
+  } = {}
+): { id: string } {
+  const db = getTestDb();
+  const id = crypto.randomUUID();
+
+  db.prepare(
+    `
+    INSERT INTO alerts (id, user_id, type, title, content, priority, status, source_type, source_id, action_type, action_data)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `
+  ).run(
+    id,
+    userId,
+    overrides.type || "email",
+    overrides.title || "Test Alert",
+    overrides.content || "This is a test alert",
+    overrides.priority || "normal",
+    overrides.status || "unread",
+    overrides.source_type || null,
+    overrides.source_id || null,
+    overrides.action_type || null,
+    overrides.action_data ? JSON.stringify(overrides.action_data) : null
+  );
+
+  return { id };
+}
+
+/**
+ * Create a test briefing
+ */
+export function createTestBriefing(
+  userId: string,
+  overrides: {
+    date?: string;
+    type?: string;
+    summary?: string;
+    calendar_events?: object[];
+    emails?: object[];
+    tasks?: object[];
+    viewed_at?: string;
+  } = {}
+): { id: string } {
+  const db = getTestDb();
+  const id = crypto.randomUUID();
+  const date = overrides.date || new Date().toISOString().split("T")[0];
+
+  db.prepare(
+    `
+    INSERT INTO briefings (id, user_id, date, type, summary, calendar_events, emails, tasks, viewed_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `
+  ).run(
+    id,
+    userId,
+    date,
+    overrides.type || "morning",
+    overrides.summary || "Good morning! Here is your briefing.",
+    overrides.calendar_events ? JSON.stringify(overrides.calendar_events) : null,
+    overrides.emails ? JSON.stringify(overrides.emails) : null,
+    overrides.tasks ? JSON.stringify(overrides.tasks) : null,
+    overrides.viewed_at || null
+  );
+
+  return { id };
+}
+
+/**
+ * Create a test Google connection (for briefing tests)
+ */
+export function createTestGoogleConnection(
+  userId: string,
+  overrides: {
+    email?: string;
+    scopes?: string[];
+  } = {}
+): { id: string } {
+  const db = getTestDb();
+  const id = crypto.randomUUID();
+
+  db.prepare(
+    `
+    INSERT INTO google_connections (id, user_id, access_token, refresh_token, token_expires_at, email, scopes)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `
+  ).run(
+    id,
+    userId,
+    "fake_access_token",
+    "fake_refresh_token",
+    new Date(Date.now() + 3600000).toISOString(),
+    overrides.email || "test@gmail.com",
+    JSON.stringify(overrides.scopes || ["gmail.readonly", "calendar.readonly"])
+  );
+
+  return { id };
+}
