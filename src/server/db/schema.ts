@@ -129,6 +129,48 @@ CREATE TABLE IF NOT EXISTS notion_api_logs (
   notion_object_type TEXT         -- "page", "database", "block", etc.
 );
 
+-- Google OAuth connections (Gmail, Calendar)
+CREATE TABLE IF NOT EXISTS google_connections (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  access_token TEXT NOT NULL,
+  refresh_token TEXT NOT NULL,
+  token_expires_at TEXT NOT NULL,
+  email TEXT NOT NULL,            -- Google account email
+  connected_at TEXT DEFAULT (datetime('now')),
+  last_synced_at TEXT,
+
+  -- Granted scopes (stored as JSON array)
+  scopes TEXT NOT NULL,
+
+  UNIQUE(user_id)
+);
+
+-- Google API call logs for transparency (similar to Notion)
+CREATE TABLE IF NOT EXISTS google_api_logs (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  timestamp TEXT DEFAULT (datetime('now')),
+
+  -- Request details
+  method TEXT NOT NULL,
+  endpoint TEXT NOT NULL,
+  request_body TEXT,
+
+  -- Response details
+  status_code INTEGER NOT NULL,
+  response_body TEXT,
+
+  -- Context
+  operation TEXT NOT NULL,
+  service TEXT NOT NULL,          -- 'gmail', 'calendar', 'people'
+  triggered_by TEXT,
+  duration_ms INTEGER,
+
+  -- Error tracking
+  error_message TEXT
+);
+
 -- Side chats for organized topic-based conversations
 CREATE TABLE IF NOT EXISTS side_chats (
   id TEXT PRIMARY KEY,
@@ -190,6 +232,9 @@ CREATE INDEX IF NOT EXISTS idx_side_chats_user_id ON side_chats(user_id);
 CREATE INDEX IF NOT EXISTS idx_side_chats_status ON side_chats(status);
 CREATE INDEX IF NOT EXISTS idx_side_chat_messages_chat_id ON side_chat_messages(side_chat_id);
 CREATE INDEX IF NOT EXISTS idx_main_chat_messages_user_id ON main_chat_messages(user_id);
+CREATE INDEX IF NOT EXISTS idx_google_connections_user_id ON google_connections(user_id);
+CREATE INDEX IF NOT EXISTS idx_google_api_logs_user_id ON google_api_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_google_api_logs_timestamp ON google_api_logs(timestamp);
 `;
 
 // TypeScript types matching the schema
@@ -348,6 +393,56 @@ export interface NotionApiLogInput {
   error_message?: string;
   notion_object_id?: string;
   notion_object_type?: "page" | "database" | "block" | "user";
+}
+
+// Google OAuth integration types
+export interface GoogleConnection {
+  id: string;
+  user_id: string;
+  access_token: string;
+  refresh_token: string;
+  token_expires_at: string;
+  email: string;
+  connected_at: string;
+  last_synced_at: string | null;
+  scopes: string; // JSON array
+}
+
+export interface GoogleConnectionPublic {
+  id: string;
+  email: string;
+  connected_at: string;
+  last_synced_at: string | null;
+  scopes: string[];
+}
+
+export interface GoogleApiLog {
+  id: string;
+  user_id: string;
+  timestamp: string;
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  endpoint: string;
+  request_body: string | null;
+  status_code: number;
+  response_body: string | null;
+  operation: string;
+  service: "gmail" | "calendar" | "people";
+  triggered_by: "user_request" | "proactive_check" | "assistant_action" | "system";
+  duration_ms: number | null;
+  error_message: string | null;
+}
+
+export interface GoogleApiLogInput {
+  method: "GET" | "POST" | "PATCH" | "DELETE";
+  endpoint: string;
+  request_body?: object | null;
+  status_code: number;
+  response_body?: object | null;
+  operation: string;
+  service: "gmail" | "calendar" | "people";
+  triggered_by: "user_request" | "proactive_check" | "assistant_action" | "system";
+  duration_ms?: number;
+  error_message?: string;
 }
 
 // Side chats for topic-based conversations

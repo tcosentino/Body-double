@@ -18,6 +18,7 @@ import chatRouter from "./routes/chat.js";
 import memoryRouter from "./routes/memory.js";
 import notionRouter from "./routes/notion.js";
 import chatsRouter from "./routes/chats.js";
+import googleRouter from "./routes/google.js";
 import { cleanupExpiredAuth } from "./services/auth.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -55,6 +56,7 @@ app.use("/api/chat", chatRouter);
 app.use("/api/memory", memoryRouter);
 app.use("/api/notion", notionRouter);
 app.use("/api/chats", chatsRouter);
+app.use("/api/google", googleRouter);
 
 // Error handling
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -165,6 +167,18 @@ Chat Endpoints (auth required):
   GET    /api/chats/side/:id/messages Get side chat messages
   POST   /api/chats/side/:id/messages Add message to side chat
   GET    /api/chats/activity          Get recent chat activity
+
+Google Endpoints (auth required):
+  GET    /api/google/status           Check Google connection status
+  GET    /api/google/connect          Start Google OAuth flow
+  GET    /api/google/callback         OAuth callback (internal)
+  DELETE /api/google/disconnect       Disconnect Google
+  GET    /api/google/gmail/messages   List recent emails
+  GET    /api/google/gmail/messages/:id  Get email by ID
+  GET    /api/google/gmail/unread     Get unread email count
+  GET    /api/google/calendar/events  List calendar events
+  GET    /api/google/calendar/today   Get today's events
+  GET    /api/google/logs             Get API call logs
 
 WebSocket:
   Connect to /ws with token query param: /ws?token=xxx

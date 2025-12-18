@@ -691,6 +691,65 @@
         </div>
       </section>
 
+      <!-- Google Integration Section -->
+      <section class="settings-section">
+        <h2>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Google Integration
+        </h2>
+        <p>Connect your Google account to let your assistant read emails and calendar events.</p>
+
+        <!-- Loading State -->
+        <div class="loading" id="googleLoading">
+          <div class="spinner"></div>
+          Checking Google connection...
+        </div>
+
+        <!-- Not Configured State -->
+        <div class="notion-status not-configured hidden" id="googleNotConfigured">
+          <div class="notion-icon" style="color: #4285f4;">G</div>
+          <div class="notion-info">
+            <h3>Google Integration Not Available</h3>
+            <p>The server needs to be configured with Google API credentials.</p>
+          </div>
+        </div>
+
+        <!-- Disconnected State -->
+        <div id="googleDisconnected" class="hidden">
+          <div class="notion-status">
+            <div class="notion-icon" style="color: #4285f4;">G</div>
+            <div class="notion-info">
+              <h3>Connect to Google</h3>
+              <p>Allow your assistant to read your Gmail and Google Calendar.</p>
+            </div>
+            <button class="btn-connect" id="connectGoogleBtn">Connect Google</button>
+          </div>
+        </div>
+
+        <!-- Connected State -->
+        <div id="googleConnected" class="hidden">
+          <div class="notion-status connected">
+            <div class="notion-icon" style="color: #4285f4; font-size: 1.5rem;">G</div>
+            <div class="notion-info">
+              <h3 id="googleEmail">Connected Account</h3>
+              <p id="googleConnectionDate">Connected on...</p>
+            </div>
+            <button class="btn-disconnect" id="disconnectGoogleBtn">Disconnect</button>
+          </div>
+
+          <!-- Scopes Info -->
+          <div class="database-config">
+            <h3>Granted Permissions</h3>
+            <div id="googleScopes" style="font-size: 0.875rem; color: var(--gray-600);">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- API Logs Section -->
       <section class="settings-section" id="logsSection">
         <h2>
@@ -796,7 +855,7 @@
       window.location.href = '/auth/login';
     }
 
-    // DOM elements
+    // DOM elements - Notion
     const alertContainer = document.getElementById('alertContainer');
     const notionLoading = document.getElementById('notionLoading');
     const notionNotConfigured = document.getElementById('notionNotConfigured');
@@ -812,6 +871,17 @@
     const notesDb = document.getElementById('notesDb');
     const saveConfigBtn = document.getElementById('saveConfigBtn');
 
+    // DOM elements - Google
+    const googleLoading = document.getElementById('googleLoading');
+    const googleNotConfigured = document.getElementById('googleNotConfigured');
+    const googleDisconnected = document.getElementById('googleDisconnected');
+    const googleConnected = document.getElementById('googleConnected');
+    const connectGoogleBtn = document.getElementById('connectGoogleBtn');
+    const disconnectGoogleBtn = document.getElementById('disconnectGoogleBtn');
+    const googleEmail = document.getElementById('googleEmail');
+    const googleConnectionDate = document.getElementById('googleConnectionDate');
+    const googleScopes = document.getElementById('googleScopes');
+
     // State
     let databases = [];
     let currentConfig = null;
@@ -820,7 +890,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('notion_connected') === 'true') {
       showAlert('Successfully connected to Notion!', 'success');
-      // Clean URL
       window.history.replaceState({}, document.title, '/app/settings');
     } else if (urlParams.get('notion_error')) {
       const errorMap = {
@@ -831,10 +900,24 @@
       };
       showAlert(errorMap[urlParams.get('notion_error')] || 'Failed to connect to Notion.', 'error');
       window.history.replaceState({}, document.title, '/app/settings');
+    } else if (urlParams.get('google_connected') === 'true') {
+      showAlert('Successfully connected to Google!', 'success');
+      window.history.replaceState({}, document.title, '/app/settings');
+    } else if (urlParams.get('google_error')) {
+      const errorMap = {
+        'access_denied': 'You denied access to Google.',
+        'invalid_request': 'Invalid OAuth request. Please try again.',
+        'invalid_state': 'Session expired. Please try connecting again.',
+        'token_exchange_failed': 'Failed to connect to Google. Please try again.',
+        'failed_to_get_email': 'Failed to get your Google email. Please try again.'
+      };
+      showAlert(errorMap[urlParams.get('google_error')] || 'Failed to connect to Google.', 'error');
+      window.history.replaceState({}, document.title, '/app/settings');
     }
 
     // Initialize
     checkNotionStatus();
+    checkGoogleStatus();
 
     async function checkNotionStatus() {
       notionLoading.classList.remove('hidden');
@@ -973,6 +1056,106 @@
       } finally {
         saveConfigBtn.disabled = false;
         saveConfigBtn.textContent = 'Save Configuration';
+      }
+    });
+
+    // ============================================
+    // Google Integration
+    // ============================================
+
+    async function checkGoogleStatus() {
+      googleLoading.classList.remove('hidden');
+      googleNotConfigured.classList.add('hidden');
+      googleDisconnected.classList.add('hidden');
+      googleConnected.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/google/status', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        googleLoading.classList.add('hidden');
+
+        if (!data.configured) {
+          googleNotConfigured.classList.remove('hidden');
+          return;
+        }
+
+        if (!data.connected) {
+          googleDisconnected.classList.remove('hidden');
+          return;
+        }
+
+        // Connected!
+        googleConnected.classList.remove('hidden');
+
+        // Update UI
+        googleEmail.textContent = data.connection.email || 'Connected Account';
+        const connectedDate = new Date(data.connection.connected_at);
+        googleConnectionDate.textContent = `Connected ${connectedDate.toLocaleDateString()}`;
+
+        // Show scopes
+        const scopeNames = {
+          'https://www.googleapis.com/auth/gmail.readonly': 'Read Gmail messages',
+          'https://www.googleapis.com/auth/calendar.readonly': 'Read Calendar events',
+          'https://www.googleapis.com/auth/calendar': 'Read & write Calendar',
+          'https://www.googleapis.com/auth/userinfo.email': 'View email address',
+        };
+
+        const scopeList = (data.connection.scopes || [])
+          .map(scope => scopeNames[scope] || scope)
+          .map(name => `<div style="padding: 0.25rem 0;">• ${name}</div>`)
+          .join('');
+
+        googleScopes.innerHTML = scopeList || '<div>No permissions granted</div>';
+
+      } catch (err) {
+        googleLoading.classList.add('hidden');
+        showAlert('Failed to check Google status. Please try again.', 'error');
+      }
+    }
+
+    // Connect to Google
+    connectGoogleBtn.addEventListener('click', async () => {
+      try {
+        const response = await fetch('/api/google/connect', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const data = await response.json();
+
+        if (data.authUrl) {
+          window.location.href = data.authUrl;
+        } else {
+          showAlert('Failed to start Google connection. Please try again.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.', 'error');
+      }
+    });
+
+    // Disconnect from Google
+    disconnectGoogleBtn.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to disconnect Google? Your assistant will no longer be able to read your emails or calendar.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/google/disconnect', {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          showAlert('Google disconnected.', 'success');
+          checkGoogleStatus();
+        } else {
+          showAlert('Failed to disconnect. Please try again.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error. Please try again.', 'error');
       }
     });
 
