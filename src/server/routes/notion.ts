@@ -36,7 +36,8 @@ router.get("/status", requireAuth, async (req, res) => {
     res.json({
       configured: false,
       connected: false,
-      message: "Notion integration is not configured. Set NOTION_CLIENT_ID and NOTION_CLIENT_SECRET.",
+      message:
+        "Notion integration is not configured. Set NOTION_CLIENT_ID and NOTION_CLIENT_SECRET.",
     });
     return;
   }
@@ -190,13 +191,7 @@ router.put("/configure", requireAuth, (req, res) => {
  */
 router.get("/logs", requireAuth, (req, res) => {
   const userId = req.user!.id;
-  const {
-    limit = "50",
-    offset = "0",
-    operation,
-    start_date,
-    end_date,
-  } = req.query;
+  const { limit = "50", offset = "0", operation, start_date, end_date } = req.query;
 
   const result = getNotionApiLogs(userId, {
     limit: parseInt(limit as string, 10),

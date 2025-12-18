@@ -293,10 +293,7 @@ router.get("/activity", (req, res) => {
   const userId = req.user!.id;
   const { limit } = req.query;
 
-  const activity = getChatActivity(
-    userId,
-    limit ? parseInt(limit as string, 10) : undefined
-  );
+  const activity = getChatActivity(userId, limit ? parseInt(limit as string, 10) : undefined);
 
   res.json({ activity });
 });

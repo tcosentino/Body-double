@@ -20,12 +20,7 @@ import type {
   BackgroundCheck,
   BackgroundCheckType,
 } from "../db/schema.js";
-import {
-  getGoogleConnection,
-  getTodayEvents,
-  listEmails,
-  getUnreadCount,
-} from "./google.js";
+import { getGoogleConnection, getTodayEvents, listEmails, getUnreadCount } from "./google.js";
 import { getNotionConnection } from "./notion.js";
 
 // ============================================
@@ -204,10 +199,7 @@ export function saveBriefing(userId: string, input: BriefingInput): Briefing {
 /**
  * Get today's briefing for a user
  */
-export function getTodayBriefing(
-  userId: string,
-  type: BriefingType = "morning"
-): Briefing | null {
+export function getTodayBriefing(userId: string, type: BriefingType = "morning"): Briefing | null {
   const db = getDb();
   const today = new Date().toISOString().split("T")[0];
 
@@ -221,10 +213,7 @@ export function getTodayBriefing(
 /**
  * Get recent briefings for a user
  */
-export function getRecentBriefings(
-  userId: string,
-  limit: number = 7
-): Briefing[] {
+export function getRecentBriefings(userId: string, limit: number = 7): Briefing[] {
   const db = getDb();
   return db
     .prepare(`SELECT * FROM briefings WHERE user_id = ? ORDER BY date DESC LIMIT ?`)
@@ -237,9 +226,7 @@ export function getRecentBriefings(
 export function markBriefingViewed(userId: string, briefingId: string): boolean {
   const db = getDb();
   const result = db
-    .prepare(
-      `UPDATE briefings SET viewed_at = datetime('now') WHERE id = ? AND user_id = ?`
-    )
+    .prepare(`UPDATE briefings SET viewed_at = datetime('now') WHERE id = ? AND user_id = ?`)
     .run(briefingId, userId);
   return result.changes > 0;
 }
@@ -263,9 +250,11 @@ export function getOrCreateBackgroundCheck(
 
   if (!check) {
     const id = crypto.randomUUID();
-    db.prepare(
-      `INSERT INTO background_checks (id, user_id, check_type) VALUES (?, ?, ?)`
-    ).run(id, userId, checkType);
+    db.prepare(`INSERT INTO background_checks (id, user_id, check_type) VALUES (?, ?, ?)`).run(
+      id,
+      userId,
+      checkType
+    );
     check = db.prepare(`SELECT * FROM background_checks WHERE id = ?`).get(id) as BackgroundCheck;
   }
 
@@ -481,9 +470,7 @@ export function generateBriefingSummary(data: BriefingData): string {
       "Connect Google or Notion in Settings to see your calendar, emails, and tasks in your briefing."
     );
   } else if (!data.hasGoogle) {
-    parts.push(
-      "Tip: Connect Google in Settings to see your calendar and emails in your briefing."
-    );
+    parts.push("Tip: Connect Google in Settings to see your calendar and emails in your briefing.");
   }
 
   return parts.join("\n");
@@ -548,7 +535,7 @@ export async function checkNewEmails(userId: string): Promise<number> {
   }
 
   let newEmailCount = 0;
-  let newestId = emails[0]?.id;
+  const newestId = emails[0]?.id;
 
   for (const email of emails) {
     // Stop if we've reached the last checked email

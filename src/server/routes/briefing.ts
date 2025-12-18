@@ -18,10 +18,7 @@ import {
   dismissAlert,
   gatherBriefingData,
 } from "../services/briefing.js";
-import {
-  triggerUserCheck,
-  initializeBackgroundChecks,
-} from "../services/scheduler.js";
+import { triggerUserCheck, initializeBackgroundChecks } from "../services/scheduler.js";
 
 const router = Router();
 
@@ -86,10 +83,7 @@ router.get("/data", requireAuth, async (req, res) => {
  */
 router.get("/history", requireAuth, (req, res) => {
   const { limit } = req.query;
-  const briefings = getRecentBriefings(
-    req.user!.id,
-    limit ? parseInt(limit as string, 10) : 7
-  );
+  const briefings = getRecentBriefings(req.user!.id, limit ? parseInt(limit as string, 10) : 7);
 
   res.json({
     briefings: briefings.map((b) => ({

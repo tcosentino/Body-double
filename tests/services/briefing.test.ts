@@ -195,7 +195,9 @@ describe("Briefing Service", () => {
         expect(success).toBe(true);
 
         const db = getTestDb();
-        const alert = db.prepare(`SELECT status, read_at FROM alerts WHERE id = ?`).get(alertId) as {
+        const alert = db
+          .prepare(`SELECT status, read_at FROM alerts WHERE id = ?`)
+          .get(alertId) as {
           status: string;
           read_at: string;
         };
@@ -254,7 +256,9 @@ describe("Briefing Service", () => {
         expect(success).toBe(true);
 
         const db = getTestDb();
-        const alert = db.prepare(`SELECT status, dismissed_at FROM alerts WHERE id = ?`).get(alertId) as {
+        const alert = db
+          .prepare(`SELECT status, dismissed_at FROM alerts WHERE id = ?`)
+          .get(alertId) as {
           status: string;
           dismissed_at: string;
         };
@@ -284,7 +288,12 @@ describe("Briefing Service", () => {
             { id: "3", summary: "Team Retro", start: "16:00", end: "17:00" },
           ],
           emails: [
-            { id: "e1", from: "boss@company.com", subject: "Q4 Goals", snippet: "Let's discuss..." },
+            {
+              id: "e1",
+              from: "boss@company.com",
+              subject: "Q4 Goals",
+              snippet: "Let's discuss...",
+            },
           ],
           tasks: [],
         });
@@ -395,7 +404,9 @@ describe("Briefing Service", () => {
         expect(success).toBe(true);
 
         const db = getTestDb();
-        const briefing = db.prepare(`SELECT viewed_at FROM briefings WHERE id = ?`).get(briefingId) as {
+        const briefing = db
+          .prepare(`SELECT viewed_at FROM briefings WHERE id = ?`)
+          .get(briefingId) as {
           viewed_at: string;
         };
         expect(briefing.viewed_at).toBeDefined();
@@ -411,8 +422,18 @@ describe("Briefing Service", () => {
     it("should generate summary with calendar events", () => {
       const summary = generateBriefingSummary({
         calendarEvents: [
-          { id: "1", summary: "Team Standup", start: "2024-01-15T09:00:00", end: "2024-01-15T09:30:00" },
-          { id: "2", summary: "Client Call", start: "2024-01-15T14:00:00", end: "2024-01-15T15:00:00" },
+          {
+            id: "1",
+            summary: "Team Standup",
+            start: "2024-01-15T09:00:00",
+            end: "2024-01-15T09:30:00",
+          },
+          {
+            id: "2",
+            summary: "Client Call",
+            start: "2024-01-15T14:00:00",
+            end: "2024-01-15T15:00:00",
+          },
         ],
         emails: [],
         unreadCount: 0,
@@ -431,8 +452,20 @@ describe("Briefing Service", () => {
       const summary = generateBriefingSummary({
         calendarEvents: [],
         emails: [
-          { id: "1", from: "John Doe <john@example.com>", subject: "Project Update", snippet: "Here is...", date: "" },
-          { id: "2", from: "Jane Smith <jane@example.com>", subject: "Meeting Notes", snippet: "From...", date: "" },
+          {
+            id: "1",
+            from: "John Doe <john@example.com>",
+            subject: "Project Update",
+            snippet: "Here is...",
+            date: "",
+          },
+          {
+            id: "2",
+            from: "Jane Smith <jane@example.com>",
+            subject: "Meeting Notes",
+            snippet: "From...",
+            date: "",
+          },
         ],
         unreadCount: 5,
         tasks: [],
@@ -564,7 +597,9 @@ describe("Briefing Service", () => {
 
         const db = getTestDb();
         const check = db
-          .prepare(`SELECT last_checked_at FROM background_checks WHERE user_id = ? AND check_type = ?`)
+          .prepare(
+            `SELECT last_checked_at FROM background_checks WHERE user_id = ? AND check_type = ?`
+          )
           .get(user.id, "email") as { last_checked_at: string };
 
         expect(check.last_checked_at).toBeDefined();
@@ -578,7 +613,9 @@ describe("Briefing Service", () => {
 
         const db = getTestDb();
         const check = db
-          .prepare(`SELECT last_item_id FROM background_checks WHERE user_id = ? AND check_type = ?`)
+          .prepare(
+            `SELECT last_item_id FROM background_checks WHERE user_id = ? AND check_type = ?`
+          )
           .get(user.id, "email") as { last_item_id: string };
 
         expect(check.last_item_id).toBe("msg_12345");
@@ -594,16 +631,59 @@ describe("Briefing Service", () => {
     it("Scenario: Busy Monday morning", () => {
       const summary = generateBriefingSummary({
         calendarEvents: [
-          { id: "1", summary: "Team Standup", start: "2024-01-15T09:00:00", end: "2024-01-15T09:30:00" },
-          { id: "2", summary: "Sprint Planning", start: "2024-01-15T10:00:00", end: "2024-01-15T12:00:00" },
-          { id: "3", summary: "Lunch with Client", start: "2024-01-15T12:30:00", end: "2024-01-15T13:30:00" },
-          { id: "4", summary: "Code Review Session", start: "2024-01-15T14:00:00", end: "2024-01-15T15:00:00" },
-          { id: "5", summary: "1:1 with Manager", start: "2024-01-15T16:00:00", end: "2024-01-15T16:30:00" },
+          {
+            id: "1",
+            summary: "Team Standup",
+            start: "2024-01-15T09:00:00",
+            end: "2024-01-15T09:30:00",
+          },
+          {
+            id: "2",
+            summary: "Sprint Planning",
+            start: "2024-01-15T10:00:00",
+            end: "2024-01-15T12:00:00",
+          },
+          {
+            id: "3",
+            summary: "Lunch with Client",
+            start: "2024-01-15T12:30:00",
+            end: "2024-01-15T13:30:00",
+          },
+          {
+            id: "4",
+            summary: "Code Review Session",
+            start: "2024-01-15T14:00:00",
+            end: "2024-01-15T15:00:00",
+          },
+          {
+            id: "5",
+            summary: "1:1 with Manager",
+            start: "2024-01-15T16:00:00",
+            end: "2024-01-15T16:30:00",
+          },
         ],
         emails: [
-          { id: "1", from: "CEO <ceo@company.com>", subject: "Q1 Goals - Action Required", snippet: "Please review...", date: "" },
-          { id: "2", from: "HR <hr@company.com>", subject: "Benefits Enrollment Reminder", snippet: "Deadline approaching...", date: "" },
-          { id: "3", from: "Client <client@external.com>", subject: "Contract Review", snippet: "Attached is...", date: "" },
+          {
+            id: "1",
+            from: "CEO <ceo@company.com>",
+            subject: "Q1 Goals - Action Required",
+            snippet: "Please review...",
+            date: "",
+          },
+          {
+            id: "2",
+            from: "HR <hr@company.com>",
+            subject: "Benefits Enrollment Reminder",
+            snippet: "Deadline approaching...",
+            date: "",
+          },
+          {
+            id: "3",
+            from: "Client <client@external.com>",
+            subject: "Contract Review",
+            snippet: "Attached is...",
+            date: "",
+          },
         ],
         unreadCount: 12,
         tasks: [
@@ -624,7 +704,12 @@ describe("Briefing Service", () => {
     it("Scenario: Quiet Friday afternoon", () => {
       const summary = generateBriefingSummary({
         calendarEvents: [
-          { id: "1", summary: "Weekly Wrap-up", start: "2024-01-19T16:00:00", end: "2024-01-19T17:00:00" },
+          {
+            id: "1",
+            summary: "Weekly Wrap-up",
+            start: "2024-01-19T16:00:00",
+            end: "2024-01-19T17:00:00",
+          },
         ],
         emails: [],
         unreadCount: 0,
@@ -681,9 +766,7 @@ describe("Briefing Service", () => {
         calendarEvents: [],
         emails: [],
         unreadCount: 0,
-        tasks: [
-          { id: "1", title: "Daily standup notes", status: "todo" },
-        ],
+        tasks: [{ id: "1", title: "Daily standup notes", status: "todo" }],
         hasGoogle: false,
         hasNotion: true,
       });

@@ -99,31 +99,32 @@ CREATE INDEX idx_notion_connections_user_id ON notion_connections(user_id);
 
 The assistant reads/writes tasks here. Expected properties:
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| Name | Title | Task title |
-| Status | Select | Todo, In Progress, Done, Blocked |
-| Priority | Select | High, Medium, Low |
-| Due Date | Date | When task is due |
-| Project | Relation | Link to Projects database |
-| Notes | Rich Text | Additional details |
-| Created By | Select | "User" or "Assistant" |
-| Estimated Time | Number | Minutes expected |
+| Property       | Type      | Purpose                          |
+| -------------- | --------- | -------------------------------- |
+| Name           | Title     | Task title                       |
+| Status         | Select    | Todo, In Progress, Done, Blocked |
+| Priority       | Select    | High, Medium, Low                |
+| Due Date       | Date      | When task is due                 |
+| Project        | Relation  | Link to Projects database        |
+| Notes          | Rich Text | Additional details               |
+| Created By     | Select    | "User" or "Assistant"            |
+| Estimated Time | Number    | Minutes expected                 |
 
 ### 2. Calendar/Reminders Database
 
 Used for time-based items AND assistant self-reminders:
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| Name | Title | Event/reminder title |
-| Date | Date | When (supports datetime) |
-| Type | Select | Event, Reminder, Follow-up, Assistant-Note |
-| Related Task | Relation | Optional link to task |
-| Context | Rich Text | Details for the reminder |
-| For | Select | "User" or "Assistant" |
+| Property     | Type      | Purpose                                    |
+| ------------ | --------- | ------------------------------------------ |
+| Name         | Title     | Event/reminder title                       |
+| Date         | Date      | When (supports datetime)                   |
+| Type         | Select    | Event, Reminder, Follow-up, Assistant-Note |
+| Related Task | Relation  | Optional link to task                      |
+| Context      | Rich Text | Details for the reminder                   |
+| For          | Select    | "User" or "Assistant"                      |
 
 **Assistant Self-Reminders**: When the assistant needs to follow up on something in the future, it creates a calendar entry with `For: Assistant`. Example:
+
 - User: "Remind me to check on the proposal in 2 weeks"
 - Assistant creates: `{ Name: "Follow up on proposal", Date: "2024-02-01", Type: "Follow-up", For: "Assistant", Context: "User asked to be reminded about the Henderson proposal status" }`
 
@@ -131,26 +132,27 @@ Used for time-based items AND assistant self-reminders:
 
 For capturing information, meeting notes, research, etc:
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| Name | Title | Note title |
-| Tags | Multi-select | Categorization |
-| Created | Date | When created |
-| Related Project | Relation | Optional project link |
-| Source | Select | User, Assistant, Web, etc |
+| Property        | Type         | Purpose                   |
+| --------------- | ------------ | ------------------------- |
+| Name            | Title        | Note title                |
+| Tags            | Multi-select | Categorization            |
+| Created         | Date         | When created              |
+| Related Project | Relation     | Optional project link     |
+| Source          | Select       | User, Assistant, Web, etc |
 
 ### 4. Assistant Workspace Database (Private)
 
 The assistant's own "scratchpad" for tracking:
 
-| Property | Type | Purpose |
-|----------|------|---------|
-| Name | Title | Entry title |
-| Type | Select | Insight, Pattern, Preference, TODO |
-| Content | Rich Text | Details |
-| Last Used | Date | When last referenced |
+| Property  | Type      | Purpose                            |
+| --------- | --------- | ---------------------------------- |
+| Name      | Title     | Entry title                        |
+| Type      | Select    | Insight, Pattern, Preference, TODO |
+| Content   | Rich Text | Details                            |
+| Last Used | Date      | When last referenced               |
 
 This is where the assistant stores things like:
+
 - "User prefers morning for deep work"
 - "User gets overwhelmed by lists > 5 items"
 - "User's Q4 goal is launching the mobile app"
@@ -168,12 +170,12 @@ interface ProactiveCheck {
 
   // What to check
   checks: [
-    'overdue_tasks',           // Tasks past due date
-    'due_today',               // Tasks due today
-    'upcoming_reminders',      // Calendar items in next 2 hours
-    'assistant_followups',     // Assistant's own reminders
-    'stale_in_progress',       // Tasks stuck in progress > 3 days
-    'weekly_review_due',       // Sunday evening prompt
+    "overdue_tasks", // Tasks past due date
+    "due_today", // Tasks due today
+    "upcoming_reminders", // Calendar items in next 2 hours
+    "assistant_followups", // Assistant's own reminders
+    "stale_in_progress", // Tasks stuck in progress > 3 days
+    "weekly_review_due", // Sunday evening prompt
   ];
 }
 ```
@@ -187,6 +189,7 @@ When checks find actionable items, the assistant can:
 3. **Email Digest** (future): Daily/weekly email summary
 
 Example proactive message:
+
 > "Good morning! Quick heads up: the Henderson proposal is due tomorrow and still shows 'In Progress'. You also have a dentist appointment at 2pm. Want to tackle the proposal this morning?"
 
 ## Webhook Integration (Future Enhancement)
@@ -202,6 +205,7 @@ For real-time awareness of Notion changes:
 ### Our Response
 
 When user updates Notion directly:
+
 1. Receive webhook event
 2. Update our cached understanding
 3. Potentially acknowledge: "I see you completed the budget review - nice work!"
@@ -209,6 +213,7 @@ When user updates Notion directly:
 ### Polling Fallback
 
 Until webhooks are available/reliable, poll for changes:
+
 - Check task database every 5 minutes
 - Check calendar every 15 minutes
 - Full sync daily
@@ -225,6 +230,7 @@ Assistant: "Done! I've added 'Review Q4 budget' to your tasks with a Thursday
 ```
 
 **Capabilities:**
+
 - Create tasks with title, due date, priority, notes
 - Update task status (mark complete, change priority)
 - Query tasks (what's due today? what's overdue?)
@@ -240,6 +246,7 @@ Assistant: "Got it! I've set a reminder for January 28th to follow up with
 ```
 
 **Behind the scenes:**
+
 - Creates calendar entry with `Type: Follow-up`, `For: Assistant`
 - When that date arrives, proactive check surfaces it
 - Assistant leads conversation with the reminder
@@ -255,6 +262,7 @@ Assistant: "Found a great authentic carbonara recipe! I've saved it to your
 ```
 
 **Capabilities:**
+
 - Create new pages with rich content
 - Organize with tags and relations
 - Capture meeting notes from conversation
@@ -270,6 +278,7 @@ Assistant: "Great idea! I've created a 'Movie Watchlist' database in your
 ```
 
 **Capabilities:**
+
 - Create new databases with sensible schemas
 - Suggest properties based on content type
 - Link to existing databases where appropriate
@@ -285,6 +294,7 @@ Assistant: "Looking through your notes... In the November 15th project meeting,
 ```
 
 **Capabilities:**
+
 - Search across all connected databases
 - Reference past conversations and notes
 - Connect dots between related information
@@ -351,16 +361,19 @@ Assistant: "Hey! It's been a week - did you hear back from the vendor about
 ## Security Considerations
 
 ### Token Storage
+
 - Notion access tokens are encrypted at rest
 - Tokens are never exposed to frontend
 - All Notion API calls happen server-side
 
 ### Data Access
+
 - Only access databases/pages user explicitly shared
 - Clear indication in UI of what's connected
 - Easy disconnect/revoke access
 
 ### Privacy
+
 - Assistant workspace notes stay in user's Notion (not our DB)
 - We don't store copies of Notion content long-term
 - Conversation memory stays in our DB, but references Notion by ID
@@ -444,16 +457,19 @@ interface NotionService {
 ## Future Enhancements
 
 ### Phase 2
+
 - Email integration (Gmail/Outlook)
 - Calendar sync (Google Calendar ↔ Notion)
 - Mobile push notifications
 
 ### Phase 3
+
 - Voice interface
 - Browser extension for quick capture
 - Integrations with other tools (Slack, Linear, etc.)
 
 ### Phase 4
+
 - Team workspaces
 - Shared assistant contexts
 - Delegation to other team members

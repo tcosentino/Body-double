@@ -147,9 +147,9 @@ export function saveNotionConnection(
   const db = getDb();
 
   // Check if user already has a connection
-  const existing = db
-    .prepare("SELECT id FROM notion_connections WHERE user_id = ?")
-    .get(userId) as { id: string } | undefined;
+  const existing = db.prepare("SELECT id FROM notion_connections WHERE user_id = ?").get(userId) as
+    | { id: string }
+    | undefined;
 
   if (existing) {
     // Update existing connection
@@ -605,15 +605,20 @@ export async function searchDatabases(
     }>;
   }
 
-  const result = await notionRequest<NotionSearchResponse>(userId, connection.access_token, "/search", {
-    method: "POST",
-    body: {
-      filter: { property: "object", value: "database" },
-      page_size: 100,
-    },
-    operation: "Search databases",
-    triggeredBy: "user_request",
-  });
+  const result = await notionRequest<NotionSearchResponse>(
+    userId,
+    connection.access_token,
+    "/search",
+    {
+      method: "POST",
+      body: {
+        filter: { property: "object", value: "database" },
+        page_size: 100,
+      },
+      operation: "Search databases",
+      triggeredBy: "user_request",
+    }
+  );
 
   if (!result) return [];
 
@@ -637,11 +642,16 @@ export async function verifyNotionConnection(userId: string): Promise<boolean> {
     object: string;
   }
 
-  const result = await notionRequest<NotionUserResponse>(userId, connection.access_token, "/users/me", {
-    operation: "Verify connection",
-    triggeredBy: "system",
-    notionObjectType: "user",
-  });
+  const result = await notionRequest<NotionUserResponse>(
+    userId,
+    connection.access_token,
+    "/users/me",
+    {
+      operation: "Verify connection",
+      triggeredBy: "system",
+      notionObjectType: "user",
+    }
+  );
   return result !== null;
 }
 

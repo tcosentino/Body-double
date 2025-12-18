@@ -54,10 +54,7 @@ export function getMainChatMessages(
 /**
  * Add a message to the main chat
  */
-export function addMainChatMessage(
-  userId: string,
-  input: MainChatMessageInput
-): MainChatMessage {
+export function addMainChatMessage(userId: string, input: MainChatMessageInput): MainChatMessage {
   const db = getDb();
   const id = crypto.randomUUID();
 
@@ -75,9 +72,7 @@ export function addMainChatMessage(
     input.metadata ? JSON.stringify(input.metadata) : null
   );
 
-  return db
-    .prepare(`SELECT * FROM main_chat_messages WHERE id = ?`)
-    .get(id) as MainChatMessage;
+  return db.prepare(`SELECT * FROM main_chat_messages WHERE id = ?`).get(id) as MainChatMessage;
 }
 
 /**
@@ -85,9 +80,7 @@ export function addMainChatMessage(
  */
 export function clearMainChat(userId: string): number {
   const db = getDb();
-  const result = db
-    .prepare(`DELETE FROM main_chat_messages WHERE user_id = ?`)
-    .run(userId);
+  const result = db.prepare(`DELETE FROM main_chat_messages WHERE user_id = ?`).run(userId);
   return result.changes;
 }
 
@@ -189,16 +182,18 @@ export function updateSideChat(
   }
   if (updates.context !== undefined) {
     fields.push("context = ?");
-    values.push(typeof updates.context === "string" ? updates.context : JSON.stringify(updates.context));
+    values.push(
+      typeof updates.context === "string" ? updates.context : JSON.stringify(updates.context)
+    );
   }
 
   if (fields.length === 0) return getSideChat(userId, chatId);
 
   values.push(chatId, userId);
 
-  db.prepare(
-    `UPDATE side_chats SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`
-  ).run(...values);
+  db.prepare(`UPDATE side_chats SET ${fields.join(", ")} WHERE id = ? AND user_id = ?`).run(
+    ...values
+  );
 
   return getSideChat(userId, chatId);
 }
@@ -233,9 +228,7 @@ export function deleteSideChat(userId: string, chatId: string): boolean {
   ).run(chatId);
 
   // Delete the chat
-  const result = db
-    .prepare(`DELETE FROM side_chats WHERE id = ?`)
-    .run(chatId);
+  const result = db.prepare(`DELETE FROM side_chats WHERE id = ?`).run(chatId);
 
   return result.changes > 0;
 }
@@ -317,13 +310,9 @@ export function addSideChatMessage(
   );
 
   // Update last_message_at on the chat
-  db.prepare(
-    `UPDATE side_chats SET last_message_at = datetime('now') WHERE id = ?`
-  ).run(chatId);
+  db.prepare(`UPDATE side_chats SET last_message_at = datetime('now') WHERE id = ?`).run(chatId);
 
-  return db
-    .prepare(`SELECT * FROM side_chat_messages WHERE id = ?`)
-    .get(id) as SideChatMessage;
+  return db.prepare(`SELECT * FROM side_chat_messages WHERE id = ?`).get(id) as SideChatMessage;
 }
 
 // ============================================

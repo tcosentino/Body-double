@@ -36,9 +36,9 @@ let briefingCheckTimer: ReturnType<typeof setInterval> | null = null;
  */
 function getGoogleConnectedUsers(): string[] {
   const db = getDb();
-  const users = db
-    .prepare(`SELECT DISTINCT user_id FROM google_connections`)
-    .all() as Array<{ user_id: string }>;
+  const users = db.prepare(`SELECT DISTINCT user_id FROM google_connections`).all() as Array<{
+    user_id: string;
+  }>;
   return users.map((u) => u.user_id);
 }
 

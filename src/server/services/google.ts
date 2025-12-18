@@ -243,9 +243,7 @@ export function saveGoogleConnection(
   `
   ).run(id, userId, accessToken, refreshToken, expiresAt, email, scopes);
 
-  return db
-    .prepare(`SELECT * FROM google_connections WHERE id = ?`)
-    .get(id) as GoogleConnection;
+  return db.prepare(`SELECT * FROM google_connections WHERE id = ?`).get(id) as GoogleConnection;
 }
 
 /**
@@ -556,15 +554,13 @@ export async function getUnreadCount(
   const accessToken = await getValidAccessToken(userId);
   if (!accessToken) return null;
 
-  const response = await gmailRequest<{ messages?: Array<{ id: string }>; resultSizeEstimate?: number }>(
-    userId,
-    accessToken,
-    `/users/me/messages?q=is:unread&maxResults=1`,
-    {
-      operation: "Get unread count",
-      triggeredBy,
-    }
-  );
+  const response = await gmailRequest<{
+    messages?: Array<{ id: string }>;
+    resultSizeEstimate?: number;
+  }>(userId, accessToken, `/users/me/messages?q=is:unread&maxResults=1`, {
+    operation: "Get unread count",
+    triggeredBy,
+  });
 
   return response?.resultSizeEstimate ?? 0;
 }
@@ -687,12 +683,7 @@ export async function listCalendarEvents(
   const accessToken = await getValidAccessToken(userId);
   if (!accessToken) return null;
 
-  const {
-    maxResults = 10,
-    timeMin = new Date(),
-    timeMax,
-    triggeredBy = "user_request",
-  } = options;
+  const { maxResults = 10, timeMin = new Date(), timeMax, triggeredBy = "user_request" } = options;
 
   const params = new URLSearchParams({
     maxResults: maxResults.toString(),
