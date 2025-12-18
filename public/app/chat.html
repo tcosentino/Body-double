@@ -103,6 +103,276 @@
       background: var(--gray-200);
     }
 
+    /* Alerts button and badge */
+    .btn-alerts {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      color: var(--gray-500);
+      background: var(--gray-100);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-alerts:hover {
+      color: var(--gray-700);
+      background: var(--gray-200);
+    }
+
+    .btn-alerts.has-alerts {
+      color: var(--primary);
+    }
+
+    .alert-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      background: #ef4444;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border-radius: var(--radius-full);
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .alert-badge.show {
+      display: flex;
+    }
+
+    /* Alerts panel */
+    .alerts-panel {
+      position: fixed;
+      top: 60px;
+      right: 16px;
+      width: 380px;
+      max-height: calc(100vh - 80px);
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      z-index: 1001;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .alerts-panel.show {
+      display: flex;
+    }
+
+    .alerts-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem;
+      border-bottom: 1px solid var(--gray-100);
+    }
+
+    .alerts-panel-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .alerts-panel-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-mark-all {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.75rem;
+      color: var(--primary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-mark-all:hover {
+      text-decoration: underline;
+    }
+
+    .alerts-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      max-height: 400px;
+    }
+
+    .alert-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .alert-item:hover {
+      background: var(--gray-50);
+    }
+
+    .alert-item.unread {
+      background: #f0f9ff;
+    }
+
+    .alert-item.unread:hover {
+      background: #e0f2fe;
+    }
+
+    .alert-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .alert-icon.email { background: #fef3c7; color: #d97706; }
+    .alert-icon.calendar { background: #dbeafe; color: #2563eb; }
+    .alert-icon.briefing { background: #d1fae5; color: #059669; }
+    .alert-icon.task { background: #ede9fe; color: #7c3aed; }
+    .alert-icon.reminder { background: #fce7f3; color: #db2777; }
+
+    .alert-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .alert-title {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--gray-900);
+      margin-bottom: 0.125rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .alert-body {
+      font-size: 0.8rem;
+      color: var(--gray-600);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .alert-time {
+      font-size: 0.7rem;
+      color: var(--gray-400);
+      margin-top: 0.25rem;
+    }
+
+    .alert-dismiss {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      opacity: 0;
+      transition: all 0.15s;
+    }
+
+    .alert-item:hover .alert-dismiss {
+      opacity: 1;
+    }
+
+    .alert-dismiss:hover {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+
+    .empty-alerts {
+      padding: 2rem;
+      text-align: center;
+      color: var(--gray-400);
+    }
+
+    .empty-alerts svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 0.75rem;
+      color: var(--gray-300);
+    }
+
+    /* Briefing card */
+    .briefing-card {
+      margin: 0.5rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      border-radius: var(--radius-md);
+      color: white;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .briefing-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .briefing-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .briefing-card-title {
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+
+    .briefing-card-summary {
+      font-size: 0.8rem;
+      opacity: 0.9;
+      line-height: 1.4;
+    }
+
+    /* Priority indicators */
+    .priority-high .alert-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+
+    .priority-urgent .alert-title::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
     .app-body {
       flex: 1;
       display: flex;
@@ -618,6 +888,13 @@
         <a href="/app/chat" class="nav-link active">Chat</a>
       </nav>
       <div class="header-actions">
+        <button class="btn-alerts" id="alertsBtn" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="alert-badge" id="alertBadge">0</span>
+        </button>
         <a href="/app/settings" class="btn-settings" title="Settings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
@@ -702,6 +979,35 @@
           <button type="submit" class="btn-create">Create</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Alerts Panel -->
+  <div class="alerts-panel" id="alertsPanel">
+    <div class="alerts-panel-header">
+      <h3>Notifications</h3>
+      <div class="alerts-panel-actions">
+        <button class="btn-mark-all" id="markAllReadBtn">Mark all read</button>
+      </div>
+    </div>
+    <div id="briefingCard" class="briefing-card" style="display: none;">
+      <div class="briefing-card-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span class="briefing-card-title">Morning Briefing</span>
+      </div>
+      <div class="briefing-card-summary" id="briefingSummary">Loading...</div>
+    </div>
+    <div class="alerts-list" id="alertsList">
+      <div class="empty-alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+        <div>No notifications yet</div>
+      </div>
     </div>
   </div>
 
@@ -1226,6 +1532,261 @@
       } catch (err) {
         console.error('Failed to create side chat:', err);
         alert('Failed to create side chat');
+      }
+    });
+
+    // ============================================
+    // Alerts & Briefing
+    // ============================================
+
+    const alertsBtn = document.getElementById('alertsBtn');
+    const alertBadge = document.getElementById('alertBadge');
+    const alertsPanel = document.getElementById('alertsPanel');
+    const alertsList = document.getElementById('alertsList');
+    const markAllReadBtn = document.getElementById('markAllReadBtn');
+    const briefingCard = document.getElementById('briefingCard');
+    const briefingSummary = document.getElementById('briefingSummary');
+
+    let alerts = [];
+    let briefing = null;
+    let alertsVisible = false;
+
+    // Load alerts on startup
+    loadAlerts();
+    loadBriefing();
+
+    // Poll for new alerts every 30 seconds
+    setInterval(loadAlerts, 30000);
+
+    async function loadAlerts() {
+      try {
+        const [alertsRes, countRes] = await Promise.all([
+          fetch('/api/briefing/alerts?limit=20', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch('/api/briefing/alerts/unread', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+        ]);
+
+        if (!alertsRes.ok || !countRes.ok) throw new Error('Failed to load alerts');
+
+        const alertsData = await alertsRes.json();
+        const countData = await countRes.json();
+
+        alerts = alertsData.alerts || [];
+        updateAlertBadge(countData.count);
+        if (alertsVisible) {
+          renderAlerts();
+        }
+      } catch (err) {
+        console.error('Failed to load alerts:', err);
+      }
+    }
+
+    async function loadBriefing() {
+      try {
+        const response = await fetch('/api/briefing/today', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!response.ok) throw new Error('Failed to load briefing');
+
+        const data = await response.json();
+        briefing = data.briefing;
+
+        if (briefing) {
+          // Extract a short summary (first 2 lines)
+          const lines = briefing.summary.split('\n').filter(l => l.trim());
+          const shortSummary = lines.slice(0, 2).join(' ').substring(0, 100);
+          briefingSummary.textContent = shortSummary + (shortSummary.length >= 100 ? '...' : '');
+          briefingCard.style.display = 'block';
+        }
+      } catch (err) {
+        console.error('Failed to load briefing:', err);
+      }
+    }
+
+    function updateAlertBadge(count) {
+      if (count > 0) {
+        alertBadge.textContent = count > 99 ? '99+' : count;
+        alertBadge.classList.add('show');
+        alertsBtn.classList.add('has-alerts');
+      } else {
+        alertBadge.classList.remove('show');
+        alertsBtn.classList.remove('has-alerts');
+      }
+    }
+
+    function renderAlerts() {
+      if (alerts.length === 0) {
+        alertsList.innerHTML = `
+          <div class="empty-alerts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <div>No notifications yet</div>
+          </div>
+        `;
+        return;
+      }
+
+      alertsList.innerHTML = alerts.map(alert => {
+        const isUnread = alert.status === 'unread';
+        const timeAgo = formatTimeAgo(new Date(alert.created_at));
+        const priorityClass = alert.priority === 'high' || alert.priority === 'urgent' ? `priority-${alert.priority}` : '';
+        const iconSvg = getAlertIcon(alert.type);
+
+        return `
+          <div class="alert-item ${isUnread ? 'unread' : ''} ${priorityClass}" data-id="${alert.id}">
+            <div class="alert-icon ${alert.type}">
+              ${iconSvg}
+            </div>
+            <div class="alert-content">
+              <div class="alert-title">${escapeHtml(alert.title)}</div>
+              <div class="alert-body">${escapeHtml(alert.content)}</div>
+              <div class="alert-time">${timeAgo}</div>
+            </div>
+            <button class="alert-dismiss" data-id="${alert.id}" title="Dismiss">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      // Add click handlers
+      alertsList.querySelectorAll('.alert-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.alert-dismiss')) return;
+          handleAlertClick(item.dataset.id);
+        });
+      });
+
+      alertsList.querySelectorAll('.alert-dismiss').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dismissAlert(btn.dataset.id);
+        });
+      });
+    }
+
+    function getAlertIcon(type) {
+      switch (type) {
+        case 'email':
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>';
+        case 'calendar':
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>';
+        case 'briefing':
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>';
+        case 'task':
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>';
+        case 'reminder':
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>';
+        default:
+          return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>';
+      }
+    }
+
+    function formatTimeAgo(date) {
+      const now = new Date();
+      const diff = now - date;
+      const minutes = Math.floor(diff / 60000);
+      const hours = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+
+      if (minutes < 1) return 'Just now';
+      if (minutes < 60) return `${minutes}m ago`;
+      if (hours < 24) return `${hours}h ago`;
+      if (days === 1) return 'Yesterday';
+      return `${days}d ago`;
+    }
+
+    async function handleAlertClick(alertId) {
+      const alert = alerts.find(a => a.id === alertId);
+      if (!alert) return;
+
+      // Mark as read
+      try {
+        await fetch(`/api/briefing/alerts/${alertId}/read`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+      } catch (err) {
+        console.error('Failed to mark alert as read:', err);
+      }
+
+      // Handle action if any
+      if (alert.action_type === 'spawn_chat' && alert.action_data) {
+        const data = typeof alert.action_data === 'string' ? JSON.parse(alert.action_data) : alert.action_data;
+        if (data.topic === 'morning_briefing' && briefing) {
+          // Add briefing to chat
+          addMessage(briefing.summary, 'assistant');
+          alertsPanel.classList.remove('show');
+          alertsVisible = false;
+        }
+      }
+
+      // Refresh alerts
+      loadAlerts();
+    }
+
+    async function dismissAlert(alertId) {
+      try {
+        await fetch(`/api/briefing/alerts/${alertId}/dismiss`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        await loadAlerts();
+        renderAlerts();
+      } catch (err) {
+        console.error('Failed to dismiss alert:', err);
+      }
+    }
+
+    async function markAllRead() {
+      try {
+        await fetch('/api/briefing/alerts/read-all', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        await loadAlerts();
+        renderAlerts();
+      } catch (err) {
+        console.error('Failed to mark all as read:', err);
+      }
+    }
+
+    // Toggle alerts panel
+    alertsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      alertsVisible = !alertsVisible;
+      alertsPanel.classList.toggle('show', alertsVisible);
+      if (alertsVisible) {
+        renderAlerts();
+      }
+    });
+
+    // Close panel when clicking outside
+    document.addEventListener('click', (e) => {
+      if (alertsVisible && !alertsPanel.contains(e.target) && e.target !== alertsBtn) {
+        alertsPanel.classList.remove('show');
+        alertsVisible = false;
+      }
+    });
+
+    // Mark all read button
+    markAllReadBtn.addEventListener('click', markAllRead);
+
+    // Briefing card click
+    briefingCard.addEventListener('click', () => {
+      if (briefing) {
+        addMessage(briefing.summary, 'assistant');
+        alertsPanel.classList.remove('show');
+        alertsVisible = false;
       }
     });
 

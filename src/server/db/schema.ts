@@ -235,6 +235,74 @@ CREATE INDEX IF NOT EXISTS idx_main_chat_messages_user_id ON main_chat_messages(
 CREATE INDEX IF NOT EXISTS idx_google_connections_user_id ON google_connections(user_id);
 CREATE INDEX IF NOT EXISTS idx_google_api_logs_user_id ON google_api_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_google_api_logs_timestamp ON google_api_logs(timestamp);
+
+-- Alerts/notifications from the assistant
+CREATE TABLE IF NOT EXISTS alerts (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT DEFAULT (datetime('now')),
+
+  -- Alert details
+  type TEXT NOT NULL,              -- 'email', 'calendar', 'task', 'briefing', 'reminder', 'insight'
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  priority TEXT DEFAULT 'normal',  -- 'low', 'normal', 'high', 'urgent'
+
+  -- Status
+  status TEXT DEFAULT 'unread',    -- 'unread', 'read', 'dismissed', 'actioned'
+  read_at TEXT,
+  dismissed_at TEXT,
+
+  -- Source information
+  source_type TEXT,                -- 'gmail', 'calendar', 'notion', 'system'
+  source_id TEXT,                  -- ID of the source item (email ID, event ID, etc.)
+
+  -- Optional action
+  action_type TEXT,                -- 'open_email', 'open_event', 'open_task', 'spawn_chat', etc.
+  action_data TEXT                 -- JSON with action-specific data
+);
+
+-- Daily briefings
+CREATE TABLE IF NOT EXISTS briefings (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  created_at TEXT DEFAULT (datetime('now')),
+
+  -- Briefing details
+  date TEXT NOT NULL,              -- The date this briefing is for (YYYY-MM-DD)
+  type TEXT DEFAULT 'morning',     -- 'morning', 'evening', 'weekly'
+
+  -- Content
+  summary TEXT NOT NULL,           -- AI-generated summary
+
+  -- Raw data used to generate briefing (for transparency)
+  calendar_events TEXT,            -- JSON array of events
+  emails TEXT,                     -- JSON array of email summaries
+  tasks TEXT,                      -- JSON array of tasks
+
+  -- Status
+  viewed_at TEXT,
+
+  UNIQUE(user_id, date, type)
+);
+
+-- Background job tracking
+CREATE TABLE IF NOT EXISTS background_checks (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  check_type TEXT NOT NULL,        -- 'email', 'calendar', 'tasks'
+  last_checked_at TEXT,
+  last_item_id TEXT,               -- Last seen item ID (for incremental checks)
+  check_interval_minutes INTEGER DEFAULT 15,
+  enabled INTEGER DEFAULT 1
+);
+
+CREATE INDEX IF NOT EXISTS idx_alerts_user_id ON alerts(user_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
+CREATE INDEX IF NOT EXISTS idx_alerts_created_at ON alerts(created_at);
+CREATE INDEX IF NOT EXISTS idx_briefings_user_id ON briefings(user_id);
+CREATE INDEX IF NOT EXISTS idx_briefings_date ON briefings(date);
+CREATE INDEX IF NOT EXISTS idx_background_checks_user_id ON background_checks(user_id);
 `;
 
 // TypeScript types matching the schema
@@ -497,4 +565,77 @@ export interface MainChatMessageInput {
   content: string;
   spawned_side_chat_id?: string;
   metadata?: object;
+}
+
+// Alert types
+export type AlertType = "email" | "calendar" | "task" | "briefing" | "reminder" | "insight";
+export type AlertPriority = "low" | "normal" | "high" | "urgent";
+export type AlertStatus = "unread" | "read" | "dismissed" | "actioned";
+export type AlertSourceType = "gmail" | "calendar" | "notion" | "system";
+export type AlertActionType = "open_email" | "open_event" | "open_task" | "spawn_chat" | "open_url";
+
+export interface Alert {
+  id: string;
+  user_id: string;
+  created_at: string;
+  type: AlertType;
+  title: string;
+  content: string;
+  priority: AlertPriority;
+  status: AlertStatus;
+  read_at: string | null;
+  dismissed_at: string | null;
+  source_type: AlertSourceType | null;
+  source_id: string | null;
+  action_type: AlertActionType | null;
+  action_data: string | null; // JSON string
+}
+
+export interface AlertInput {
+  type: AlertType;
+  title: string;
+  content: string;
+  priority?: AlertPriority;
+  source_type?: AlertSourceType;
+  source_id?: string;
+  action_type?: AlertActionType;
+  action_data?: object;
+}
+
+// Briefing types
+export type BriefingType = "morning" | "evening" | "weekly";
+
+export interface Briefing {
+  id: string;
+  user_id: string;
+  created_at: string;
+  date: string;
+  type: BriefingType;
+  summary: string;
+  calendar_events: string | null; // JSON string
+  emails: string | null; // JSON string
+  tasks: string | null; // JSON string
+  viewed_at: string | null;
+}
+
+export interface BriefingInput {
+  date: string;
+  type: BriefingType;
+  summary: string;
+  calendar_events?: object[];
+  emails?: object[];
+  tasks?: object[];
+}
+
+// Background check types
+export type BackgroundCheckType = "email" | "calendar" | "tasks";
+
+export interface BackgroundCheck {
+  id: string;
+  user_id: string;
+  check_type: BackgroundCheckType;
+  last_checked_at: string | null;
+  last_item_id: string | null;
+  check_interval_minutes: number;
+  enabled: number; // 0 or 1
 }
